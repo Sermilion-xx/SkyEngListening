@@ -1,11 +1,38 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="ParentTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="titleTextColor">@color/textColorDark</item>
+        <item name="subtitleTextColor">@color/textColorDark</item>
+    </style>
+
+    <style name="AppTheme" parent="ParentTheme">
+        <item name="actionBarStyle">@style/MyActionBarTheme</item>
+        <item name="colorControlActivated">@color/textColorDark</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="actionMenuTextColor">@color/textColorDark</item>
+        <item name="android:textColorPrimary">@color/textColorDark</item>
+        <item name="android:textColorSecondary">@color/colorBlue2</item>
+        <item name="android:textColor">@color/textColorDark</item>
+        <item name="textColorAlertDialogListItem">@color/colorBlack</item>
+        <item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
+        <item name="android:buttonStyle">@style/RobotoButtonStyle</item>
+        <item name="colorControlNormal">@color/textColorDark</item>
+    </style>
+
+
+    <style name="MyActionBarTheme" parent="Base.Widget.AppCompat.Light.ActionBar.Solid">
+        <item name="elevation">0dp</item>
+    </style>
+
+    <style name="RobotoTextViewStyle" parent="android:Widget.TextView">
+        <item name="fontPath">fonts/Roboto-Regular.tff</item>
+    </style>
+
+    <style name="RobotoButtonStyle" parent="android:Widget.Holo.Button">
+        <item name="fontPath">fonts/Roboto-Regular.tff</item>
     </style>
 
 </resources>

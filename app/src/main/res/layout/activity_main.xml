@@ -6,8 +6,40 @@
     android:layout_height="match_parent"
     tools:context="ru.skyeng.listening.AudioFiles.AudioListActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:background="@color/colorPrimary">
+
+        <include layout="@layout/toolbar" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button_category"
+                android:layout_width="158dp"
+                android:layout_height="36dp"
+                android:layout_margin="16dp"
+                android:background="@color/colorBlue0"
+                android:text="@string/catergories"
+                android:textColor="@color/colorBlue2" />
+
+            <Button
+                android:layout_width="158dp"
+                android:layout_height="36dp"
+                android:layout_margin="16dp"
+                android:layout_toEndOf="@+id/button_category"
+                android:layout_toRightOf="@+id/button_category"
+                android:background="@color/colorBlue1"
+                android:text="@string/catergories"
+                android:textColor="@color/colorBlue2" />
+
+        </RelativeLayout>
+
+
+    </android.support.design.widget.AppBarLayout>
+
 </RelativeLayout>
