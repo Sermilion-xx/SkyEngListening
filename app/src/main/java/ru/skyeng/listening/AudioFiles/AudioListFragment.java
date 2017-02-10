@@ -3,12 +3,17 @@ package ru.skyeng.listening.AudioFiles;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.FrameLayout;
 
 import com.hannesdorfmann.mosby.mvp.lce.MvpLceFragment;
 
@@ -18,6 +23,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.skyeng.listening.AudioFiles.domain.AudioFile;
 import ru.skyeng.listening.AudioFiles.domain.AudioFilesRequestParams;
+import ru.skyeng.listening.CommonCoponents.HidingScrollListener;
 import ru.skyeng.listening.MVPBase.MVPView;
 import ru.skyeng.listening.R;
 
@@ -39,6 +45,13 @@ public class AudioListFragment extends MvpLceFragment<
         implements MVPView<List<AudioFile>>,
         SwipeRefreshLayout.OnRefreshListener{
 
+
+    private AppBarLayout appBarLayout;
+
+    public void setAppBarLayout(AppBarLayout appBarLayout) {
+        this.appBarLayout = appBarLayout;
+    }
+
     @BindView(R.id.recyclerView)
     RecyclerView mRecyclerView;
 
@@ -57,7 +70,25 @@ public class AudioListFragment extends MvpLceFragment<
         mAdapter = new AudioListAdapter(getActivity());
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.addOnScrollListener(new HidingScrollListener() {
+            @Override
+            public void onHide() {
+                hideViews();
+            }
+            @Override
+            public void onShow() {
+                showViews();
+            }
+        });
         loadData(false);
+    }
+
+    private void hideViews() {
+        appBarLayout.animate().translationY(-appBarLayout.getHeight()).setInterpolator(new AccelerateInterpolator(2));
+    }
+
+    private void showViews() {
+        appBarLayout.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
     }
 
     @Override

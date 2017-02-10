@@ -7,11 +7,25 @@
     tools:context="ru.skyeng.listening.AudioFiles.AudioListActivity">
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary">
 
-        <include layout="@layout/toolbar" />
+        <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize" >
+
+            <ImageButton
+                android:id="@+id/action_settings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/gear"
+                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_gravity="end"/>
+            </android.support.v7.widget.Toolbar>
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -23,19 +37,22 @@
                 android:layout_width="158dp"
                 android:layout_height="36dp"
                 android:layout_margin="16dp"
-                android:background="@color/colorBlue0"
-                android:text="@string/catergories"
-                android:textColor="@color/colorBlue2" />
+                android:background="@drawable/selector_button_category"
+                android:text="@string/categories"
+                android:textColor="@color/colorBlue2"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"/>
 
             <Button
+                android:id="@+id/button_length"
                 android:layout_width="158dp"
                 android:layout_height="36dp"
                 android:layout_margin="16dp"
-                android:layout_toEndOf="@+id/button_category"
-                android:layout_toRightOf="@+id/button_category"
-                android:background="@color/colorBlue1"
-                android:text="@string/catergories"
-                android:textColor="@color/colorBlue2" />
+                android:background="@drawable/selector_button_length"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:text="@string/length"
+                android:textColor="@color/colorBlue2"/>
 
         </RelativeLayout>
 

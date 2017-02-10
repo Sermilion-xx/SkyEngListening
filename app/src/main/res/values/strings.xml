@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Listening</string>
-    <string name="catergories">Категории</string>
+    <string name="categories">Категории</string>
+    <string name="length">Длительность</string>
+    <string name="settings">Настройки</string>
+    <string name="Listening">Listening</string>
+    <string name="track_cover">Обложка трека</string>
 </resources>
