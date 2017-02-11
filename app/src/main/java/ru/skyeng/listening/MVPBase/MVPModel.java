@@ -21,6 +21,7 @@ import ru.skyeng.listening.CommonCoponents.SECallback;
 public interface MVPModel<L, P, E extends RequestParams> {
     void initRetrofitService();
     void loadData(Observer<L> observable, E params);
+    void setData(L data);
     P processResult(L data);
     P getItems();
     Bundle getExtraData();

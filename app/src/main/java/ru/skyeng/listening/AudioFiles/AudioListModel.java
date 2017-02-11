@@ -12,7 +12,6 @@ import ru.skyeng.listening.AudioFiles.domain.AudioData;
 import ru.skyeng.listening.AudioFiles.domain.AudioFile;
 import ru.skyeng.listening.AudioFiles.domain.AudioFilesRequestParams;
 import ru.skyeng.listening.AudioFiles.network.AudioFilesService;
-import ru.skyeng.listening.CommonCoponents.SECallback;
 import ru.skyeng.listening.CommonCoponents.ServiceGenerator;
 import ru.skyeng.listening.MVPBase.MVPModel;
 
@@ -25,6 +24,7 @@ import ru.skyeng.listening.MVPBase.MVPModel;
  * <a href="http://www.github.com/sermilion>github</a>
  * ---------------------------------------------------
  */
+
 public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, AudioFilesRequestParams> {
 
     private static final String CURRENT_PAGE = "currentPage";
@@ -51,12 +51,13 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
                 params.getDurationLT())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
-        audioDataObservable.subscribe(data->{
-            mData = data;
-            observable.onNext(data);
-        });
+        audioDataObservable.subscribe(observable);
     }
 
+    @Override
+    public void setData(AudioData data) {
+        this.mData = data;
+    }
 
     @Override
     public List<AudioFile> processResult(AudioData data) {

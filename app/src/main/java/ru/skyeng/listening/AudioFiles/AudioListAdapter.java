@@ -57,7 +57,6 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         AudioViewHolder viewHolder = (AudioViewHolder) holder;
         AudioFile item = mItems.get(position);
-
         viewHolder.mDuration.setText(getDateFromMillis(item.getDurationInSeconds()*1000));
         viewHolder.mDescription.setText(item.getDescription());
         viewHolder.mName.setText(item.getTitle());

@@ -23,6 +23,9 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import ru.skyeng.listening.AudioFiles.domain.AudioData;
 import ru.skyeng.listening.AudioFiles.domain.AudioFile;
 import ru.skyeng.listening.AudioFiles.domain.AudioFilesRequestParams;
 import ru.skyeng.listening.CommonCoponents.HidingScrollListener;
@@ -46,12 +49,14 @@ public class AudioListFragment extends MvpLceFragment<
         MVPView<List<AudioFile>>,
         AudioListPresenter>
         implements MVPView<List<AudioFile>>,
-        SwipeRefreshLayout.OnRefreshListener {
+        SwipeRefreshLayout.OnRefreshListener, Observer<AudioData> {
 
     private AppBarLayout appBarLayout;
+    private boolean isRefreshing;
 
     @Override @Inject
     public void setPresenter(@NonNull AudioListPresenter presenter) {
+        presenter.setObserver(this);
         super.setPresenter(presenter);
     }
 
@@ -123,6 +128,7 @@ public class AudioListFragment extends MvpLceFragment<
 
     @Override
     public void onRefresh() {
+        isRefreshing = true;
         loadData(true);
     }
 
@@ -145,23 +151,9 @@ public class AudioListFragment extends MvpLceFragment<
 
     @Override
     public void loadData(boolean pullToRefresh) {
-        if (!pullToRefresh)
-            mProgress.setVisibility(View.VISIBLE);
+        if(!pullToRefresh)
+            mProgress.setVisibility(View.GONE);
         presenter.loadData(pullToRefresh, new AudioFilesRequestParams());
-    }
-
-    @Override
-    public void showContent() {
-        mProgress.setVisibility(View.GONE);
-        super.showContent();
-        contentView.setRefreshing(false);
-    }
-
-    @Override
-    public void showError(Throwable e, boolean pullToRefresh) {
-        mProgress.setVisibility(View.GONE);
-        super.showError(e, pullToRefresh);
-        contentView.setRefreshing(false);
     }
 
     @Override
@@ -178,5 +170,31 @@ public class AudioListFragment extends MvpLceFragment<
     @Override
     public Context getActivityContext() {
         return getActivity();
+    }
+
+    @Override
+    public void onSubscribe(Disposable d) {
+        if(!isRefreshing)
+        mProgress.setVisibility(View.VISIBLE);
+    }
+
+    @Override @SuppressWarnings("unchecked")
+    public void onNext(AudioData value) {
+        presenter.getModel().setData(value);
+        isRefreshing = false;
+        setData(value.getAudioFiles());
+    }
+
+    @Override
+    public void onError(Throwable e) {
+        isRefreshing = false;
+        showError(e.getCause(), isRefreshing);
+        contentView.setRefreshing(false);
+    }
+
+    @Override
+    public void onComplete() {
+        mProgress.setVisibility(View.GONE);
+        contentView.setRefreshing(isRefreshing);
     }
 }

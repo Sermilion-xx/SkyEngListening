@@ -35,6 +35,12 @@ public class AudioListPresenter
         AudioFilesRequestParams> {
 
     private AudioListModel mModel;
+    private Observer<AudioData> mObserver;
+
+    @Override
+    public void setObserver(Observer<AudioData> observer) {
+        mObserver = observer;
+    }
 
     @Override
     public void setModel(MVPModel<AudioData, List<AudioFile>, AudioFilesRequestParams> model) {
@@ -50,34 +56,10 @@ public class AudioListPresenter
     @Override
     public void loadData(final boolean pullToRefresh,
                          RequestParams params) {
-        mModel.loadData(new Observer<AudioData>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
-
-            @Override
-            public void onNext(AudioData value) {
-                if (isViewAttached()) {
-                    getView().setData(value.getAudioFiles());
-                    getView().showContent();
-                }
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                e.printStackTrace();
-                if (isViewAttached()) {
-                    getView().showError(e.getCause(), pullToRefresh);
-                }
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-        }, (AudioFilesRequestParams) params);
+        mModel.loadData(mObserver
+        , (AudioFilesRequestParams) params);
     }
+
 
     @Override
     public Context getAppContext() {
