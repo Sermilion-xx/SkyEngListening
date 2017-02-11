@@ -2,6 +2,7 @@ package ru.skyeng.listening.AudioFiles.network;
 
 import java.util.List;
 
+import io.reactivex.Observable;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
@@ -20,7 +21,7 @@ import ru.skyeng.listening.AudioFiles.domain.AudioData;
 public interface AudioFilesService {
 
     @GET("/audios")
-    Call<AudioData> getAudioFiles(
+    Observable<AudioData> getAudioFiles(
             @Query("page") Integer  page,
             @Query("pageSize") Integer  pageSize,
             @Query("title") String title,

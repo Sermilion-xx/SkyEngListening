@@ -4,16 +4,21 @@ import android.os.Bundle;
 
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import ru.skyeng.listening.AudioFiles.network.AudioFilesService;
 import ru.skyeng.listening.AudioFiles.domain.AudioData;
 import ru.skyeng.listening.AudioFiles.domain.AudioFile;
 import ru.skyeng.listening.AudioFiles.domain.AudioFilesRequestParams;
+import ru.skyeng.listening.AudioFiles.network.AudioFilesService;
 import ru.skyeng.listening.CommonCoponents.SECallback;
-import ru.skyeng.listening.MVPBase.MVPModel;
 import ru.skyeng.listening.CommonCoponents.ServiceGenerator;
+import ru.skyeng.listening.MVPBase.MVPModel;
 
 /**
  * ---------------------------------------------------
@@ -35,7 +40,7 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
                          AudioFilesRequestParams params) {
         ServiceGenerator serviceGenerator = new ServiceGenerator();
         AudioFilesService audioFilesService = serviceGenerator.createService(AudioFilesService.class);
-        Call<AudioData> call = audioFilesService.getAudioFiles(
+        Observable<AudioData> call = audioFilesService.getAudioFiles(
                 params.getPage(),
                 params.getPageSize(),
                 params.getTitle(),
@@ -43,19 +48,13 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
                 params.getLevelId(),
                 params.getTagIds(),
                 params.getDurationGT(),
-                params.getDurationLT());
-        call.enqueue(new Callback<AudioData>() {
-            @Override
-            public void onResponse(Call<AudioData> call, Response<AudioData> response) {
-                mData = response.body();
-                callback.onSuccess(mData.getAudioFiles());
-            }
-
-            @Override
-            public void onFailure(Call<AudioData> call, Throwable t) {
-                callback.onError(t);
-            }
-        });
+                params.getDurationLT())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+                call.subscribe(audioData -> {
+                    mData = audioData;
+                    callback.onSuccess(mData.getAudioFiles());
+                });
     }
 
     @Override
