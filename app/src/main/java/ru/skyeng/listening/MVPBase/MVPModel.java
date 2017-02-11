@@ -2,6 +2,8 @@ package ru.skyeng.listening.MVPBase;
 
 import android.os.Bundle;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
 import retrofit2.Callback;
 import ru.skyeng.listening.CommonCoponents.RequestParams;
 import ru.skyeng.listening.CommonCoponents.SECallback;
@@ -17,7 +19,8 @@ import ru.skyeng.listening.CommonCoponents.SECallback;
  */
 
 public interface MVPModel<L, P, E extends RequestParams> {
-    void loadData(SECallback<P> callback, E params);
+    void initRetrofitService();
+    void loadData(Observer<L> observable, E params);
     P processResult(L data);
     P getItems();
     Bundle getExtraData();

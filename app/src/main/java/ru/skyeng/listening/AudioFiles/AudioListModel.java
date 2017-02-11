@@ -7,11 +7,7 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import ru.skyeng.listening.AudioFiles.domain.AudioData;
 import ru.skyeng.listening.AudioFiles.domain.AudioFile;
 import ru.skyeng.listening.AudioFiles.domain.AudioFilesRequestParams;
@@ -33,14 +29,18 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
 
     private static final String CURRENT_PAGE = "currentPage";
     private static final String LAST_PAGE = "lastPage";
+    private AudioFilesService audioFilesService;
     private AudioData mData;
 
     @Override
-    public void loadData(final SECallback<List<AudioFile>> callback,
-                         AudioFilesRequestParams params) {
+    public void initRetrofitService() {
         ServiceGenerator serviceGenerator = new ServiceGenerator();
-        AudioFilesService audioFilesService = serviceGenerator.createService(AudioFilesService.class);
-        Observable<AudioData> call = audioFilesService.getAudioFiles(
+        audioFilesService = serviceGenerator.createService(AudioFilesService.class);
+    }
+
+    @Override
+    public void loadData(Observer<AudioData> observable, AudioFilesRequestParams params) {
+        Observable<AudioData> audioDataObservable = audioFilesService.getAudioFiles(
                 params.getPage(),
                 params.getPageSize(),
                 params.getTitle(),
@@ -51,11 +51,12 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
                 params.getDurationLT())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
-                call.subscribe(audioData -> {
-                    mData = audioData;
-                    callback.onSuccess(mData.getAudioFiles());
-                });
+        audioDataObservable.subscribe(data->{
+            mData = data;
+            observable.onNext(data);
+        });
     }
+
 
     @Override
     public List<AudioFile> processResult(AudioData data) {

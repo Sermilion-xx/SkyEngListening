@@ -6,6 +6,8 @@ import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
 import java.util.List;
 
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 import ru.skyeng.listening.AudioFiles.domain.AudioData;
 import ru.skyeng.listening.AudioFiles.domain.AudioFile;
 import ru.skyeng.listening.AudioFiles.domain.AudioFilesRequestParams;
@@ -35,22 +37,44 @@ public class AudioListPresenter
     private AudioListModel mModel;
 
     @Override
+    public void setModel(MVPModel<AudioData, List<AudioFile>, AudioFilesRequestParams> model) {
+        this.mModel = (AudioListModel) model;
+        this.mModel.initRetrofitService();
+    }
+
+    @Override
+    public MVPModel getModel() {
+        return mModel;
+    }
+
+    @Override
     public void loadData(final boolean pullToRefresh,
                          RequestParams params) {
-        mModel.loadData(new SECallback<List<AudioFile>>() {
+        mModel.loadData(new Observer<AudioData>() {
             @Override
-            public void onSuccess(List<AudioFile> o) {
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(AudioData value) {
                 if (isViewAttached()) {
-                    getView().setData(o);
+                    getView().setData(value.getAudioFiles());
                     getView().showContent();
                 }
             }
 
             @Override
-            public void onError(Throwable t) {
+            public void onError(Throwable e) {
+                e.printStackTrace();
                 if (isViewAttached()) {
-                    getView().showError(t.getCause(), pullToRefresh);
+                    getView().showError(e.getCause(), pullToRefresh);
                 }
+            }
+
+            @Override
+            public void onComplete() {
+
             }
         }, (AudioFilesRequestParams) params);
     }
@@ -69,16 +93,6 @@ public class AudioListPresenter
             return getView().getActivityContext();
         }
         return null;
-    }
-
-    @Override
-    public void setModel(MVPModel<AudioData, List<AudioFile>, AudioFilesRequestParams> model) {
-        this.mModel = (AudioListModel) model;
-    }
-
-    @Override
-    public MVPModel getModel() {
-        return mModel;
     }
 
 }
