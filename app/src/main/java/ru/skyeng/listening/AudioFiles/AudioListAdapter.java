@@ -62,7 +62,11 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         viewHolder.mDuration.setText(getDateFromMillis(item.getDurationInSeconds()*1000));
         viewHolder.mDescription.setText(item.getDescription());
         viewHolder.mName.setText(item.getTitle());
-        viewHolder.mCategory.setText(item.getTags().get(0).get("title"));
+        String category = "Нет категории";
+        if(item.getTags().size()>0){
+            category = item.getTags().get(0).get("title");
+        }
+        viewHolder.mCategory.setText(category);
         if(item.getImageFileUrl()!=null) {
             Glide.with(mContext)
                     .load(item.getImageFileUrl())
@@ -71,7 +75,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     public static String getDateFromMillis(long millis) {
-        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+        SimpleDateFormat formatter = new SimpleDateFormat("mm:ss", Locale.getDefault());
         return formatter.format(new Date(millis));
     }
 

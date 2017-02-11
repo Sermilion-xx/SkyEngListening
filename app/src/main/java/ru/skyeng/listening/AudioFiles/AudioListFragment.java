@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.ProgressBar;
+
 import com.hannesdorfmann.mosby.mvp.lce.MvpLceFragment;
 
 import java.util.List;
@@ -41,7 +43,7 @@ public class AudioListFragment extends MvpLceFragment<
         MVPView<List<AudioFile>>,
         AudioListPresenter>
         implements MVPView<List<AudioFile>>,
-        SwipeRefreshLayout.OnRefreshListener{
+        SwipeRefreshLayout.OnRefreshListener {
 
 
     private AppBarLayout appBarLayout;
@@ -53,6 +55,8 @@ public class AudioListFragment extends MvpLceFragment<
     @BindView(R.id.recyclerView)
     RecyclerView mRecyclerView;
 
+    @BindView(R.id.loadingView)
+    ProgressBar mProgress;
     AudioListAdapter mAdapter;
 
     @Override
@@ -61,7 +65,8 @@ public class AudioListFragment extends MvpLceFragment<
         return inflater.inflate(R.layout.fragment_audio_list, container, false);
     }
 
-    @Override public void onViewCreated(View view, Bundle savedInstance) {
+    @Override
+    public void onViewCreated(View view, Bundle savedInstance) {
         super.onViewCreated(view, savedInstance);
         setRetainInstance(true);
         ButterKnife.bind(this, view);
@@ -79,6 +84,7 @@ public class AudioListFragment extends MvpLceFragment<
             public void onHide() {
                 hideViews();
             }
+
             @Override
             public void onShow() {
                 showViews();
@@ -119,17 +125,21 @@ public class AudioListFragment extends MvpLceFragment<
 
     @Override
     public void loadData(boolean pullToRefresh) {
+        if (!pullToRefresh)
+            mProgress.setVisibility(View.VISIBLE);
         presenter.loadData(pullToRefresh, new AudioFilesRequestParams());
     }
 
     @Override
     public void showContent() {
+        mProgress.setVisibility(View.GONE);
         super.showContent();
         contentView.setRefreshing(false);
     }
 
     @Override
     public void showError(Throwable e, boolean pullToRefresh) {
+        mProgress.setVisibility(View.GONE);
         super.showError(e, pullToRefresh);
         contentView.setRefreshing(false);
     }
