@@ -11,8 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.ProgressBar;
 
 import com.hannesdorfmann.mosby.mvp.lce.MvpLceFragment;
@@ -28,7 +26,6 @@ import io.reactivex.disposables.Disposable;
 import ru.skyeng.listening.AudioFiles.domain.AudioData;
 import ru.skyeng.listening.AudioFiles.domain.AudioFile;
 import ru.skyeng.listening.AudioFiles.domain.AudioFilesRequestParams;
-import ru.skyeng.listening.CommonCoponents.HidingScrollListener;
 import ru.skyeng.listening.CommonCoponents.SEApplication;
 import ru.skyeng.listening.MVPBase.MVPView;
 import ru.skyeng.listening.R;
@@ -103,27 +100,7 @@ public class AudioListFragment extends MvpLceFragment<
 
         DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(this.mRecyclerView.getContext(), layoutManager.getOrientation());
         this.mRecyclerView.addItemDecoration(mDividerItemDecoration);
-
-        mRecyclerView.addOnScrollListener(new HidingScrollListener() {
-            @Override
-            public void onHide() {
-                hideViews();
-            }
-
-            @Override
-            public void onShow() {
-                showViews();
-            }
-        });
         loadData(false);
-    }
-
-    private void hideViews() {
-        appBarLayout.animate().translationY(-appBarLayout.getHeight()).setInterpolator(new AccelerateInterpolator(2));
-    }
-
-    private void showViews() {
-        appBarLayout.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
     }
 
     @Override
