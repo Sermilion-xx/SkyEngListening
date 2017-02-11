@@ -48,7 +48,6 @@ public class AudioListFragment extends MvpLceFragment<
         implements MVPView<List<AudioFile>>,
         SwipeRefreshLayout.OnRefreshListener, Observer<AudioData> {
 
-    private AppBarLayout appBarLayout;
     private boolean isRefreshing;
 
     @Override @Inject
@@ -64,10 +63,6 @@ public class AudioListFragment extends MvpLceFragment<
 
     @Inject
     AudioListAdapter mAdapter;
-
-    public void setAppBarLayout(AppBarLayout appBarLayout) {
-        this.appBarLayout = appBarLayout;
-    }
 
     @BindView(R.id.recyclerView)
     RecyclerView mRecyclerView;
@@ -97,10 +92,11 @@ public class AudioListFragment extends MvpLceFragment<
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mAdapter);
-
         DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(this.mRecyclerView.getContext(), layoutManager.getOrientation());
         this.mRecyclerView.addItemDecoration(mDividerItemDecoration);
-        loadData(false);
+        if(((AudioListModel)presenter.getModel()).getItems()==null){
+            loadData(false);
+        }
     }
 
     @Override

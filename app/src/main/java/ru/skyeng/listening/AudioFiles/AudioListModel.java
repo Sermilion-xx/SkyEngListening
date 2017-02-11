@@ -66,7 +66,10 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
 
     @Override
     public List<AudioFile> getItems() {
-        return mData.getAudioFiles();
+        if(mData!=null){
+            return mData.getAudioFiles();
+        }
+        return null;
     }
 
     @Override
