@@ -2,6 +2,8 @@ package ru.skyeng.listening.AudioFiles.domain;
 
 import android.content.Intent;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +19,7 @@ import java.util.Map;
 
 public class AudioData {
 
+    @SerializedName("data")
     private List<AudioFile> audioFiles;
     private Map<String, String> meta;
 

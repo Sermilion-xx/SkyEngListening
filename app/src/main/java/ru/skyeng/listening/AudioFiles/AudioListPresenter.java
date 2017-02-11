@@ -25,8 +25,12 @@ import ru.skyeng.listening.MVPBase.MVPView;
  * ---------------------------------------------------
  */
 
-public class AudioListPresenter extends MvpBasePresenter<MVPView<List<AudioFile>>>
-        implements MVPPresenter<AudioData, List<AudioFile>, AudioFilesRequestParams> {
+public class AudioListPresenter
+        extends MvpBasePresenter<MVPView<List<AudioFile>>>
+        implements MVPPresenter<
+        AudioData,
+        List<AudioFile>,
+        AudioFilesRequestParams> {
 
     private AudioFilesModel mModel = new AudioFilesModel();
 

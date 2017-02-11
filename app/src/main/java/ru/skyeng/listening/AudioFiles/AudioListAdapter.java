@@ -1,12 +1,23 @@
 package ru.skyeng.listening.AudioFiles;
 
-import android.app.Activity;
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import ru.skyeng.listening.AudioFiles.domain.AudioFile;
+import ru.skyeng.listening.R;
 
 /**
  * ---------------------------------------------------
@@ -21,8 +32,14 @@ import ru.skyeng.listening.AudioFiles.domain.AudioFile;
 public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private List<AudioFile> mItems;
+    private Context mContext;
 
-    public AudioListAdapter(Activity activity){
+    public AudioListAdapter(Context context){
+        this.mContext = context;
+        mItems = new ArrayList<>();
+    }
+
+    private AudioListAdapter(){
 
     }
 
@@ -30,19 +47,55 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         mItems = data;
     }
 
-
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return null;
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        View viewRow =  inflater.inflate(R.layout.list_item_audio_file, parent, false);
+        return new AudioViewHolder(viewRow);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        AudioViewHolder viewHolder = (AudioViewHolder) holder;
+        AudioFile item = mItems.get(position);
 
+        viewHolder.mDuration.setText(getDateFromMillis(item.getDurationInSeconds()*1000));
+        viewHolder.mDescription.setText(item.getDescription());
+        viewHolder.mName.setText(item.getTitle());
+        viewHolder.mCategory.setText(item.getTags().get(0).get("title"));
+        if(item.getImageFileUrl()!=null) {
+            Glide.with(mContext)
+                    .load(item.getImageFileUrl())
+                    .into(viewHolder.mCoverImage);
+        }
+    }
+
+    public static String getDateFromMillis(long millis) {
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+        return formatter.format(new Date(millis));
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return mItems.size();
+    }
+
+    private class AudioViewHolder extends RecyclerView.ViewHolder{
+
+        ImageView mCoverImage;
+        TextView  mCategory;
+        TextView  mName;
+        TextView  mDescription;
+        TextView  mDuration;
+
+
+        AudioViewHolder(View itemView) {
+            super(itemView);
+            mCoverImage = (ImageView) itemView.findViewById(R.id.image_cover);
+            mCategory   = (TextView) itemView.findViewById(R.id.text_category);
+            mName       = (TextView) itemView.findViewById(R.id.text_name);
+            mDescription= (TextView) itemView.findViewById(R.id.text_description);
+            mDuration   = (TextView) itemView.findViewById(R.id.text_length);
+        }
     }
 }

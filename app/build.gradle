@@ -34,6 +34,7 @@ dependencies {
     annotationProcessor "com.google.dagger:dagger-compiler:$DAGGER_VERSION"
     compile "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
     compile "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
+    compile 'com.squareup.okhttp3:logging-interceptor:3.3.1'
     compile "io.reactivex.rxjava2:rxandroid:$RXJAVA_VERSION"
     compile "io.reactivex.rxjava2:rxjava:$RXJAVA_VERSION"
     compile "com.jakewharton:butterknife:$BUTTERKNIFE_VERSION"

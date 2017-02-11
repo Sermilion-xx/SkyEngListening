@@ -21,9 +21,9 @@ public class AudioFile {
     private String audioFileUrl;
     private String imageFileUrl;
     private int wordsInMinute;
-    private List<String> accent;
+    private Map<String, String> accent;
     private Map<String, String> level;
-    private Map<String, String> tags;
+    private List<Map<String, String>> tags;
     private int durationInSeconds;
 
     public int getId() {
@@ -74,11 +74,11 @@ public class AudioFile {
         this.wordsInMinute = wordsInMinute;
     }
 
-    public List<String> getAccent() {
+    public Map<String, String> getAccent() {
         return accent;
     }
 
-    public void setAccent(List<String> accent) {
+    public void setAccent(Map<String, String> accent) {
         this.accent = accent;
     }
 
@@ -90,11 +90,11 @@ public class AudioFile {
         this.level = level;
     }
 
-    public Map<String, String> getTags() {
+    public List<Map<String, String>> getTags() {
         return tags;
     }
 
-    public void setTags(Map<String, String> tags) {
+    public void setTags(List<Map<String, String>> tags) {
         this.tags = tags;
     }
 

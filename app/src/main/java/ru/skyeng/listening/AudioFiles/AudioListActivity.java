@@ -17,8 +17,10 @@ public class AudioListActivity extends BaseActivity {
         AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appBarLayout);
         AudioListFragment fragment = (AudioListFragment) setupRecyclerFragment(savedInstanceState,
                 AudioListFragment.class.getName(),
-                R.id.activity_main);
-        fragment.setAppBarLayout(appBarLayout);
+                R.id.fragment_container);
+        if(fragment!=null){
+            fragment.setAppBarLayout(appBarLayout);
+        }
     }
 
 

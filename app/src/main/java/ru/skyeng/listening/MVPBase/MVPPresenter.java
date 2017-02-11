@@ -14,10 +14,10 @@ import ru.skyeng.listening.CommonCoponents.RequestParams;
  * ---------------------------------------------------
  */
 
-public interface MVPPresenter<T,E,V extends RequestParams> {
+public interface MVPPresenter<L, P, E extends RequestParams> {
     Context getAppContext();
     Context getActivityContext();
-    void setModel(MVPModel<T,E,V> models);
+    void setModel(MVPModel<L, P, E> models);
     MVPModel getModel();
     void loadData(boolean pullToRefresh, RequestParams params);
 }

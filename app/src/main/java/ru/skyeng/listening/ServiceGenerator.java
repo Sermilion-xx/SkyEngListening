@@ -1,6 +1,7 @@
 package ru.skyeng.listening;
 
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -29,7 +30,6 @@ public class ServiceGenerator {
                     );
 
     private Retrofit retrofit = builder.client(httpClient.build()) .build();
-
 
     public <S> S createService(Class<S> serviceClass) {
         return retrofit.create(serviceClass);
