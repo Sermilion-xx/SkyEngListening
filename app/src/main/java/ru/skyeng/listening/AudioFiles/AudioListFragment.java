@@ -19,11 +19,14 @@ import com.hannesdorfmann.mosby.mvp.lce.MvpLceFragment;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.skyeng.listening.AudioFiles.domain.AudioFile;
 import ru.skyeng.listening.AudioFiles.domain.AudioFilesRequestParams;
 import ru.skyeng.listening.CommonCoponents.HidingScrollListener;
+import ru.skyeng.listening.CommonCoponents.SEApplication;
 import ru.skyeng.listening.MVPBase.MVPView;
 import ru.skyeng.listening.R;
 
@@ -32,7 +35,7 @@ import ru.skyeng.listening.R;
  * Created by Sermilion on 10/02/2017.
  * Project: Listening
  * ---------------------------------------------------
- * <a href="http://www.ucomplex.org">ucomplex.org</a>
+ * <a href="http://www.skyeng.ru">www.skyeng.ru</a>
  * <a href="http://www.github.com/sermilion>github</a>
  * ---------------------------------------------------
  */
@@ -45,8 +48,20 @@ public class AudioListFragment extends MvpLceFragment<
         implements MVPView<List<AudioFile>>,
         SwipeRefreshLayout.OnRefreshListener {
 
-
     private AppBarLayout appBarLayout;
+
+    @Override @Inject
+    public void setPresenter(@NonNull AudioListPresenter presenter) {
+        super.setPresenter(presenter);
+    }
+
+    @Inject
+    void setModel(AudioListModel mode){
+        presenter.setModel(mode);
+    }
+
+    @Inject
+    AudioListAdapter mAdapter;
 
     public void setAppBarLayout(AppBarLayout appBarLayout) {
         this.appBarLayout = appBarLayout;
@@ -57,7 +72,12 @@ public class AudioListFragment extends MvpLceFragment<
 
     @BindView(R.id.loadingView)
     ProgressBar mProgress;
-    AudioListAdapter mAdapter;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ((SEApplication) getAppContext()).getAudioListDiComponent().inject(this);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,7 +91,7 @@ public class AudioListFragment extends MvpLceFragment<
         setRetainInstance(true);
         ButterKnife.bind(this, view);
         contentView.setOnRefreshListener(this);
-        mAdapter = new AudioListAdapter(getActivity());
+        mAdapter.setContext(getActivityContext());
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mAdapter);
@@ -114,7 +134,7 @@ public class AudioListFragment extends MvpLceFragment<
     @NonNull
     @Override
     public AudioListPresenter createPresenter() {
-        return new AudioListPresenter();
+        return presenter;
     }
 
     @Override
@@ -152,11 +172,11 @@ public class AudioListFragment extends MvpLceFragment<
 
     @Override
     public Context getAppContext() {
-        return getActivity();
+        return getActivity().getApplicationContext();
     }
 
     @Override
     public Context getActivityContext() {
-        return getActivity().getApplicationContext();
+        return getActivity();
     }
 }

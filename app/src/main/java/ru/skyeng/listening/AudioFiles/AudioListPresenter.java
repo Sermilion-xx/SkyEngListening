@@ -20,7 +20,7 @@ import ru.skyeng.listening.MVPBase.MVPView;
  * Created by Sermilion on 10/02/2017.
  * Project: Listening
  * ---------------------------------------------------
- * <a href="http://www.ucomplex.org">ucomplex.org</a>
+ * <a href="http://www.skyeng.ru">www.skyeng.ru</a>
  * <a href="http://www.github.com/sermilion>github</a>
  * ---------------------------------------------------
  */
@@ -32,7 +32,7 @@ public class AudioListPresenter
         List<AudioFile>,
         AudioFilesRequestParams> {
 
-    private AudioFilesModel mModel = new AudioFilesModel();
+    private AudioListModel mModel;
 
     @Override
     public void loadData(final boolean pullToRefresh,
@@ -73,7 +73,7 @@ public class AudioListPresenter
 
     @Override
     public void setModel(MVPModel<AudioData, List<AudioFile>, AudioFilesRequestParams> model) {
-        this.mModel = (AudioFilesModel) model;
+        this.mModel = (AudioListModel) model;
     }
 
     @Override

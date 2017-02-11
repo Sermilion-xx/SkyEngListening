@@ -1,32 +1,30 @@
 package ru.skyeng.listening.AudioFiles;
 
 import android.os.Bundle;
-import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import ru.skyeng.listening.AudioFiles.Network.AudioFilesService;
+import ru.skyeng.listening.AudioFiles.network.AudioFilesService;
 import ru.skyeng.listening.AudioFiles.domain.AudioData;
 import ru.skyeng.listening.AudioFiles.domain.AudioFile;
 import ru.skyeng.listening.AudioFiles.domain.AudioFilesRequestParams;
 import ru.skyeng.listening.CommonCoponents.SECallback;
 import ru.skyeng.listening.MVPBase.MVPModel;
-import ru.skyeng.listening.ServiceGenerator;
+import ru.skyeng.listening.CommonCoponents.ServiceGenerator;
 
 /**
  * ---------------------------------------------------
  * Created by Sermilion on 10/02/2017.
  * Project: Listening
  * ---------------------------------------------------
- * <a href="http://www.ucomplex.org">ucomplex.org</a>
+ * <a href="http://www.skyeng.ru">www.skyeng.ru</a>
  * <a href="http://www.github.com/sermilion>github</a>
  * ---------------------------------------------------
  */
-public class AudioFilesModel implements MVPModel<AudioData, List<AudioFile>, AudioFilesRequestParams> {
+public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, AudioFilesRequestParams> {
 
     private static final String CURRENT_PAGE = "currentPage";
     private static final String LAST_PAGE = "lastPage";

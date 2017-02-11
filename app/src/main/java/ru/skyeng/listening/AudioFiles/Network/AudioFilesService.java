@@ -1,4 +1,4 @@
-package ru.skyeng.listening.AudioFiles.Network;
+package ru.skyeng.listening.AudioFiles.network;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import ru.skyeng.listening.AudioFiles.domain.AudioData;
  * Created by Sermilion on 10/02/2017.
  * Project: Listening
  * ---------------------------------------------------
- * <a href="http://www.ucomplex.org">ucomplex.org</a>
+ * <a href="http://www.skyeng.ru">www.skyeng.ru</a>
  * <a href="http://www.github.com/sermilion>github</a>
  * ---------------------------------------------------
  */

@@ -24,7 +24,7 @@ import ru.skyeng.listening.R;
  * Created by Sermilion on 10/02/2017.
  * Project: Listening
  * ---------------------------------------------------
- * <a href="http://www.ucomplex.org">ucomplex.org</a>
+ * <a href="http://www.skyeng.ru">www.skyeng.ru</a>
  * <a href="http://www.github.com/sermilion>github</a>
  * ---------------------------------------------------
  */
@@ -34,13 +34,12 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private List<AudioFile> mItems;
     private Context mContext;
 
-    public AudioListAdapter(Context context){
-        this.mContext = context;
-        mItems = new ArrayList<>();
+    public void setContext(Context mContext) {
+        this.mContext = mContext;
     }
 
-    private AudioListAdapter(){
-
+    public AudioListAdapter(){
+        mItems = new ArrayList<>();
     }
 
     public void setAudioFiles(List<AudioFile> data){

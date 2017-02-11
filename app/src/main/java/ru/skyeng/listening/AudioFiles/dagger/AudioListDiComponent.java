@@ -1,4 +1,9 @@
-package ru.skyeng.listening.CommonCoponents;
+package ru.skyeng.listening.AudioFiles.dagger;
+
+import javax.inject.Singleton;
+
+import dagger.Component;
+import ru.skyeng.listening.AudioFiles.AudioListFragment;
 
 /**
  * ---------------------------------------------------
@@ -9,6 +14,8 @@ package ru.skyeng.listening.CommonCoponents;
  * <a href="http://www.github.com/sermilion>github</a>
  * ---------------------------------------------------
  */
-
-public interface RequestParams {
+@Singleton
+@Component(modules = {AudioListModule.class})
+public interface AudioListDiComponent {
+    void inject(AudioListFragment fragment);
 }
