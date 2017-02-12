@@ -98,6 +98,7 @@ public class AudioListActivity extends BaseActivity {
 
     public void pausePlayer() {
         audioPlayPause.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.exo_controls_play));
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
     public void hidePlayer() {

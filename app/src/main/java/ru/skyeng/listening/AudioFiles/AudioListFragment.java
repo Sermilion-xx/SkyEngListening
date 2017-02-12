@@ -14,6 +14,7 @@ import android.widget.ProgressBar;
 
 import com.hannesdorfmann.mosby.mvp.lce.MvpLceFragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -180,6 +181,8 @@ public class AudioListFragment extends MvpLceFragment<
         isRefreshing = false;
         showError(e.getCause(), isRefreshing);
         contentView.setRefreshing(false);
+        e.printStackTrace();
+        setData(new ArrayList<>());
     }
 
     @Override

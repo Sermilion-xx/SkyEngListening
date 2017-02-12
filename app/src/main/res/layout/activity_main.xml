@@ -82,6 +82,12 @@
         android:layout_marginTop="1dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:background="@drawable/shape_gradient_top_shadow"
+        app:layout_anchor="@+id/player_dialog" />
+
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -89,6 +95,7 @@
         android:id="@+id/player_dialog"
         android:background="@color/playerColor"
         app:behavior_hideable="true"
+        app:elevation="16dp"
         app:layout_behavior="@string/bottom_sheet_behavior">
 
         <FrameLayout
