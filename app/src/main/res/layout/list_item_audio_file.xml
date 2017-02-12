@@ -1,7 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@color/colorWhite">
 
     <ImageView
         android:id="@+id/image_cover"
@@ -48,11 +49,8 @@
 
     <TextView
         android:id="@+id/text_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:text="Название аудио"
-        android:textSize="16sp"
-        android:maxLines="2"
+        style="@style/textStylePrimary"
         android:layout_toRightOf="@id/image_cover"
         android:layout_toEndOf="@id/image_cover"
         android:layout_below="@+id/text_category"
@@ -64,19 +62,28 @@
 
     <TextView
         android:id="@+id/text_description"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/textStyleSecondary"
         android:text="Описание"
-        android:maxLines="2"
-        android:ellipsize="end"
         android:layout_toRightOf="@id/image_cover"
         android:layout_toEndOf="@id/image_cover"
         android:layout_below="@+id/text_name"
         android:layout_marginTop="6dp"
         android:layout_marginLeft="12dp"
         android:layout_marginStart="12dp"
-        android:textSize="12sp"
-        android:textColor="@color/colorGrey"
         android:layout_marginEnd="38dp"
         android:layout_marginRight="38dp" />
+
+    <ImageView
+        android:id="@+id/audio_play_pause"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/ic_pause_blue"
+        android:padding="10dp"
+        android:visibility="gone"
+        android:background="@drawable/round_image_background"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/text_name"
+        android:layout_toStartOf="@+id/text_name"
+        android:layout_marginRight="26dp"
+        android:layout_marginEnd="26dp" />
 </RelativeLayout>

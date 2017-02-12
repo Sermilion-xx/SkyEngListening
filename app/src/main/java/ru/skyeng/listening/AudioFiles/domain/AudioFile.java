@@ -1,5 +1,9 @@
 package ru.skyeng.listening.AudioFiles.domain;
 
+import android.graphics.Bitmap;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.List;
 import java.util.Map;
 
@@ -13,18 +17,70 @@ import java.util.Map;
  * ---------------------------------------------------
  */
 
-public class AudioFile {
+public class AudioFile implements Parcelable{
 
     private int id;
     private String title;
     private String description;
     private String audioFileUrl;
     private String imageFileUrl;
+    private Bitmap imageBitmap;
     private int wordsInMinute;
     private Map<String, String> accent;
     private Map<String, String> level;
     private List<Map<String, String>> tags;
     private int durationInSeconds;
+    private String durationInMinutes;
+    private boolean isPlaying;
+
+    protected AudioFile(Parcel in) {
+        id = in.readInt();
+        title = in.readString();
+        description = in.readString();
+        audioFileUrl = in.readString();
+        imageFileUrl = in.readString();
+        imageBitmap = in.readParcelable(Bitmap.class.getClassLoader());
+        wordsInMinute = in.readInt();
+        durationInSeconds = in.readInt();
+        durationInMinutes = in.readString();
+        isPlaying = in.readByte() != 0;
+    }
+
+    public static final Creator<AudioFile> CREATOR = new Creator<AudioFile>() {
+        @Override
+        public AudioFile createFromParcel(Parcel in) {
+            return new AudioFile(in);
+        }
+
+        @Override
+        public AudioFile[] newArray(int size) {
+            return new AudioFile[size];
+        }
+    };
+
+    public String getDurationInMinutes() {
+        return durationInMinutes;
+    }
+
+    public void setDurationInMinutes(String durationInMinutes) {
+        this.durationInMinutes = durationInMinutes;
+    }
+
+    public Bitmap getImageBitmap() {
+        return imageBitmap;
+    }
+
+    public void setImageBitmap(Bitmap imageBitmap) {
+        this.imageBitmap = imageBitmap;
+    }
+
+    public boolean isPlaying() {
+        return isPlaying;
+    }
+
+    public void setPlaying(boolean playing) {
+        isPlaying = playing;
+    }
 
     public int getId() {
         return id;
@@ -104,5 +160,24 @@ public class AudioFile {
 
     public void setDurationInSeconds(int durationInSeconds) {
         this.durationInSeconds = durationInSeconds;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(title);
+        dest.writeString(description);
+        dest.writeString(audioFileUrl);
+        dest.writeString(imageFileUrl);
+        dest.writeParcelable(imageBitmap, flags);
+        dest.writeInt(wordsInMinute);
+        dest.writeInt(durationInSeconds);
+        dest.writeString(durationInMinutes);
+        dest.writeByte((byte) (isPlaying ? 1 : 0));
     }
 }

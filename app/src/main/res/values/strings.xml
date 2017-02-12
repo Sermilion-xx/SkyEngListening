@@ -5,4 +5,7 @@
     <string name="settings">Настройки</string>
     <string name="Listening">Listening</string>
     <string name="track_cover">Обложка трека</string>
+    <string name="no_category">Нет категории</string>
+    <string name="audio_start_time">0:00</string>
+    <string name="dash">-</string>
 </resources>

@@ -26,7 +26,6 @@
             android:text="Error"
             android:visibility="gone"/>
 
-
     </FrameLayout>
 
 </android.support.v4.widget.SwipeRefreshLayout>
