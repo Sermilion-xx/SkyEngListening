@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +13,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import ru.skyeng.listening.AudioFiles.domain.AudioFile;
 import ru.skyeng.listening.CommonCoponents.FacadeCommon;
@@ -75,6 +73,10 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         if (item.isPlaying()) { //to preserve configuration change
             playingPosition = position;
             viewHolder.mPlayPause.setVisibility(View.VISIBLE);
+            viewHolder.mDarkLayer.setVisibility(View.VISIBLE);
+        }else{
+            viewHolder.mPlayPause.setVisibility(View.GONE);
+            viewHolder.mDarkLayer.setVisibility(View.GONE);
         }
 
         String category = mContext.getString(R.string.no_category);
@@ -93,46 +95,83 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 viewHolder.mCoverImage.setImageBitmap(item.getImageBitmap());
             }
         }
-
         viewHolder.mCoverImage.setOnClickListener(getOnClickListener(position, viewHolder, item));
     }
 
     public void pausePlayer(){
-
         AudioFile item = mItems.get(playingPosition);
         item.setPlaying(false);
         AudioViewHolder currentlyPlaying = (AudioViewHolder) mFragment.getRecyclerView().findViewHolderForAdapterPosition(playingPosition);
         currentlyPlaying.mPlayPause.setVisibility(View.GONE);
-        mFragment.pausePlayer();
+        mFragment.pausePlayer(R.drawable.ic_play_white);
         playingPosition = -1;
     }
+
+//    public void setActiveUserPosition(int position) {
+//        if (playingPosition != position) {
+//            int oldPosition = playingPosition;
+//            playingPosition = position;
+//            notifyItemChanged(oldPosition);
+//            notifyItemChanged(position);
+//        }
+//    }
 
     @NonNull
     private View.OnClickListener getOnClickListener(int position,
                                                     AudioViewHolder viewHolder,
                                                     AudioFile item) {
-        return v -> {
-            if (playingPosition != -1 && playingPosition != position) {
-                AudioViewHolder currentlyPlaying = (AudioViewHolder) mFragment.getRecyclerView().findViewHolderForAdapterPosition(playingPosition);
-                currentlyPlaying.mPlayPause.setVisibility(View.GONE);
-                mItems.get(playingPosition).setPlaying(false);
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (playingPosition != -1 && playingPosition != position) {
+                    AudioViewHolder currentlyPlaying = (AudioViewHolder) mFragment.getRecyclerView().findViewHolderForAdapterPosition(playingPosition);
+                    if(currentlyPlaying!=null){
+                        currentlyPlaying.mDarkLayer.setVisibility(View.GONE);
+                        currentlyPlaying.mPlayPause.setVisibility(View.GONE);
+                    }
+                    mItems.get(playingPosition).setPlaying(false);
 
-                playingPosition = position;
-                item.setPlaying(true);
-                mFragment.showPlayer(item);
-                viewHolder.mPlayPause.setVisibility(View.VISIBLE);
-            } else if (playingPosition == position) {
-                playingPosition = -1;
-                item.setPlaying(false);
-                viewHolder.mPlayPause.setVisibility(View.GONE);
-                mFragment.pausePlayer();
-            } else {
-                playingPosition = position;
-                item.setPlaying(true);
-                mFragment.showPlayer(item);
-                viewHolder.mPlayPause.setVisibility(View.VISIBLE);
+                    playingPosition = position;
+//                    setActiveUserPosition(position);
+                    item.setPlaying(true);
+                    mFragment.startPlaying(item);
+                    setPlayPauseIcon(viewHolder, item);
+                    viewHolder.mPlayPause.setVisibility(View.VISIBLE);
+                    viewHolder.mDarkLayer.setVisibility(View.VISIBLE);
+                } else if (playingPosition == position) { //playing audio clicked
+                    item.setPlaying(!item.isPlaying());
+                    int actionType = setPlayPauseIcon(viewHolder, item);
+                    if(actionType == 1) {
+                        mFragment.pausePlayer(R.drawable.ic_play_white);
+                    } else if(actionType==0) {
+                        mFragment.pausePlayer(R.drawable.ic_pause_white);
+                        mFragment.showPlayer();
+                    }
+                } else {
+                    if(viewHolder.mPlayPause.getVisibility()==View.VISIBLE) {
+                        viewHolder.mPlayPause.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_pause_blue));
+                    }
+                    playingPosition = position;
+//                    setActiveUserPosition(position);
+                    item.setPlaying(true);
+                    mFragment.startPlaying(item);
+                    viewHolder.mDarkLayer.setVisibility(View.VISIBLE);
+                    viewHolder.mPlayPause.setVisibility(View.VISIBLE);
+                }
             }
         };
+
+    }
+
+    private int setPlayPauseIcon(AudioViewHolder viewHolder, AudioFile item) {
+        int actionType = 1;
+        int icon = R.drawable.ic_play_blue;
+        if(item.isPlaying()){
+            icon = R.drawable.ic_pause_blue;
+            actionType = 0;
+        }
+        viewHolder.mPlayPause.setImageDrawable(mContext.getResources().getDrawable(icon));
+        return actionType;
     }
 
 
@@ -149,6 +188,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         TextView mDescription;
         TextView mDuration;
         ImageView mPlayPause;
+        View      mDarkLayer;
 
 
         AudioViewHolder(View itemView) {
@@ -159,6 +199,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             mDescription = (TextView) itemView.findViewById(R.id.text_description);
             mDuration = (TextView) itemView.findViewById(R.id.text_length);
             mPlayPause = (ImageView) itemView.findViewById(R.id.audio_play_pause);
+            mDarkLayer = itemView.findViewById(R.id.cover_dark_layer);
         }
     }
 }

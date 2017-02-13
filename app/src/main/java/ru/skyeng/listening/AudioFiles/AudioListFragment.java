@@ -106,12 +106,16 @@ public class AudioListFragment extends MvpLceFragment<
         return mRecyclerView;
     }
 
-    public void showPlayer(AudioFile item) {
-        ((AudioListActivity) getActivity()).showPlayer(item);
+    public void startPlaying(AudioFile item) {
+        ((AudioListActivity) getActivity()).startPlaying(item);
     }
 
-    public void pausePlayer() {
-        ((AudioListActivity) getActivity()).pausePlayer();
+    public void showPlayer(){
+        ((AudioListActivity) getActivity()).showPlayer();
+    }
+
+    public void pausePlayer(int icon) {
+        ((AudioListActivity) getActivity()).pausePlayer(icon);
     }
 
     @Override

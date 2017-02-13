@@ -4,19 +4,42 @@
     android:layout_height="wrap_content"
     android:background="@color/colorWhite">
 
-    <ImageView
-        android:id="@+id/image_cover"
-        android:layout_width="86dp"
-        android:layout_height="86dp"
-        android:src="@drawable/cover_placeholder"
-        android:padding="24dp"
-        android:background="@drawable/round_image_background"
-        android:layout_marginLeft="17dp"
-        android:layout_marginStart="17dp"
-        android:layout_marginTop="24dp"
-        android:contentDescription="@string/track_cover"
-        android:layout_marginBottom="24dp"
-        android:paddingBottom="24dp"/>
+    <RelativeLayout
+        android:id="@+id/dark_image_layer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        >
+
+        <ImageView
+            android:id="@+id/image_cover"
+            android:layout_width="86dp"
+            android:layout_height="86dp"
+            android:src="@drawable/cover_placeholder"
+            android:padding="24dp"
+            android:background="@drawable/round_image_background"
+            android:layout_marginLeft="17dp"
+            android:layout_marginStart="17dp"
+            android:layout_marginTop="24dp"
+            android:contentDescription="@string/track_cover"
+            android:layout_marginBottom="24dp"
+            android:paddingBottom="24dp"/>
+
+        <View
+            android:id="@+id/cover_dark_layer"
+            android:layout_width="86dp"
+            android:layout_height="86dp"
+            android:background="@drawable/dark_image_layer"
+            android:visibility="gone"
+            android:layout_alignBottom="@+id/image_cover"
+            android:layout_alignRight="@+id/image_cover"
+            android:layout_alignEnd="@+id/image_cover"
+            android:layout_alignTop="@+id/image_cover"
+            android:layout_alignLeft="@+id/image_cover"
+            android:layout_alignStart="@+id/image_cover" />
+
+    </RelativeLayout>
+
+
 
     <TextView
         android:id="@+id/text_category"
@@ -26,9 +49,9 @@
         android:text="Кино"
         android:textColor="@color/colorAccent"
         android:textStyle="bold"
-        android:layout_toRightOf="@id/image_cover"
-        android:layout_toEndOf="@id/image_cover"
-        android:layout_alignTop="@id/image_cover"
+        android:layout_toRightOf="@id/dark_image_layer"
+        android:layout_toEndOf="@id/dark_image_layer"
+        android:layout_marginTop="24dp"
         android:layout_marginStart="12dp"
         android:layout_marginLeft="12dp"
         android:layout_marginEnd="38dp"
@@ -43,7 +66,7 @@
         android:textColor="@color/colorBlue3"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/image_cover"
+        android:layout_alignTop="@+id/dark_image_layer"
         android:layout_marginEnd="38dp"
         android:layout_marginRight="38dp"/>
 
@@ -51,8 +74,8 @@
         android:id="@+id/text_name"
         android:text="Название аудио"
         style="@style/textStylePrimary"
-        android:layout_toRightOf="@id/image_cover"
-        android:layout_toEndOf="@id/image_cover"
+        android:layout_toRightOf="@id/dark_image_layer"
+        android:layout_toEndOf="@id/dark_image_layer"
         android:layout_below="@+id/text_category"
         android:layout_marginTop="6dp"
         android:layout_marginStart="12dp"
@@ -64,8 +87,8 @@
         android:id="@+id/text_description"
         style="@style/textStyleSecondary"
         android:text="Описание"
-        android:layout_toRightOf="@id/image_cover"
-        android:layout_toEndOf="@id/image_cover"
+        android:layout_toRightOf="@id/dark_image_layer"
+        android:layout_toEndOf="@id/dark_image_layer"
         android:layout_below="@+id/text_name"
         android:layout_marginTop="6dp"
         android:layout_marginLeft="12dp"

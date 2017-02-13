@@ -119,6 +119,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_pause_white"
             android:id="@+id/audio_play_pause"
+            android:visibility="gone"
             android:layout_gravity="center" />
         </FrameLayout>
 

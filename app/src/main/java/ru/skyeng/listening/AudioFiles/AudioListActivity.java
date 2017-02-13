@@ -75,11 +75,11 @@ public class AudioListActivity extends BaseActivity {
         if (savedInstanceState != null && savedInstanceState.containsKey(KEY_AUDIO_FILE)) {
             mAudioFile = savedInstanceState.getParcelable(KEY_AUDIO_FILE);
             if (mAudioFile != null)
-                showPlayer(mAudioFile);
+                startPlaying(mAudioFile);
         }
     }
 
-    public void showPlayer(AudioFile item) {
+    public void startPlaying(AudioFile item) {
         mAudioFile = item;
         audioTitle.setText(item.getTitle());
         audioPlayed.setText(getString(R.string.audio_start_time));
@@ -88,17 +88,20 @@ public class AudioListActivity extends BaseActivity {
             audioCoverImage.setImageBitmap(item.getImageBitmap());
         }
         audioPlayPause.setVisibility(View.VISIBLE);
-        int playPauseIcon = R.drawable.exo_controls_play;
+        int playPauseIcon = R.drawable.ic_play_white;
         if (item.isPlaying()) {
-            playPauseIcon = R.drawable.exo_controls_pause;
+            playPauseIcon = R.drawable.ic_pause_white;
         }
         audioPlayPause.setImageDrawable(ContextCompat.getDrawable(this, playPauseIcon));
+        showPlayer();
+    }
+
+    public void showPlayer(){
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
-    public void pausePlayer() {
-        audioPlayPause.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.exo_controls_play));
-        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+    public void pausePlayer(int icon) {
+        audioPlayPause.setImageDrawable(ContextCompat.getDrawable(this, icon));
     }
 
     public void hidePlayer() {
