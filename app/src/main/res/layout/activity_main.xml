@@ -92,6 +92,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:clickable="true"
         android:id="@+id/player_dialog"
         android:background="@color/playerColor"
         app:behavior_hideable="true"
@@ -106,6 +107,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="12dp">
         <ImageView
+            android:clickable="true"
             android:id="@+id/audio_cover"
             android:layout_width="50dp"
             android:layout_height="50dp"

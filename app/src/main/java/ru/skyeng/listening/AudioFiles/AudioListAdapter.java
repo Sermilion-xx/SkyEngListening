@@ -3,6 +3,7 @@ package ru.skyeng.listening.AudioFiles;
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,12 +12,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.hannesdorfmann.mosby.mvp.MvpPresenter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.skyeng.listening.AudioFiles.domain.AudioData;
 import ru.skyeng.listening.AudioFiles.domain.AudioFile;
+import ru.skyeng.listening.AudioFiles.domain.AudioFilesRequestParams;
 import ru.skyeng.listening.CommonCoponents.FacadeCommon;
+import ru.skyeng.listening.MVPBase.MVPPresenter;
 import ru.skyeng.listening.R;
 
 /**
@@ -32,13 +37,24 @@ import ru.skyeng.listening.R;
 public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final String KEY_TITLE = "title";
-    private List<AudioFile> mItems;
-    private Context mContext;
+    private MVPPresenter<AudioData, List<AudioFile>, AudioFilesRequestParams> mPresenter;
     private AudioListFragment mFragment;
     private int playingPosition = -1;
 
-    void setContext(Context mContext) {
-        this.mContext = mContext;
+    private List<AudioFile> getItems(){
+        return mPresenter.getModel().getItems();
+    }
+
+    int getPlayingPosition() {
+        return playingPosition;
+    }
+
+    void setPresenter(MVPPresenter<AudioData, List<AudioFile>, AudioFilesRequestParams> mPresenter) {
+        this.mPresenter = mPresenter;
+    }
+
+    private Context getContext(){
+        return mPresenter.getActivityContext();
     }
 
     void setFragment(AudioListFragment mFragment) {
@@ -46,11 +62,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     public AudioListAdapter() {
-        mItems = new ArrayList<>();
-    }
 
-    void setAudioFiles(List<AudioFile> data) {
-        mItems = data;
     }
 
     @Override
@@ -63,7 +75,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         AudioViewHolder viewHolder = (AudioViewHolder) holder;
-        AudioFile item = mItems.get(position);
+        AudioFile item = getItems().get(position);
         item.setDurationInMinutes(FacadeCommon.getDateFromMillis(item.getDurationInSeconds() * 1000));
         viewHolder.mDuration.setText(item.getDurationInMinutes());
         viewHolder.mDescription.setText(item.getDescription());
@@ -71,11 +83,11 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         if (item.getState()==1) { //to preserve configuration change
             playingPosition = position;
-            viewHolder.mPlayPause.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_pause_blue));
+            viewHolder.mPlayPause.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_pause_blue));
             viewHolder.mPlayPause.setVisibility(View.VISIBLE);
             viewHolder.mDarkLayer.setVisibility(View.VISIBLE);
         } if(item.getState()==2){
-            viewHolder.mPlayPause.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_play_blue));
+            viewHolder.mPlayPause.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_play_blue));
             viewHolder.mPlayPause.setVisibility(View.VISIBLE);
             viewHolder.mDarkLayer.setVisibility(View.VISIBLE);
         }else if(item.getState()==0){
@@ -83,14 +95,14 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             viewHolder.mDarkLayer.setVisibility(View.GONE);
         }
 
-        String category = mContext.getString(R.string.no_category);
+        String category = getContext().getString(R.string.no_category);
         if (item.getTags().size() > 0) {
             category = item.getTags().get(0).get(KEY_TITLE);
         }
         viewHolder.mCategory.setText(category);
 
         if (item.getImageFileUrl() != null && item.getImageBitmap()==null) {
-            Glide.with(mContext)
+            Glide.with(getContext())
                     .load(item.getImageFileUrl())
                     .into(viewHolder.mCoverImage);
             item.setImageBitmap(((BitmapDrawable)viewHolder.mCoverImage.getDrawable()).getBitmap());
@@ -102,23 +114,15 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         viewHolder.mCoverImage.setOnClickListener(getOnClickListener(position, viewHolder, item));
     }
 
-    public void pausePlayer(){
-        AudioFile item = mItems.get(playingPosition);
-        item.setState(2);
-        AudioViewHolder currentlyPlaying = (AudioViewHolder) mFragment.getRecyclerView().findViewHolderForAdapterPosition(playingPosition);
-//        currentlyPlaying.mPlayPause.setVisibility(View.GONE);
-        mFragment.pausePlayer(R.drawable.ic_play_white);
-        playingPosition = -1;
+    void pausePlayer(){
+        getItems().get(playingPosition).setState(2);
+        notifyItemChanged(playingPosition);
     }
 
-//    public void setActiveUserPosition(int position) {
-//        if (playingPosition != position) {
-//            int oldPosition = playingPosition;
-//            playingPosition = position;
-//            notifyItemChanged(oldPosition);
-//            notifyItemChanged(position);
-//        }
-//    }
+    void startPlayer(){
+        getItems().get(playingPosition).setState(1);
+        notifyItemChanged(playingPosition);
+    }
 
     @NonNull
     private View.OnClickListener getOnClickListener(int position,
@@ -129,16 +133,13 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             public void onClick(View v) {
                 //playing different audio
                 if (playingPosition != -1 && playingPosition != position) {
-                    mItems.get(playingPosition).setState(0);
+                    getItems().get(playingPosition).setState(0);
                     notifyItemChanged(playingPosition);
                     item.setState(1);
                     showItemPlaying(position, item);
                 } else if (playingPosition == position) { //currently playing audio clicked
-                    if(item.getState()==1){
-                        item.setState(2);
-                    }else {
-                        item.setState(1);
-                    }
+                    //0 - stopped, 1 - playing, 2 - paused
+                    item.setState(item.getState()==1?2:1);
                     notifyItemChanged(position);
                     int actionType = setPlayPauseIcon(viewHolder, item);
                     if(actionType == 1) {
@@ -156,24 +157,6 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     }
 
-//    private void startPlayerParams(AudioFile item) {
-//        item.setPlaying(true);
-//        item.setPaused(false);
-//        item.setStopped(false);
-//    }
-//
-//    private void pausePlayerParams(AudioFile item) {
-//        item.setPaused(true);
-//        item.setPlaying(false);
-//        item.setStopped(false);
-//    }
-//
-//    private void stopPlayerParams(AudioFile item) {
-//        item.setPaused(false);
-//        item.setPlaying(false);
-//        item.setStopped(true);
-//    }
-
     private void showItemPlaying(int position, AudioFile item) {
         playingPosition = position;
         mFragment.startPlaying(item);
@@ -187,14 +170,14 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             icon = R.drawable.ic_pause_blue;
             actionType = 0;
         }
-        viewHolder.mPlayPause.setImageDrawable(mContext.getResources().getDrawable(icon));
+        viewHolder.mPlayPause.setImageDrawable(ContextCompat.getDrawable(getContext(), icon));
         return actionType;
     }
 
 
     @Override
     public int getItemCount() {
-        return mItems.size();
+        return getItems()!=null?getItems().size():0;
     }
 
     private class AudioViewHolder extends RecyclerView.ViewHolder {

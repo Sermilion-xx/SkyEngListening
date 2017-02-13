@@ -55,7 +55,7 @@ public class AudioListActivity extends BaseActivity {
         setupToolbar(getString(R.string.Listening), false);
         mAudioListFragment = (AudioListFragment) setupRecyclerFragment(
                 savedInstanceState,
-                AudioListFragment.class.getName(),
+                TAG_AUDIO_FILES_FRAGMENT,
                 R.id.fragment_container
         );
         mBottomSheetBehavior = BottomSheetBehavior.from(mLayoutBottomSheet);
@@ -71,7 +71,22 @@ public class AudioListActivity extends BaseActivity {
         audioSubtitles = (TextView) mLayoutBottomSheet.findViewById(R.id.audio_subtitles);
         audioSeek = (SeekBar) mLayoutBottomSheet.findViewById(R.id.audio_seek);
         audioPlayPause = (ImageView) mLayoutBottomSheet.findViewById(R.id.audio_play_pause);
-        audioPlayPause.setOnClickListener(v -> mAudioListFragment.mAdapter.pausePlayer());
+        audioPlayPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mAudioListFragment.mAdapter.getPlayingPosition()!=-1){
+                    int audioState = mAudioListFragment.getPresenter().getData().get(mAudioListFragment.mAdapter.getPlayingPosition()).getState();
+                    int buttonIcon = R.drawable.ic_pause_white;
+                    if(audioState==1){
+                        buttonIcon = R.drawable.ic_play_white;
+                        mAudioListFragment.mAdapter.pausePlayer();
+                    }else {
+                        mAudioListFragment.mAdapter.startPlayer();
+                    }
+                    audioPlayPause.setImageDrawable(ContextCompat.getDrawable(AudioListActivity.this, buttonIcon));
+                }
+            }
+        });
         if (savedInstanceState != null && savedInstanceState.containsKey(KEY_AUDIO_FILE)) {
             mAudioFile = savedInstanceState.getParcelable(KEY_AUDIO_FILE);
             if (mAudioFile != null)

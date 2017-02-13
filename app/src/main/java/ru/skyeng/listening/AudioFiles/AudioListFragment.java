@@ -49,7 +49,6 @@ public class AudioListFragment extends MvpLceFragment<
         SwipeRefreshLayout.OnRefreshListener, Observer<AudioData> {
 
     private boolean isRefreshing;
-    private boolean isPlaying;
 
     @Override
     @Inject
@@ -58,9 +57,15 @@ public class AudioListFragment extends MvpLceFragment<
         super.setPresenter(presenter);
     }
 
+    @NonNull
+    @Override
+    public AudioListPresenter getPresenter() {
+        return super.getPresenter();
+    }
+
     @Inject
-    void setModel(AudioListModel mode) {
-        presenter.setModel(mode);
+    void setModel(AudioListModel model) {
+        presenter.setModel(model);
     }
 
     @Inject
@@ -90,7 +95,7 @@ public class AudioListFragment extends MvpLceFragment<
         super.onViewCreated(view, savedInstance);
         ButterKnife.bind(this, view);
         contentView.setOnRefreshListener(this);
-        mAdapter.setContext(getActivityContext());
+        mAdapter.setPresenter(presenter);
         mAdapter.setFragment(this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
@@ -139,7 +144,6 @@ public class AudioListFragment extends MvpLceFragment<
 
     @Override
     public void setData(List<AudioFile> data) {
-        mAdapter.setAudioFiles(data);
         mAdapter.notifyDataSetChanged();
     }
 

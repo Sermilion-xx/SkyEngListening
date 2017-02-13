@@ -49,8 +49,15 @@ public class AudioListPresenter
     }
 
     @Override
-    public MVPModel getModel() {
+    public MVPModel<AudioData,
+            List<AudioFile>,
+            AudioFilesRequestParams> getModel() {
         return mModel;
+    }
+
+    @Override
+    public List<AudioFile> getData() {
+        return getModel().getItems();
     }
 
     @Override
