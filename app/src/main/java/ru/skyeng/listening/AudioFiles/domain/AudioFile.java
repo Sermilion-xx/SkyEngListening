@@ -31,7 +31,9 @@ public class AudioFile implements Parcelable{
     private List<Map<String, String>> tags;
     private int durationInSeconds;
     private String durationInMinutes;
-    private boolean isPlaying;
+    //0 - stopped, 1 - playing, 2 - paused
+    private int state;
+
 
     protected AudioFile(Parcel in) {
         id = in.readInt();
@@ -43,7 +45,7 @@ public class AudioFile implements Parcelable{
         wordsInMinute = in.readInt();
         durationInSeconds = in.readInt();
         durationInMinutes = in.readString();
-        isPlaying = in.readByte() != 0;
+        state = in.readInt();
     }
 
     public static final Creator<AudioFile> CREATOR = new Creator<AudioFile>() {
@@ -74,13 +76,6 @@ public class AudioFile implements Parcelable{
         this.imageBitmap = imageBitmap;
     }
 
-    public boolean isPlaying() {
-        return isPlaying;
-    }
-
-    public void setPlaying(boolean playing) {
-        isPlaying = playing;
-    }
 
     public int getId() {
         return id;
@@ -162,6 +157,14 @@ public class AudioFile implements Parcelable{
         this.durationInSeconds = durationInSeconds;
     }
 
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -178,6 +181,6 @@ public class AudioFile implements Parcelable{
         dest.writeInt(wordsInMinute);
         dest.writeInt(durationInSeconds);
         dest.writeString(durationInMinutes);
-        dest.writeByte((byte) (isPlaying ? 1 : 0));
+        dest.writeInt(state);
     }
 }

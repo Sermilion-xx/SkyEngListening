@@ -89,7 +89,7 @@ public class AudioListActivity extends BaseActivity {
         }
         audioPlayPause.setVisibility(View.VISIBLE);
         int playPauseIcon = R.drawable.ic_play_white;
-        if (item.isPlaying()) {
+        if (item.getState()==1) {
             playPauseIcon = R.drawable.ic_pause_white;
         }
         audioPlayPause.setImageDrawable(ContextCompat.getDrawable(this, playPauseIcon));

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,11 +69,16 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         viewHolder.mDescription.setText(item.getDescription());
         viewHolder.mName.setText(item.getTitle());
 
-        if (item.isPlaying()) { //to preserve configuration change
+        if (item.getState()==1) { //to preserve configuration change
             playingPosition = position;
+            viewHolder.mPlayPause.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_pause_blue));
             viewHolder.mPlayPause.setVisibility(View.VISIBLE);
             viewHolder.mDarkLayer.setVisibility(View.VISIBLE);
-        }else{
+        } if(item.getState()==2){
+            viewHolder.mPlayPause.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_play_blue));
+            viewHolder.mPlayPause.setVisibility(View.VISIBLE);
+            viewHolder.mDarkLayer.setVisibility(View.VISIBLE);
+        }else if(item.getState()==0){
             viewHolder.mPlayPause.setVisibility(View.GONE);
             viewHolder.mDarkLayer.setVisibility(View.GONE);
         }
@@ -100,9 +104,9 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     public void pausePlayer(){
         AudioFile item = mItems.get(playingPosition);
-        item.setPlaying(false);
+        item.setState(2);
         AudioViewHolder currentlyPlaying = (AudioViewHolder) mFragment.getRecyclerView().findViewHolderForAdapterPosition(playingPosition);
-        currentlyPlaying.mPlayPause.setVisibility(View.GONE);
+//        currentlyPlaying.mPlayPause.setVisibility(View.GONE);
         mFragment.pausePlayer(R.drawable.ic_play_white);
         playingPosition = -1;
     }
@@ -123,23 +127,19 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //playing different audio
                 if (playingPosition != -1 && playingPosition != position) {
-                    AudioViewHolder currentlyPlaying = (AudioViewHolder) mFragment.getRecyclerView().findViewHolderForAdapterPosition(playingPosition);
-                    if(currentlyPlaying!=null){
-                        currentlyPlaying.mDarkLayer.setVisibility(View.GONE);
-                        currentlyPlaying.mPlayPause.setVisibility(View.GONE);
+                    mItems.get(playingPosition).setState(0);
+                    notifyItemChanged(playingPosition);
+                    item.setState(1);
+                    showItemPlaying(position, item);
+                } else if (playingPosition == position) { //currently playing audio clicked
+                    if(item.getState()==1){
+                        item.setState(2);
+                    }else {
+                        item.setState(1);
                     }
-                    mItems.get(playingPosition).setPlaying(false);
-
-                    playingPosition = position;
-//                    setActiveUserPosition(position);
-                    item.setPlaying(true);
-                    mFragment.startPlaying(item);
-                    setPlayPauseIcon(viewHolder, item);
-                    viewHolder.mPlayPause.setVisibility(View.VISIBLE);
-                    viewHolder.mDarkLayer.setVisibility(View.VISIBLE);
-                } else if (playingPosition == position) { //playing audio clicked
-                    item.setPlaying(!item.isPlaying());
+                    notifyItemChanged(position);
                     int actionType = setPlayPauseIcon(viewHolder, item);
                     if(actionType == 1) {
                         mFragment.pausePlayer(R.drawable.ic_play_white);
@@ -147,26 +147,43 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                         mFragment.pausePlayer(R.drawable.ic_pause_white);
                         mFragment.showPlayer();
                     }
-                } else {
-                    if(viewHolder.mPlayPause.getVisibility()==View.VISIBLE) {
-                        viewHolder.mPlayPause.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_pause_blue));
-                    }
-                    playingPosition = position;
-//                    setActiveUserPosition(position);
-                    item.setPlaying(true);
-                    mFragment.startPlaying(item);
-                    viewHolder.mDarkLayer.setVisibility(View.VISIBLE);
-                    viewHolder.mPlayPause.setVisibility(View.VISIBLE);
+                } else { // playing new audio
+                    item.setState(1);
+                    showItemPlaying(position, item);
                 }
             }
         };
 
     }
 
+//    private void startPlayerParams(AudioFile item) {
+//        item.setPlaying(true);
+//        item.setPaused(false);
+//        item.setStopped(false);
+//    }
+//
+//    private void pausePlayerParams(AudioFile item) {
+//        item.setPaused(true);
+//        item.setPlaying(false);
+//        item.setStopped(false);
+//    }
+//
+//    private void stopPlayerParams(AudioFile item) {
+//        item.setPaused(false);
+//        item.setPlaying(false);
+//        item.setStopped(true);
+//    }
+
+    private void showItemPlaying(int position, AudioFile item) {
+        playingPosition = position;
+        mFragment.startPlaying(item);
+        notifyItemChanged(position);
+    }
+
     private int setPlayPauseIcon(AudioViewHolder viewHolder, AudioFile item) {
         int actionType = 1;
         int icon = R.drawable.ic_play_blue;
-        if(item.isPlaying()){
+        if(item.getState()==1){
             icon = R.drawable.ic_pause_blue;
             actionType = 0;
         }
