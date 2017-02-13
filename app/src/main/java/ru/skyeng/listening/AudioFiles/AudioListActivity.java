@@ -1,6 +1,7 @@
 package ru.skyeng.listening.AudioFiles;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
@@ -14,29 +15,43 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.skyeng.listening.AudioFiles.domain.AudioFile;
-import ru.skyeng.listening.CommonCoponents.BaseActivity;
+import ru.skyeng.listening.CommonComponents.BaseActivity;
 import ru.skyeng.listening.R;
+
+import static ru.skyeng.listening.AudioFiles.PlayerService.ACTION_CONTINUE;
+import static ru.skyeng.listening.AudioFiles.PlayerService.ACTION_PAUSE;
+import static ru.skyeng.listening.AudioFiles.PlayerService.ACTION_PLAY;
+import static ru.skyeng.listening.AudioFiles.PlayerService.AUDIO_URL;
 
 public class AudioListActivity extends BaseActivity {
 
     private static final String TAG_AUDIO_FILES_FRAGMENT = "mAudioListFragment";
     private static final String KEY_AUDIO_FILE = "mAudioFile";
-    @BindView(R.id.appBarLayout)
-    AppBarLayout mAppBarLayout;
-    AudioListFragment mAudioListFragment;
-    @BindView(R.id.player_dialog)
-    RelativeLayout mLayoutBottomSheet;
-    private BottomSheetBehavior mBottomSheetBehavior;
 
-    private ImageView audioCoverImage;
-    private TextView audioTitle;
-    private TextView audioLeft;
-    private SeekBar audioSeek;
-    private TextView audioPlayed;
-    private TextView audioSubtitles;
-    private ImageView audioPlayPause;
+    private AudioListFragment mAudioListFragment;
+    private BottomSheetBehavior mBottomSheetBehavior;
     private AudioFile mAudioFile;
 
+    @BindView(R.id.appBarLayout)
+    AppBarLayout mAppBarLayout;
+    @BindView(R.id.player_dialog)
+    RelativeLayout mLayoutBottomSheet;
+    @BindView(R.id.audio_cover)
+    ImageView audioCoverImage;
+    @BindView(R.id.audio_title)
+    TextView audioTitle;
+    @BindView(R.id.audio_left)
+    TextView audioLeft;
+    @BindView(R.id.audio_seek)
+    SeekBar audioSeek;
+    @BindView(R.id.audio_played)
+    TextView audioPlayed;
+    @BindView(R.id.audio_subtitles)
+    TextView audioSubtitles;
+    @BindView(R.id.audio_play_pause)
+    ImageView audioPlayPause;
+    @BindView(R.id.cover_dark_layer)
+    View mDarkLayer;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -59,29 +74,29 @@ public class AudioListActivity extends BaseActivity {
                 R.id.fragment_container
         );
         mBottomSheetBehavior = BottomSheetBehavior.from(mLayoutBottomSheet);
-
-        initPlayerViews(savedInstanceState);
+        setupPlayPlayer(savedInstanceState);
     }
 
-    private void initPlayerViews(Bundle savedInstanceState) {
-        audioCoverImage = (ImageView) mLayoutBottomSheet.findViewById(R.id.audio_cover);
-        audioTitle = (TextView) mLayoutBottomSheet.findViewById(R.id.audio_title);
-        audioLeft = (TextView) mLayoutBottomSheet.findViewById(R.id.audio_left);
-        audioPlayed = (TextView) mLayoutBottomSheet.findViewById(R.id.audio_played);
-        audioSubtitles = (TextView) mLayoutBottomSheet.findViewById(R.id.audio_subtitles);
-        audioSeek = (SeekBar) mLayoutBottomSheet.findViewById(R.id.audio_seek);
-        audioPlayPause = (ImageView) mLayoutBottomSheet.findViewById(R.id.audio_play_pause);
-        audioPlayPause.setOnClickListener(new View.OnClickListener() {
+
+    private void setupPlayPlayer(Bundle savedInstanceState) {
+        audioCoverImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mAudioListFragment.mAdapter.getPlayingPosition()!=-1){
+                if (mAudioListFragment.mAdapter.getPlayingPosition() != -1) {
                     int audioState = mAudioListFragment.getPresenter().getData().get(mAudioListFragment.mAdapter.getPlayingPosition()).getState();
                     int buttonIcon = R.drawable.ic_pause_white;
-                    if(audioState==1){
+                    if (audioState == 1) {
                         buttonIcon = R.drawable.ic_play_white;
+                        pausePlayer(buttonIcon);
                         mAudioListFragment.mAdapter.pausePlayer();
-                    }else {
+                    } else {
+                        startPlayerIntent(mAudioFile);
                         mAudioListFragment.mAdapter.startPlayer();
+                    }
+                    if (audioState != 0) {
+                        mDarkLayer.setVisibility(View.VISIBLE);
+                    } else {
+                        mDarkLayer.setVisibility(View.GONE);
                     }
                     audioPlayPause.setImageDrawable(ContextCompat.getDrawable(AudioListActivity.this, buttonIcon));
                 }
@@ -95,28 +110,48 @@ public class AudioListActivity extends BaseActivity {
     }
 
     public void startPlaying(AudioFile item) {
-        mAudioFile = item;
-        audioTitle.setText(item.getTitle());
-        audioPlayed.setText(getString(R.string.audio_start_time));
-        audioLeft.setText("-" + item.getDurationInMinutes());
-        if (item.getImageBitmap() != null) {
-            audioCoverImage.setImageBitmap(item.getImageBitmap());
+        try {
+            startPlayerIntent(item);
+            mDarkLayer.setVisibility(View.VISIBLE);
+            mAudioFile = item;
+            audioTitle.setText(item.getTitle());
+            audioPlayed.setText(getString(R.string.audio_start_time));
+            audioLeft.setText("-" + item.getDurationInMinutes());
+            if (item.getImageBitmap() != null) {
+                audioCoverImage.setImageBitmap(item.getImageBitmap());
+            }
+            audioPlayPause.setVisibility(View.VISIBLE);
+            int playPauseIcon = R.drawable.ic_play_white;
+            if (item.getState() == 1) {
+                playPauseIcon = R.drawable.ic_pause_white;
+            }
+            audioPlayPause.setImageDrawable(ContextCompat.getDrawable(this, playPauseIcon));
+            showPlayer();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        audioPlayPause.setVisibility(View.VISIBLE);
-        int playPauseIcon = R.drawable.ic_play_white;
-        if (item.getState()==1) {
-            playPauseIcon = R.drawable.ic_pause_white;
-        }
-        audioPlayPause.setImageDrawable(ContextCompat.getDrawable(this, playPauseIcon));
-        showPlayer();
     }
 
-    public void showPlayer(){
-        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+    private void startPlayerIntent(AudioFile item) {
+        if(item.compareTo(mAudioFile)==0){
+            Intent continueIntent = new Intent(ACTION_CONTINUE);
+            sendBroadcast(continueIntent);
+        }else {
+            Intent intent = new Intent(this, PlayerService.class);
+            intent.setAction(ACTION_PLAY);
+            intent.putExtra(AUDIO_URL, item.getAudioFileUrl());
+            startService(intent);
+        }
     }
 
     public void pausePlayer(int icon) {
+        Intent intent = new Intent(ACTION_PAUSE);
+        sendBroadcast(intent);
         audioPlayPause.setImageDrawable(ContextCompat.getDrawable(this, icon));
+    }
+
+    public void showPlayer() {
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
     public void hidePlayer() {

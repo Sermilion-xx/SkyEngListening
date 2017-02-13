@@ -3,7 +3,7 @@ package ru.skyeng.listening.MVPBase;
 import android.content.Context;
 
 import io.reactivex.Observer;
-import ru.skyeng.listening.CommonCoponents.RequestParams;
+import ru.skyeng.listening.CommonComponents.RequestParams;
 
 /**
  * ---------------------------------------------------

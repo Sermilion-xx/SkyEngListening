@@ -12,15 +12,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.hannesdorfmann.mosby.mvp.MvpPresenter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ru.skyeng.listening.AudioFiles.domain.AudioData;
 import ru.skyeng.listening.AudioFiles.domain.AudioFile;
 import ru.skyeng.listening.AudioFiles.domain.AudioFilesRequestParams;
-import ru.skyeng.listening.CommonCoponents.FacadeCommon;
+import ru.skyeng.listening.CommonComponents.FacadeCommon;
 import ru.skyeng.listening.MVPBase.MVPPresenter;
 import ru.skyeng.listening.R;
 
@@ -145,7 +143,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                     if(actionType == 1) {
                         mFragment.pausePlayer(R.drawable.ic_play_white);
                     } else if(actionType==0) {
-                        mFragment.pausePlayer(R.drawable.ic_pause_white);
+                        mFragment.startPlaying(item);
                         mFragment.showPlayer();
                     }
                 } else { // playing new audio

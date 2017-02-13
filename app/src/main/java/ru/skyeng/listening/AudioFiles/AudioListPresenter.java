@@ -7,12 +7,10 @@ import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 import java.util.List;
 
 import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
 import ru.skyeng.listening.AudioFiles.domain.AudioData;
 import ru.skyeng.listening.AudioFiles.domain.AudioFile;
 import ru.skyeng.listening.AudioFiles.domain.AudioFilesRequestParams;
-import ru.skyeng.listening.CommonCoponents.RequestParams;
-import ru.skyeng.listening.CommonCoponents.SECallback;
+import ru.skyeng.listening.CommonComponents.RequestParams;
 import ru.skyeng.listening.MVPBase.MVPModel;
 import ru.skyeng.listening.MVPBase.MVPPresenter;
 import ru.skyeng.listening.MVPBase.MVPView;

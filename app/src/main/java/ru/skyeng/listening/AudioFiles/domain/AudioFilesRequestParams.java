@@ -2,7 +2,7 @@ package ru.skyeng.listening.AudioFiles.domain;
 
 import java.util.List;
 
-import ru.skyeng.listening.CommonCoponents.RequestParams;
+import ru.skyeng.listening.CommonComponents.RequestParams;
 
 /**
  * ---------------------------------------------------

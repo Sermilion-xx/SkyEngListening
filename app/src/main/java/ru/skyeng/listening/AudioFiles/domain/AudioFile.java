@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +18,7 @@ import java.util.Map;
  * ---------------------------------------------------
  */
 
-public class AudioFile implements Parcelable{
+public class AudioFile implements Parcelable, Comparable<AudioFile>{
 
     private int id;
     private String title;
@@ -182,5 +183,16 @@ public class AudioFile implements Parcelable{
         dest.writeInt(durationInSeconds);
         dest.writeString(durationInMinutes);
         dest.writeInt(state);
+    }
+
+
+    @Override
+    public int compareTo(AudioFile o) {
+        if(o==null) return -1;
+        if(this.getAudioFileUrl().equals(o.getAudioFileUrl())){
+            return 0;
+        }else {
+            return -1;
+        }
     }
 }

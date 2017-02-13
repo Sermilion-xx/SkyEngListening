@@ -26,7 +26,7 @@ import io.reactivex.disposables.Disposable;
 import ru.skyeng.listening.AudioFiles.domain.AudioData;
 import ru.skyeng.listening.AudioFiles.domain.AudioFile;
 import ru.skyeng.listening.AudioFiles.domain.AudioFilesRequestParams;
-import ru.skyeng.listening.CommonCoponents.SEApplication;
+import ru.skyeng.listening.CommonComponents.SEApplication;
 import ru.skyeng.listening.MVPBase.MVPView;
 import ru.skyeng.listening.R;
 
@@ -102,13 +102,9 @@ public class AudioListFragment extends MvpLceFragment<
         mRecyclerView.setAdapter(mAdapter);
         DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(this.mRecyclerView.getContext(), layoutManager.getOrientation());
         this.mRecyclerView.addItemDecoration(mDividerItemDecoration);
-        if (((AudioListModel) presenter.getModel()).getItems() == null) {
+        if ((presenter.getModel()).getItems() == null) {
             loadData(false);
         }
-    }
-
-    public RecyclerView getRecyclerView() {
-        return mRecyclerView;
     }
 
     public void startPlaying(AudioFile item) {
@@ -133,7 +129,7 @@ public class AudioListFragment extends MvpLceFragment<
     protected String getErrorMessage(Throwable e, boolean pullToRefresh) {
         if (e != null)
             return e.getMessage();
-        return "Неизвестная ошибка";
+        return getActivityContext().getString(R.string.unknown_error);
     }
 
     @NonNull
@@ -177,7 +173,6 @@ public class AudioListFragment extends MvpLceFragment<
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void onNext(AudioData value) {
         presenter.getModel().setData(value);
         isRefreshing = false;

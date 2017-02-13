@@ -12,7 +12,7 @@ import ru.skyeng.listening.AudioFiles.domain.AudioData;
 import ru.skyeng.listening.AudioFiles.domain.AudioFile;
 import ru.skyeng.listening.AudioFiles.domain.AudioFilesRequestParams;
 import ru.skyeng.listening.AudioFiles.network.AudioFilesService;
-import ru.skyeng.listening.CommonCoponents.ServiceGenerator;
+import ru.skyeng.listening.CommonComponents.ServiceGenerator;
 import ru.skyeng.listening.MVPBase.MVPModel;
 
 /**

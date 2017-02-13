@@ -2,11 +2,8 @@ package ru.skyeng.listening.MVPBase;
 
 import android.os.Bundle;
 
-import io.reactivex.Observable;
 import io.reactivex.Observer;
-import retrofit2.Callback;
-import ru.skyeng.listening.CommonCoponents.RequestParams;
-import ru.skyeng.listening.CommonCoponents.SECallback;
+import ru.skyeng.listening.CommonComponents.RequestParams;
 
 /**
  * ---------------------------------------------------
