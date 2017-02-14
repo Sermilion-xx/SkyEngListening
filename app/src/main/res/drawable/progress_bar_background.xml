@@ -1,45 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@android:id/background">
-        <shape>
-            <corners android:radius="5dip" />
-            <gradient
-                android:startColor="#F5A9F2"
-                android:centerColor="#F5A9F2"
-                android:centerY="0.75"
-                android:endColor="#F5A9F2"
-                android:angle="270"
-                />
-        </shape>
-    </item>
+<rotate xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fromDegrees="0"
+    android:pivotX="50%"
+    android:pivotY="50%"
+    android:duration="1">
 
-    <item android:id="@android:id/secondaryProgress">
-        <clip>
-            <shape>
-                <corners android:radius="5dip" />
-                <gradient
-                    android:startColor="@color/colorWhite"
-                    android:centerColor="@color/colorWhite"
-                    android:centerY="0.75"
-                    android:endColor="@color/colorWhite"
-                    android:angle="270"
-                    />
-            </shape>
-        </clip>
-    </item>
-    <item
-        android:id="@android:id/progress"
-        >
-        <clip>
-            <shape>
-                <corners
-                    android:radius="5dip" />
-                <gradient
-                    android:startColor="@color/colorWhite"
-                    android:endColor="@color/colorWhite"
-                    android:angle="270" />
-            </shape>
-        </clip>
-    </item>
+    <shape
+        android:innerRadiusRatio="3"
+        android:shape="ring"
+        android:thicknessRatio="8"
+        android:useLevel="false">
+        <size
+            android:height="48dip"
+            android:width="48dip" />
 
-</layer-list>
+        <solid android:color="@color/colorWhite"/>
+
+    </shape>
+
+</rotate>

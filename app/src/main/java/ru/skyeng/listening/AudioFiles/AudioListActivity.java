@@ -1,6 +1,7 @@
 package ru.skyeng.listening.AudioFiles;
 
 
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -79,6 +80,8 @@ public class AudioListActivity extends BaseActivity {
         mBottomSheetBehavior = BottomSheetBehavior.from(mLayoutBottomSheet);
         setupPlayPlayer();
         restoreSavedInstanceState(savedInstanceState);
+        mProgressBar.setIndeterminate(true);
+        mProgressBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(this, R.color.colorWhite), android.graphics.PorterDuff.Mode.MULTIPLY);
     }
 
     @Override

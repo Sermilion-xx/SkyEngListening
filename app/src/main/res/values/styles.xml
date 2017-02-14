@@ -10,7 +10,7 @@
 
     <style name="AppTheme" parent="ParentTheme">
         <item name="actionBarStyle">@style/MyActionBarTheme</item>
-        <item name="colorControlActivated">@color/textColorDark</item>
+        <item name="colorControlActivated">@color/colorAccent</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="actionMenuTextColor">@color/textColorDark</item>
         <item name="android:textColorPrimary">@color/textColorDark</item>

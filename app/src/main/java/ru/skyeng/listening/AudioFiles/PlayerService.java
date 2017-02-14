@@ -25,7 +25,6 @@ import com.google.android.exoplayer2.upstream.DataSpec;
 
 import java.io.IOException;
 
-import ru.skyeng.listening.AudioFiles.domain.AudioFile;
 import ru.skyeng.listening.R;
 
 /**
@@ -42,14 +41,14 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
         AdaptiveMediaSourceEventListener, ExtractorMediaSource.EventListener {
 
     public static final String DOMAIN = "ru.skyeng.listening";
-    public static final String ACTION_PLAY = DOMAIN+".ACTION_PLAY";
-    public static final String ACTION_PAUSE = DOMAIN+".ACTION_PAUSE";
-    public static final String ACTION_CONTINUE = DOMAIN+".ACTION_CONTINUE";
+    public static final String ACTION_PLAY = DOMAIN + ".ACTION_PLAY";
+    public static final String ACTION_PAUSE = DOMAIN + ".ACTION_PAUSE";
+    public static final String ACTION_CONTINUE = DOMAIN + ".ACTION_CONTINUE";
     public static final String AUDIO_URL = "audioUrl";
     public static final String EXTRA_TITLE = "title";
     public static final String EXTRA_MESSAGE = "message";
     public static final String EXTRA_AUDIO_URL = "audioUrl";
-    public static final String ACTION_AUDIO_STATE = DOMAIN+".audioStarted";
+    public static final String ACTION_AUDIO_STATE = DOMAIN + ".audioStarted";
     public static final String KEY_PLAYER_STATE = "PLAYER_STATE";
     private AudioPlayer mPlayer;
 
@@ -57,22 +56,9 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(ACTION_PLAY)) {
-                String audioUrl = intent.getStringExtra(AUDIO_URL);
-                try {
-                    if (mPlayer.isPaused() && mPlayer.getExtraData().equals(audioUrl)) {
-                        mPlayer.setState(1);
-                        mPlayer.play(audioUrl);
-                    } else {
-                        mPlayer.play(audioUrl);
-                        mPlayer.setExtraData(audioUrl);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else if (intent.getAction().equals(ACTION_PAUSE)) {
+            if (intent.getAction().equals(ACTION_PAUSE)) {
                 mPlayer.pause();
-            }else if(intent.getAction().equals(ACTION_CONTINUE)){
+            } else if (intent.getAction().equals(ACTION_CONTINUE)) {
                 mPlayer.play();
             }
         }
@@ -115,7 +101,7 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
         intent.putExtra(EXTRA_TITLE, title);
         intent.putExtra(EXTRA_MESSAGE, message);
         NotificationCompat.Builder builder = initBasicBuilder(title, message, intent);
-        if(largeIcon==null){
+        if (largeIcon == null) {
             largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_play_white);
         }
         builder.setLargeIcon(largeIcon);
@@ -146,14 +132,21 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
 
     @Override
     public void onLoadingChanged(boolean isLoading) {
-        Intent intent = new Intent(ACTION_AUDIO_STATE);
-        intent.putExtra(KEY_PLAYER_STATE, isLoading);
-        sendBroadcast(intent);
+        if (isLoading) {
+            Intent intent = new Intent(ACTION_AUDIO_STATE);
+            intent.putExtra(KEY_PLAYER_STATE, true);
+            sendBroadcast(intent);
+        }
     }
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        System.out.println();
+        if (playbackState == 3) {
+            Intent intent = new Intent(ACTION_AUDIO_STATE);
+            intent.putExtra(KEY_PLAYER_STATE, false);
+            sendBroadcast(intent);
+        }
+
     }
 
     @Override
@@ -200,7 +193,6 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
     public void onLoadError(IOException error) {
         System.out.println();
     }
-
 
 
 }
