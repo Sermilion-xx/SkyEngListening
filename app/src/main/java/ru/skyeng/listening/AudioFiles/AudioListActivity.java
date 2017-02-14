@@ -1,6 +1,8 @@
 package ru.skyeng.listening.AudioFiles;
 
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -22,6 +24,7 @@ import static ru.skyeng.listening.AudioFiles.PlayerService.ACTION_CONTINUE;
 import static ru.skyeng.listening.AudioFiles.PlayerService.ACTION_PAUSE;
 import static ru.skyeng.listening.AudioFiles.PlayerService.ACTION_PLAY;
 import static ru.skyeng.listening.AudioFiles.PlayerService.AUDIO_URL;
+import static ru.skyeng.listening.AudioFiles.PlayerService.EXTRA_AUDIO_FILE;
 
 public class AudioListActivity extends BaseActivity {
 
@@ -139,7 +142,7 @@ public class AudioListActivity extends BaseActivity {
         }else {
             Intent intent = new Intent(this, PlayerService.class);
             intent.setAction(ACTION_PLAY);
-            intent.putExtra(AUDIO_URL, item.getAudioFileUrl());
+            intent.putExtra(EXTRA_AUDIO_FILE, item);
             startService(intent);
         }
     }

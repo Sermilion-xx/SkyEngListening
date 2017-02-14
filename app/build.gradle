@@ -51,4 +51,5 @@ dependencies {
     compile 'com.hannesdorfmann.mosby:mvp:2.0.1'
     compile 'uk.co.chrisjenx:calligraphy:2.2.0'
     compile 'com.github.wseemann:FFmpegMediaPlayer:1.0.4'
+    compile 'com.google.android.exoplayer:exoplayer:r2.2.0'
 }
