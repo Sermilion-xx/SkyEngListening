@@ -48,8 +48,6 @@ public class AudioListFragment extends MvpLceFragment<
         implements MVPView<List<AudioFile>>,
         SwipeRefreshLayout.OnRefreshListener, Observer<AudioData> {
 
-    private boolean isRefreshing;
-
     @Override
     @Inject
     public void setPresenter(@NonNull AudioListPresenter presenter) {
@@ -67,15 +65,10 @@ public class AudioListFragment extends MvpLceFragment<
     void setModel(AudioListModel model) {
         presenter.setModel(model);
     }
-
-    @Inject
-    AudioListAdapter mAdapter;
-
-    @BindView(R.id.recyclerView)
-    RecyclerView mRecyclerView;
-
-    @BindView(R.id.loadingView)
-    ProgressBar mProgress;
+    @Inject AudioListAdapter mAdapter;
+    @BindView(R.id.recyclerView) RecyclerView mRecyclerView;
+    @BindView(R.id.loadingView) ProgressBar mProgress;
+    private boolean isRefreshing;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -108,15 +101,11 @@ public class AudioListFragment extends MvpLceFragment<
     }
 
     public void startPlaying(AudioFile item) {
-        ((AudioListActivity) getActivity()).startPlaying(item);
-    }
-
-    public void showPlayer(){
-        ((AudioListActivity) getActivity()).showPlayer();
+        ((AudioListActivity) getActivity()).startPlaying(item, true);
     }
 
     public void pausePlayer(int icon) {
-        ((AudioListActivity) getActivity()).pausePlayer(icon);
+        ((AudioListActivity) getActivity()).pausePlayerIntent(icon);
     }
 
     @Override
@@ -193,6 +182,4 @@ public class AudioListFragment extends MvpLceFragment<
         mProgress.setVisibility(View.GONE);
         contentView.setRefreshing(isRefreshing);
     }
-
-
 }

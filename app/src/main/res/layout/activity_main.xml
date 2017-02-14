@@ -131,6 +131,16 @@
                     android:layout_alignEnd="@+id/audio_cover"
                     android:visibility="gone"/>
 
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="23dp"
+                    android:layout_height="23dp"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true"
+                    android:visibility="gone"
+                    />
+
             </RelativeLayout>
 
         <ImageView
@@ -151,7 +161,7 @@
             android:layout_marginTop="4dp"
             android:layout_toEndOf="@+id/audio_cover_layout"
             android:layout_toRightOf="@+id/audio_cover_layout"
-            android:text="Song title 1" />
+            android:text="@string/no_audio" />
 
         <TextView
             android:id="@+id/audio_left"
@@ -159,7 +169,7 @@
             android:layout_alignLeft="@+id/audio_title"
             android:layout_alignStart="@+id/audio_title"
             android:layout_below="@+id/audio_title"
-            android:text="-1:32" />
+            android:text="@string/negative_default_time" />
 
         <SeekBar
             android:id="@+id/audio_seek"
@@ -185,7 +195,7 @@
             android:layout_marginLeft="24dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="14dp"
-            android:text="2:34" />
+            android:text="@string/audio_default_time" />
 
         <TextView
             android:id="@+id/audio_subtitles"

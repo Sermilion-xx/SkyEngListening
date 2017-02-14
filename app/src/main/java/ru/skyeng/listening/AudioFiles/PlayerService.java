@@ -9,12 +9,19 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.MediaPlayer;
-import android.net.wifi.WifiManager;
 import android.os.IBinder;
-import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.NotificationCompat;
+
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.Format;
+import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.source.AdaptiveMediaSourceEventListener;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.upstream.DataSpec;
 
 import java.io.IOException;
 
@@ -31,17 +38,20 @@ import ru.skyeng.listening.R;
  * ---------------------------------------------------
  */
 
-public class PlayerService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener {
+public class PlayerService extends Service implements ExoPlayer.EventListener,
+        AdaptiveMediaSourceEventListener, ExtractorMediaSource.EventListener {
 
-    public static final String ACTION_PLAY = "ru.skyeng.ACTION_PLAY";
-    public static final String ACTION_PAUSE = "ru.skyeng.ACTION_PAUSE";
-    public static final String ACTION_CONTINUE = "ru.skyeng.ACTION_CONTINUE";
+    public static final String DOMAIN = "ru.skyeng.listening";
+    public static final String ACTION_PLAY = DOMAIN+".ACTION_PLAY";
+    public static final String ACTION_PAUSE = DOMAIN+".ACTION_PAUSE";
+    public static final String ACTION_CONTINUE = DOMAIN+".ACTION_CONTINUE";
     public static final String AUDIO_URL = "audioUrl";
     public static final String EXTRA_TITLE = "title";
     public static final String EXTRA_MESSAGE = "message";
-    public static final String EXTRA_AUDIO_FILE = "audioFile";
+    public static final String EXTRA_AUDIO_URL = "audioUrl";
+    public static final String ACTION_AUDIO_STATE = DOMAIN+".audioStarted";
+    public static final String KEY_PLAYER_STATE = "PLAYER_STATE";
     private AudioPlayer mPlayer;
-    private AudioFile mAudioFile;
 
     private BroadcastReceiver mPlayerBroadcast = new BroadcastReceiver() {
 
@@ -76,14 +86,13 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         filter.addAction(ACTION_PLAY);
         filter.addAction(ACTION_CONTINUE);
         this.registerReceiver(mPlayerBroadcast, filter);
-        mPlayer = new AudioPlayer(this);
+        mPlayer = new AudioPlayer(this, this);
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
-
         if (intent.getAction().equals(ACTION_PLAY)) {
-            mAudioFile = intent.getParcelableExtra(EXTRA_AUDIO_FILE);
-            mPlayer.play(mAudioFile.getAudioFileUrl());
+            String url = intent.getStringExtra(EXTRA_AUDIO_URL);
+            mPlayer.play(url);
         }
         return START_NOT_STICKY;
     }
@@ -93,17 +102,6 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     public IBinder onBind(Intent intent) {
         return null;
     }
-
-    public void onPrepared(MediaPlayer player) {
-        player.start();
-        playbackStartedNotification("SkyEng", mAudioFile.getTitle(), mAudioFile.getImageBitmap());
-    }
-
-    @Override
-    public boolean onError(MediaPlayer mp, int what, int extra) {
-        return false;
-    }
-
 
     @Override
     public void onDestroy() {
@@ -135,5 +133,75 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         }
         return builder;
     }
+
+    @Override
+    public void onTimelineChanged(Timeline timeline, Object manifest) {
+        System.out.println();
+    }
+
+    @Override
+    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+        System.out.println();
+    }
+
+    @Override
+    public void onLoadingChanged(boolean isLoading) {
+        Intent intent = new Intent(ACTION_AUDIO_STATE);
+        intent.putExtra(KEY_PLAYER_STATE, isLoading);
+        sendBroadcast(intent);
+    }
+
+    @Override
+    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+        System.out.println();
+    }
+
+    @Override
+    public void onPlayerError(ExoPlaybackException error) {
+        System.out.println();
+    }
+
+    @Override
+    public void onPositionDiscontinuity() {
+        System.out.println();
+    }
+
+    @Override
+    public void onLoadStarted(DataSpec dataSpec, int dataType, int trackType, Format trackFormat, int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs, long mediaEndTimeMs, long elapsedRealtimeMs) {
+        System.out.println();
+    }
+
+    @Override
+    public void onLoadCompleted(DataSpec dataSpec, int dataType, int trackType, Format trackFormat, int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs, long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded) {
+        System.out.println();
+    }
+
+    @Override
+    public void onLoadCanceled(DataSpec dataSpec, int dataType, int trackType, Format trackFormat, int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs, long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded) {
+        System.out.println();
+    }
+
+    @Override
+    public void onLoadError(DataSpec dataSpec, int dataType, int trackType, Format trackFormat, int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs, long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded, IOException error, boolean wasCanceled) {
+        System.out.println();
+    }
+
+    @Override
+    public void onUpstreamDiscarded(int trackType, long mediaStartTimeMs, long mediaEndTimeMs) {
+
+    }
+
+    @Override
+    public void onDownstreamFormatChanged(int trackType, Format trackFormat, int trackSelectionReason, Object trackSelectionData, long mediaTimeMs) {
+
+    }
+
+    @Override
+    public void onLoadError(IOException error) {
+        System.out.println();
+    }
+
+
+
 }
 
