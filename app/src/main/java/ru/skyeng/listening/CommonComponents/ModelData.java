@@ -1,12 +1,11 @@
-package ru.skyeng.listening.MVPBase;
+package ru.skyeng.listening.CommonComponents;
 
-import android.content.Context;
-
-import com.hannesdorfmann.mosby.mvp.lce.MvpLceView;
+import java.util.List;
+import java.util.Map;
 
 /**
  * ---------------------------------------------------
- * Created by Sermilion on 10/02/2017.
+ * Created by Sermilion on 15/02/2017.
  * Project: Listening
  * ---------------------------------------------------
  * <a href="http://www.skyeng.ru">www.skyeng.ru</a>
@@ -14,8 +13,7 @@ import com.hannesdorfmann.mosby.mvp.lce.MvpLceView;
  * ---------------------------------------------------
  */
 
-public interface MVPView<T> extends MvpLceView<T> {
-    Context getAppContext();
-    Context getActivityContext();
+public interface ModelData<A> {
+    List<A> getPrimaryData();
+    Map<String, String> getMetaData();
 }
-

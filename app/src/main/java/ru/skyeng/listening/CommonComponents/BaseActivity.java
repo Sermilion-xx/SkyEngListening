@@ -6,11 +6,15 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import ru.skyeng.listening.AudioFiles.AudioListFragment;
 import ru.skyeng.listening.R;
 
-public class BaseActivity extends AppCompatActivity {
+public class BaseActivity extends AppCompatActivity implements ActivityExtensions {
+
+    protected ProgressBar mProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,5 +47,13 @@ public class BaseActivity extends AppCompatActivity {
             transaction.commit();
         }
         return fragment;
+    }
+
+    public void showProgress(){
+        mProgress.setVisibility(View.VISIBLE);
+    }
+
+    public void hideProgress(){
+        mProgress.setVisibility(View.GONE);
     }
 }

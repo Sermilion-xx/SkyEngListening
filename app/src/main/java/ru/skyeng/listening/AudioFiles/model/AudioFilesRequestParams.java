@@ -1,4 +1,4 @@
-package ru.skyeng.listening.AudioFiles.domain;
+package ru.skyeng.listening.AudioFiles.model;
 
 import java.util.List;
 

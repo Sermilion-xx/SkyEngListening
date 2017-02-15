@@ -1,9 +1,11 @@
-package ru.skyeng.listening.AudioFiles.domain;
+package ru.skyeng.listening.AudioFiles.model;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 import java.util.Map;
+
+import ru.skyeng.listening.CommonComponents.ModelData;
 
 /**
  * ---------------------------------------------------
@@ -15,7 +17,7 @@ import java.util.Map;
  * ---------------------------------------------------
  */
 
-public class AudioData {
+public class AudioData implements ModelData<AudioFile>{
 
     @SerializedName("data")
     private List<AudioFile> audioFiles;
@@ -26,19 +28,13 @@ public class AudioData {
         this.meta = meta;
     }
 
-    public List<AudioFile> getAudioFiles() {
+    @Override
+    public List<AudioFile> getPrimaryData() {
         return audioFiles;
     }
 
-    public void setAudioFiles(List<AudioFile> audioFiles) {
-        this.audioFiles = audioFiles;
-    }
-
-    public Map<String, String> getMeta() {
+    @Override
+    public Map<String, String> getMetaData() {
         return meta;
-    }
-
-    public void setMeta(Map<String, String> meta) {
-        this.meta = meta;
     }
 }

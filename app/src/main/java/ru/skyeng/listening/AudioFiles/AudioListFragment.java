@@ -1,21 +1,15 @@
 package ru.skyeng.listening.AudioFiles;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
-
-import com.hannesdorfmann.mosby.mvp.lce.MvpLceFragment;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -23,11 +17,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
-import ru.skyeng.listening.AudioFiles.domain.AudioData;
-import ru.skyeng.listening.AudioFiles.domain.AudioFile;
-import ru.skyeng.listening.AudioFiles.domain.AudioFilesRequestParams;
+import ru.skyeng.listening.AudioFiles.model.AudioData;
+import ru.skyeng.listening.AudioFiles.model.AudioFile;
 import ru.skyeng.listening.CommonComponents.SEApplication;
-import ru.skyeng.listening.MVPBase.MVPView;
+import ru.skyeng.listening.CommonComponents.BaseFragment;
 import ru.skyeng.listening.R;
 
 /**
@@ -40,13 +33,7 @@ import ru.skyeng.listening.R;
  * ---------------------------------------------------
  */
 
-public class AudioListFragment extends MvpLceFragment<
-        SwipeRefreshLayout,
-        List<AudioFile>,
-        MVPView<List<AudioFile>>,
-        AudioListPresenter>
-        implements MVPView<List<AudioFile>>,
-        SwipeRefreshLayout.OnRefreshListener, Observer<AudioData> {
+public class AudioListFragment extends BaseFragment<AudioFile, AudioListPresenter, AudioListAdapter, AudioData> {
 
     @Override
     @Inject
@@ -55,20 +42,18 @@ public class AudioListFragment extends MvpLceFragment<
         super.setPresenter(presenter);
     }
 
-    @NonNull
-    @Override
-    public AudioListPresenter getPresenter() {
-        return super.getPresenter();
-    }
-
     @Inject
     void setModel(AudioListModel model) {
         presenter.setModel(model);
     }
-    @Inject AudioListAdapter mAdapter;
-    @BindView(R.id.recyclerView) RecyclerView mRecyclerView;
-    @BindView(R.id.loadingView) ProgressBar mProgress;
-    private boolean isRefreshing;
+
+    @Inject
+    public void setAdapter(AudioListAdapter adapter){
+        mAdapter = adapter;
+    }
+
+    @BindView(R.id.recyclerView)
+    RecyclerView mRecyclerView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -109,77 +94,9 @@ public class AudioListFragment extends MvpLceFragment<
     }
 
     @Override
-    public void onRefresh() {
-        isRefreshing = true;
-        loadData(true);
-    }
-
-    @Override
-    protected String getErrorMessage(Throwable e, boolean pullToRefresh) {
-        if (e != null)
-            return e.getMessage();
-        return getActivityContext().getString(R.string.unknown_error);
-    }
-
-    @NonNull
-    @Override
-    public AudioListPresenter createPresenter() {
-        return presenter;
-    }
-
-    @Override
-    public void setData(List<AudioFile> data) {
-        mAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void loadData(boolean pullToRefresh) {
-        if (!pullToRefresh)
-            mProgress.setVisibility(View.GONE);
-        presenter.loadData(pullToRefresh, new AudioFilesRequestParams());
-    }
-
-    @Override
-    public void showLoading(boolean pullToRefresh) {
-        super.showLoading(pullToRefresh);
-        contentView.setRefreshing(pullToRefresh);
-    }
-
-    @Override
-    public Context getAppContext() {
-        return getActivity().getApplicationContext();
-    }
-
-    @Override
-    public Context getActivityContext() {
-        return getActivity();
-    }
-
-    @Override
-    public void onSubscribe(Disposable d) {
-        if (!isRefreshing)
-            mProgress.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onNext(AudioData value) {
-        presenter.getModel().setData(value);
-        isRefreshing = false;
-        setData(value.getAudioFiles());
-    }
-
-    @Override
-    public void onError(Throwable e) {
-        isRefreshing = false;
-        showError(e.getCause(), isRefreshing);
-        contentView.setRefreshing(false);
-        e.printStackTrace();
-        setData(new ArrayList<>());
-    }
-
-    @Override
     public void onComplete() {
-        mProgress.setVisibility(View.GONE);
+        ((AudioListActivity) getActivity()).updateButtonsVisibility();
+        ((AudioListActivity) getActivity()).hideProgress();
         contentView.setRefreshing(isRefreshing);
     }
 }

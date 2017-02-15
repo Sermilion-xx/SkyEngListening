@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
 import ru.skyeng.listening.AudioFiles.AudioListFragment;
+import ru.skyeng.listening.Categories.CategoriesFragment;
 
 /**
  * ---------------------------------------------------
@@ -21,6 +22,8 @@ public class FragmentFactory {
     public static Fragment createFragmentWithName(Class<? extends Fragment> fragmentClass){
         if(fragmentClass.getName().equals(AudioListFragment.class.getName())){
             return new AudioListFragment();
+        }else if(fragmentClass.getName().equals(CategoriesFragment.class.getName())){
+            return new CategoriesFragment();
         }else {
             return null;
         }

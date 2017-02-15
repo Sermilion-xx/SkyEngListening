@@ -13,7 +13,7 @@
     <color name="textColorSecondary">#9da5b3</color>
     <color name="colorBlack12">#12000000</color>
     <color name="colorWhite">#ffffff</color>
-    <color name="playerColor">#fafafa</color>
+    <color name="almostWhite">#fafafa</color>
 
 
 </resources>

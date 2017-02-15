@@ -4,10 +4,7 @@ import com.google.gson.Gson;
 
 import org.junit.Test;
 
-import ru.skyeng.listening.AudioFiles.AudioListFragment;
-import ru.skyeng.listening.AudioFiles.domain.AudioData;
-
-import static org.junit.Assert.*;
+import ru.skyeng.listening.AudioFiles.model.AudioData;
 
 /**
  * Example local unit test, which will execute on the development machine (host).

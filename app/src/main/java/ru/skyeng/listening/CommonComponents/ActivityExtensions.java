@@ -2,7 +2,7 @@ package ru.skyeng.listening.CommonComponents;
 
 /**
  * ---------------------------------------------------
- * Created by Sermilion on 10/02/2017.
+ * Created by Sermilion on 15/02/2017.
  * Project: Listening
  * ---------------------------------------------------
  * <a href="http://www.skyeng.ru">www.skyeng.ru</a>
@@ -10,10 +10,7 @@ package ru.skyeng.listening.CommonComponents;
  * ---------------------------------------------------
  */
 
-public interface SECallback<T> {
-
-    void onSuccess(T o);
-
-    void onError(Throwable t);
-
+public interface ActivityExtensions {
+    void showProgress();
+    void hideProgress();
 }

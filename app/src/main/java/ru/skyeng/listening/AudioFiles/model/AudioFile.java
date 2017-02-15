@@ -1,10 +1,9 @@
-package ru.skyeng.listening.AudioFiles.domain;
+package ru.skyeng.listening.AudioFiles.model;
 
 import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package ru.skyeng.listening.AudioFiles;
+package ru.skyeng.listening.AudioFiles.player;
 
 import android.content.Context;
 import android.net.Uri;
@@ -6,6 +6,7 @@ import android.net.Uri;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
@@ -31,6 +32,8 @@ import ru.skyeng.listening.CommonComponents.SEApplication;
 
 class AudioPlayer {
 
+    private static final int BUFFER_SEGMENT_SIZE = 1024;
+    private static final int MAIN_BUFFER_SEGMENTS = 254;
     private static final DefaultBandwidthMeter BANDWIDTH_METER = new DefaultBandwidthMeter();
     private Context mContext;
     private SimpleExoPlayer mPlayer;
@@ -41,12 +44,8 @@ class AudioPlayer {
     private boolean shouldAutoPlay;
     private DataSource.Factory mediaDataSourceFactory;
 
-    String getExtraData() {
-        return extraData;
-    }
-
-    void setExtraData(String extraData) {
-        this.extraData = extraData;
+    public SimpleExoPlayer getPlayer() {
+        return mPlayer;
     }
 
     AudioPlayer(Context context, ExoPlayer.EventListener eventListener){
@@ -98,7 +97,9 @@ class AudioPlayer {
             TrackSelection.Factory videoTrackSelectionFactory =
                     new AdaptiveVideoTrackSelection.Factory(BANDWIDTH_METER);
             DefaultTrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
-            mPlayer = ExoPlayerFactory.newSimpleInstance(mContext, trackSelector, new DefaultLoadControl(),
+            LoadControl loadControl = new DefaultLoadControl();
+            loadControl.shouldStartPlayback(0, false);
+            mPlayer = ExoPlayerFactory.newSimpleInstance(mContext, trackSelector, loadControl,
                     null);
             mPlayer.addListener(mEventListener);
             EventLogger eventLogger = new EventLogger(trackSelector);
@@ -115,4 +116,7 @@ class AudioPlayer {
                 .buildDataSourceFactory(useBandwidthMeter ? BANDWIDTH_METER : null);
     }
 
+    public long getDuration() {
+        return mPlayer.getDuration();
+    }
 }

@@ -1,8 +1,9 @@
-package ru.skyeng.listening.MVPBase;
+package ru.skyeng.listening.Categories.dagger;
 
-import android.content.Context;
+import javax.inject.Singleton;
 
-import com.hannesdorfmann.mosby.mvp.lce.MvpLceView;
+import dagger.Component;
+import ru.skyeng.listening.Categories.CategoriesFragment;
 
 /**
  * ---------------------------------------------------
@@ -13,9 +14,8 @@ import com.hannesdorfmann.mosby.mvp.lce.MvpLceView;
  * <a href="http://www.github.com/sermilion>github</a>
  * ---------------------------------------------------
  */
-
-public interface MVPView<T> extends MvpLceView<T> {
-    Context getAppContext();
-    Context getActivityContext();
+@Singleton
+@Component(modules = {CategoriesModule.class})
+public interface CategoriesDiComponent {
+    void inject(CategoriesFragment fragment);
 }
-

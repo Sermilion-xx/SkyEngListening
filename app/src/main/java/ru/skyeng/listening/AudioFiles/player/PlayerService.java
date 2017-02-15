@@ -1,4 +1,4 @@
-package ru.skyeng.listening.AudioFiles;
+package ru.skyeng.listening.AudioFiles.player;
 
 import android.app.Notification;
 import android.app.Service;
@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v7.app.NotificationCompat;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Format;
@@ -25,6 +26,7 @@ import com.google.android.exoplayer2.upstream.DataSpec;
 
 import java.io.IOException;
 
+import ru.skyeng.listening.AudioFiles.AudioListActivity;
 import ru.skyeng.listening.R;
 
 /**
@@ -44,13 +46,20 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
     public static final String ACTION_PLAY = DOMAIN + ".ACTION_PLAY";
     public static final String ACTION_PAUSE = DOMAIN + ".ACTION_PAUSE";
     public static final String ACTION_CONTINUE = DOMAIN + ".ACTION_CONTINUE";
-    public static final String AUDIO_URL = "audioUrl";
     public static final String EXTRA_TITLE = "title";
     public static final String EXTRA_MESSAGE = "message";
     public static final String EXTRA_AUDIO_URL = "audioUrl";
-    public static final String ACTION_AUDIO_STATE = DOMAIN + ".audioStarted";
+    public static final String ACTION_AUDIO_STATE = DOMAIN + ".ACTION_STARTED";
+    public static final String ACTION_UPDATE_PLAYER = DOMAIN + ".ACTION_UPDATE_PLAYER";
     public static final String KEY_PLAYER_STATE = "PLAYER_STATE";
+    public static final String PLAYER_UPDATE_VALUE_1 = "updateValue1";
+    public static final String PLAYER_UPDATE_VALUE_2 = "updateValue2";
+    public static final String CATEGORY_AUDIO_LEFT = DOMAIN + "CATEGORY_AUDIO_LEFT";
+    public static final String CATEGORY_AUDIO_SEEK = DOMAIN + "CATEGORY_AUDIO_SEEK";
+    public static final String CATEGORY_AUDIO_PLAYED = DOMAIN + "CATEGORY_AUDIO_PLAYED";
+    public static final int PROGRESS_BAR_MAX = 1000;
     private AudioPlayer mPlayer;
+    private ComponentListener mComponentListener;
 
     private BroadcastReceiver mPlayerBroadcast = new BroadcastReceiver() {
 
@@ -73,6 +82,7 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
         filter.addAction(ACTION_CONTINUE);
         this.registerReceiver(mPlayerBroadcast, filter);
         mPlayer = new AudioPlayer(this, this);
+        mComponentListener = new ComponentListener(this, mPlayer.getPlayer());
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -194,6 +204,12 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
         System.out.println();
     }
 
+
+    private int progressBarValue(long position) {
+        long duration = mPlayer == null ? C.TIME_UNSET : mPlayer.getDuration();
+        return duration == C.TIME_UNSET || duration == 0 ? 0
+                : (int) ((position * PROGRESS_BAR_MAX) / duration);
+    }
 
 }
 

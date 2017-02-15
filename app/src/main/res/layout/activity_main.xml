@@ -8,6 +8,13 @@
     android:fitsSystemWindows="false"
     tools:context="ru.skyeng.listening.AudioFiles.AudioListActivity">
 
+    <ProgressBar android:id="@+id/loadingView"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        xmlns:android="http://schemas.android.com/apk/res/android"/>
+
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
@@ -50,7 +57,6 @@
                 android:layout_below="@+id/toolbar"
                 android:layout_margin="16dp"
                 android:background="@drawable/selector_button_category"
-                android:text="@string/categories"
                 android:textColor="@color/colorBlue2" />
 
             <Button
@@ -62,7 +68,7 @@
                 android:layout_below="@+id/toolbar"
                 android:layout_margin="16dp"
                 android:background="@drawable/selector_button_length"
-                android:text="@string/length"
+
                 android:textColor="@color/colorBlue2" />
 
             <View
@@ -94,7 +100,7 @@
         android:orientation="vertical"
         android:clickable="true"
         android:id="@+id/player_dialog"
-        android:background="@color/playerColor"
+        android:background="@color/almostWhite"
         app:behavior_hideable="true"
         app:elevation="16dp"
         app:layout_behavior="@string/bottom_sheet_behavior">

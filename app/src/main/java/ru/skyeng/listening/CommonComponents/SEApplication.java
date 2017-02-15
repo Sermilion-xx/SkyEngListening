@@ -12,6 +12,8 @@ import com.google.android.exoplayer2.util.Util;
 
 import ru.skyeng.listening.AudioFiles.dagger.AudioListDiComponent;
 import ru.skyeng.listening.AudioFiles.dagger.DaggerAudioListDiComponent;
+import ru.skyeng.listening.Categories.dagger.CategoriesDiComponent;
+import ru.skyeng.listening.Categories.dagger.DaggerCategoriesDiComponent;
 
 /**
  * ---------------------------------------------------
@@ -26,13 +28,23 @@ import ru.skyeng.listening.AudioFiles.dagger.DaggerAudioListDiComponent;
 public class SEApplication extends Application {
 
     private AudioListDiComponent audioListDiComponent;
+    private CategoriesDiComponent categoriesDiComponent;
     protected String userAgent;
 
     @Override
     public void onCreate() {
         super.onCreate();
         audioListDiComponent = DaggerAudioListDiComponent.builder().build();
+        categoriesDiComponent = DaggerCategoriesDiComponent.builder().build();
         userAgent = Util.getUserAgent(this, "SkyEng Listening");
+    }
+
+    public AudioListDiComponent getAudioListDiComponent() {
+        return audioListDiComponent;
+    }
+
+    public CategoriesDiComponent getCategoriesDiComponent() {
+        return categoriesDiComponent;
     }
 
     public DataSource.Factory buildDataSourceFactory(DefaultBandwidthMeter bandwidthMeter) {
@@ -44,9 +56,7 @@ public class SEApplication extends Application {
         return new DefaultHttpDataSourceFactory(userAgent, bandwidthMeter);
     }
 
-    public AudioListDiComponent getAudioListDiComponent() {
-        return audioListDiComponent;
-    }
+
 
     public boolean useExtensionRenderers() {
         return BuildConfig.FLAVOR.equals("withExtensions");

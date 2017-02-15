@@ -1,12 +1,10 @@
-package ru.skyeng.listening.MVPBase;
+package ru.skyeng.listening.Categories.model;
 
-import android.content.Context;
-
-import com.hannesdorfmann.mosby.mvp.lce.MvpLceView;
+import ru.skyeng.listening.CommonComponents.RequestParams;
 
 /**
  * ---------------------------------------------------
- * Created by Sermilion on 10/02/2017.
+ * Created by Sermilion on 15/02/2017.
  * Project: Listening
  * ---------------------------------------------------
  * <a href="http://www.skyeng.ru">www.skyeng.ru</a>
@@ -14,8 +12,5 @@ import com.hannesdorfmann.mosby.mvp.lce.MvpLceView;
  * ---------------------------------------------------
  */
 
-public interface MVPView<T> extends MvpLceView<T> {
-    Context getAppContext();
-    Context getActivityContext();
+public class TagsRequestParams implements RequestParams {
 }
-

@@ -1,4 +1,4 @@
-package ru.skyeng.listening.AudioFiles.network;
+package ru.skyeng.listening.Categories.network;
 
 import java.util.List;
 
@@ -17,17 +17,17 @@ import ru.skyeng.listening.AudioFiles.model.AudioData;
  * ---------------------------------------------------
  */
 
-public interface AudioFilesService {
+public interface TagsService {
 
     @GET("/audios")
     Observable<AudioData> getAudioFiles(
-            @Query("page") Integer  page,
-            @Query("pageSize") Integer  pageSize,
+            @Query("page") Integer page,
+            @Query("pageSize") Integer pageSize,
             @Query("title") String title,
-            @Query("accentId") Integer  accentId,
-            @Query("levelId") Integer  levelId,
+            @Query("accentId") Integer accentId,
+            @Query("levelId") Integer levelId,
             @Query("tagIds[]") List<String> tagIds,
-            @Query("durationGT") Integer  durationGT,
-            @Query("durationLT") Integer  durationLT
+            @Query("durationGT") Integer durationGT,
+            @Query("durationLT") Integer durationLT
     );
 }

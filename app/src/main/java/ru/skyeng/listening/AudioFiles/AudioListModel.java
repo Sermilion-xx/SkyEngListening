@@ -8,9 +8,9 @@ import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import ru.skyeng.listening.AudioFiles.domain.AudioData;
-import ru.skyeng.listening.AudioFiles.domain.AudioFile;
-import ru.skyeng.listening.AudioFiles.domain.AudioFilesRequestParams;
+import ru.skyeng.listening.AudioFiles.model.AudioData;
+import ru.skyeng.listening.AudioFiles.model.AudioFile;
+import ru.skyeng.listening.AudioFiles.model.AudioFilesRequestParams;
 import ru.skyeng.listening.AudioFiles.network.AudioFilesService;
 import ru.skyeng.listening.CommonComponents.ServiceGenerator;
 import ru.skyeng.listening.MVPBase.MVPModel;
@@ -40,6 +40,8 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
 
     @Override
     public void loadData(Observer<AudioData> observable, AudioFilesRequestParams params) {
+        if(params==null)
+            params = new AudioFilesRequestParams();
         Observable<AudioData> audioDataObservable = audioFilesService.getAudioFiles(
                 params.getPage(),
                 params.getPageSize(),

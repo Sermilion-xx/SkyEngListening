@@ -7,9 +7,9 @@ import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 import java.util.List;
 
 import io.reactivex.Observer;
-import ru.skyeng.listening.AudioFiles.domain.AudioData;
-import ru.skyeng.listening.AudioFiles.domain.AudioFile;
-import ru.skyeng.listening.AudioFiles.domain.AudioFilesRequestParams;
+import ru.skyeng.listening.AudioFiles.model.AudioData;
+import ru.skyeng.listening.AudioFiles.model.AudioFile;
+import ru.skyeng.listening.AudioFiles.model.AudioFilesRequestParams;
 import ru.skyeng.listening.CommonComponents.RequestParams;
 import ru.skyeng.listening.MVPBase.MVPModel;
 import ru.skyeng.listening.MVPBase.MVPPresenter;
@@ -59,10 +59,8 @@ public class AudioListPresenter
     }
 
     @Override
-    public void loadData(final boolean pullToRefresh,
-                         RequestParams params) {
-        mModel.loadData(mObserver
-        , (AudioFilesRequestParams) params);
+    public void loadData(final boolean pullToRefresh, RequestParams params) {
+        mModel.loadData(mObserver, (AudioFilesRequestParams) params);
     }
 
 

@@ -15,9 +15,9 @@ import com.bumptech.glide.Glide;
 
 import java.util.List;
 
-import ru.skyeng.listening.AudioFiles.domain.AudioData;
-import ru.skyeng.listening.AudioFiles.domain.AudioFile;
-import ru.skyeng.listening.AudioFiles.domain.AudioFilesRequestParams;
+import ru.skyeng.listening.AudioFiles.model.AudioData;
+import ru.skyeng.listening.AudioFiles.model.AudioFile;
+import ru.skyeng.listening.AudioFiles.model.AudioFilesRequestParams;
 import ru.skyeng.listening.CommonComponents.FacadeCommon;
 import ru.skyeng.listening.MVPBase.MVPPresenter;
 import ru.skyeng.listening.R;
