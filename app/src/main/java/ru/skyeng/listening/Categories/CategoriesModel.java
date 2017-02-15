@@ -2,18 +2,13 @@ package ru.skyeng.listening.Categories;
 
 import android.os.Bundle;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import ru.skyeng.listening.AudioFiles.model.AudioData;
-import ru.skyeng.listening.AudioFiles.model.AudioFile;
-import ru.skyeng.listening.AudioFiles.model.AudioFilesRequestParams;
-import ru.skyeng.listening.AudioFiles.network.AudioFilesService;
-import ru.skyeng.listening.Categories.model.Tag;
+import ru.skyeng.listening.Categories.model.AudioTag;
 import ru.skyeng.listening.Categories.model.TagsData;
 import ru.skyeng.listening.Categories.model.TagsRequestParams;
 import ru.skyeng.listening.Categories.network.TagsService;
@@ -33,7 +28,7 @@ import static ru.skyeng.listening.CommonComponents.Constants.LAST_PAGE;
  * ---------------------------------------------------
  */
 
-public class CategoriesModel implements MVPModel<TagsData, List<Tag>, TagsRequestParams> {
+public class CategoriesModel implements MVPModel<TagsData, List<AudioTag>, TagsRequestParams> {
 
     private TagsService mTagsService;
     private TagsData mData;
@@ -62,12 +57,12 @@ public class CategoriesModel implements MVPModel<TagsData, List<Tag>, TagsReques
     }
 
     @Override
-    public List<Tag> processResult(TagsData data) {
+    public List<AudioTag> processResult(TagsData data) {
         return data.getPrimaryData();
     }
 
     @Override
-    public List<Tag> getItems() {
+    public List<AudioTag> getItems() {
         if(mData==null) return null;
         return mData.getPrimaryData();
     }

@@ -4,14 +4,19 @@
     android:layout_height="match_parent"
     android:id="@+id/contentView">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:background="@color/almostWhite"
+    <com.cunoraz.tagview.TagView
+        xmlns:tagview="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/tag_group"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:numColumns="auto_fit"/>
+        android:layout_height="match_parent"
+        tagview:tagMargin="12dp"
+        tagview:lineMargin="12dp"
+        tagview:textPaddingTop="10dp"
+        tagview:textPaddingBottom="10dp"
+        tagview:textPaddingLeft="10dp"
+        tagview:textPaddingRight="10dp"/>
 
-    <include layout="@layout/loading_view" />
+    <include layout="@layout/loading_view"/>
 
     <TextView
         android:id="@+id/errorView"

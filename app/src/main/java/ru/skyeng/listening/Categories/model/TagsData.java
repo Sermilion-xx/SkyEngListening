@@ -17,20 +17,20 @@ import ru.skyeng.listening.CommonComponents.Interfaces.ModelData;
  * ---------------------------------------------------
  */
 
-public class TagsData implements ModelData<Tag>{
+public class TagsData implements ModelData<AudioTag>{
 
     @SerializedName("data")
-    private List<Tag> tags;
+    private List<AudioTag> audioTags;
     private Map<String, String> meta;
 
-    public TagsData(List<Tag> tags, Map<String, String> meta) {
-        this.tags = tags;
+    public TagsData(List<AudioTag> audioTags, Map<String, String> meta) {
+        this.audioTags = audioTags;
         this.meta = meta;
     }
 
     @Override
-    public List<Tag> getPrimaryData() {
-        return tags;
+    public List<AudioTag> getPrimaryData() {
+        return audioTags;
     }
 
     @Override

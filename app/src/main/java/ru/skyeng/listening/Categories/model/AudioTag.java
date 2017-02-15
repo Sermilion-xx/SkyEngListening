@@ -10,13 +10,13 @@ package ru.skyeng.listening.Categories.model;
  * ---------------------------------------------------
  */
 
-public class Tag {
+public class AudioTag {
 
     private int id;
     private String title;
     private boolean selected;
 
-    public Tag(int id, String title) {
+    public AudioTag(int id, String title) {
         this.id = id;
         this.title = title;
         this.selected = false;

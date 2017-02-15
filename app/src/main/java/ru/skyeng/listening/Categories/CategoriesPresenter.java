@@ -7,8 +7,7 @@ import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 import java.util.List;
 
 import io.reactivex.Observer;
-import ru.skyeng.listening.AudioFiles.model.AudioFilesRequestParams;
-import ru.skyeng.listening.Categories.model.Tag;
+import ru.skyeng.listening.Categories.model.AudioTag;
 import ru.skyeng.listening.Categories.model.TagsData;
 import ru.skyeng.listening.Categories.model.TagsRequestParams;
 import ru.skyeng.listening.CommonComponents.Interfaces.RequestParams;
@@ -26,10 +25,10 @@ import ru.skyeng.listening.MVPBase.MVPView;
  * ---------------------------------------------------
  */
 
-public class CategoriesPresenter extends MvpBasePresenter<MVPView<List<Tag>>>
+public class CategoriesPresenter extends MvpBasePresenter<MVPView<List<AudioTag>>>
         implements MVPPresenter<
         TagsData,
-        List<Tag>,
+        List<AudioTag>,
         TagsRequestParams> {
 
     private CategoriesModel mModel;
@@ -52,18 +51,18 @@ public class CategoriesPresenter extends MvpBasePresenter<MVPView<List<Tag>>>
     }
 
     @Override
-    public void setModel(MVPModel<TagsData, List<Tag>, TagsRequestParams> model) {
+    public void setModel(MVPModel<TagsData, List<AudioTag>, TagsRequestParams> model) {
         this.mModel = (CategoriesModel) model;
         this.mModel.initRetrofitService();
     }
 
     @Override
-    public MVPModel<TagsData, List<Tag>, TagsRequestParams> getModel() {
+    public MVPModel<TagsData, List<AudioTag>, TagsRequestParams> getModel() {
         return mModel;
     }
 
     @Override
-    public List<Tag> getData() {
+    public List<AudioTag> getData() {
         return getModel().getItems();
     }
 
