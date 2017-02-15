@@ -132,11 +132,8 @@ public class AudioListFragment extends MvpLceFragment<
         mAdapter.notifyDataSetChanged();
     }
 
-
     @Override
     public void loadData(boolean pullToRefresh) {
-        if (!pullToRefresh)
-//            mProgress.setVisibility(View.GONE);
         presenter.loadData(pullToRefresh, new AudioFilesRequestParams());
     }
 
@@ -164,7 +161,6 @@ public class AudioListFragment extends MvpLceFragment<
     @Override
     public void onNext(AudioData value) {
         presenter.getModel().setData(value);
-        isRefreshing = false;
         setData(value.getPrimaryData());
     }
 
@@ -180,7 +176,7 @@ public class AudioListFragment extends MvpLceFragment<
     @Override
     public void onComplete() {
         ((AudioListActivity)getActivityContext()).updateButtonsVisibility();
-//        mProgress.setVisibility(View.GONE);
-        contentView.setRefreshing(isRefreshing);
+        if(isRefreshing)
+        contentView.setRefreshing(false);
     }
 }

@@ -4,7 +4,6 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import ru.skyeng.listening.Categories.CategoriesAdapter;
 import ru.skyeng.listening.Categories.CategoriesModel;
 import ru.skyeng.listening.Categories.CategoriesPresenter;
 
@@ -32,10 +31,5 @@ class CategoriesModule {
         return new CategoriesModel();
     }
 
-    @Provides
-    @Singleton
-    CategoriesAdapter getCategoriesAdapter(){
-        return new CategoriesAdapter();
-    }
 
 }

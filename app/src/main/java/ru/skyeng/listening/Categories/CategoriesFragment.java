@@ -51,14 +51,17 @@ public class CategoriesFragment extends MvpLceFragment<
         SwipeRefreshLayout.OnRefreshListener, Observer<TagsData> {
 
     private List<Integer> mSelectedIds;
+
     protected boolean isRefreshing;
-    @Inject
-    CategoriesAdapter mAdapter;
     @BindView(R.id.tag_group)
     TagView tagGroup;
 
     private List<Integer> selectedTags;
 
+    public void resetSelectedTags(){
+        selectedTags.clear();
+        initTagView(selectedTags);
+    }
 
     public void addSelectedId(Integer id){
         mSelectedIds.add(id);
@@ -117,7 +120,6 @@ public class CategoriesFragment extends MvpLceFragment<
             }
         });
 
-
         if ((presenter.getModel()).getItems() == null) {
             loadData(false);
         }else {
@@ -142,7 +144,7 @@ public class CategoriesFragment extends MvpLceFragment<
 
     @Override
     public void setData(List<AudioTag> data) {
-        mAdapter.notifyDataSetChanged();
+
     }
 
     @Override
@@ -183,7 +185,7 @@ public class CategoriesFragment extends MvpLceFragment<
                 tag.background = ContextCompat.getDrawable(getActivityContext(), R.drawable.blue2_with_shadow);
                 tag.tagTextColor = ContextCompat.getColor(getActivityContext(), R.color.colorWhite);
             }else {
-                tag.layoutColor = ContextCompat.getColor(getActivityContext(), R.color.colorBlue1);
+                tag.layoutColor = ContextCompat.getColor(getActivityContext(), R.color.colorBlue0);
                 tag.tagTextColor = ContextCompat.getColor(getActivityContext(), R.color.colorBlue2);
             }
             tag.tagTextSize = 16;
