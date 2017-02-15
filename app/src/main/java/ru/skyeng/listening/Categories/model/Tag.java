@@ -14,10 +14,20 @@ public class Tag {
 
     private int id;
     private String title;
+    private boolean selected;
 
     public Tag(int id, String title) {
         this.id = id;
         this.title = title;
+        this.selected = false;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public boolean isSelected() {
+        return selected;
     }
 
     public int getId() {

@@ -6,6 +6,7 @@ import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 import ru.skyeng.listening.AudioFiles.model.AudioData;
+import ru.skyeng.listening.Categories.model.TagsData;
 
 /**
  * ---------------------------------------------------
@@ -19,15 +20,9 @@ import ru.skyeng.listening.AudioFiles.model.AudioData;
 
 public interface TagsService {
 
-    @GET("/audios")
-    Observable<AudioData> getAudioFiles(
+    @GET("/tags")
+    Observable<TagsData> getTags(
             @Query("page") Integer page,
-            @Query("pageSize") Integer pageSize,
-            @Query("title") String title,
-            @Query("accentId") Integer accentId,
-            @Query("levelId") Integer levelId,
-            @Query("tagIds[]") List<String> tagIds,
-            @Query("durationGT") Integer durationGT,
-            @Query("durationLT") Integer durationLT
+            @Query("pageSize") Integer pageSize
     );
 }

@@ -10,7 +10,7 @@ import io.reactivex.Observer;
 import ru.skyeng.listening.AudioFiles.model.AudioData;
 import ru.skyeng.listening.AudioFiles.model.AudioFile;
 import ru.skyeng.listening.AudioFiles.model.AudioFilesRequestParams;
-import ru.skyeng.listening.CommonComponents.RequestParams;
+import ru.skyeng.listening.CommonComponents.Interfaces.RequestParams;
 import ru.skyeng.listening.MVPBase.MVPModel;
 import ru.skyeng.listening.MVPBase.MVPPresenter;
 import ru.skyeng.listening.MVPBase.MVPView;

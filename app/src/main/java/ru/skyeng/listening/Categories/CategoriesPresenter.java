@@ -7,13 +7,11 @@ import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 import java.util.List;
 
 import io.reactivex.Observer;
-import ru.skyeng.listening.AudioFiles.model.AudioData;
-import ru.skyeng.listening.AudioFiles.model.AudioFile;
 import ru.skyeng.listening.AudioFiles.model.AudioFilesRequestParams;
 import ru.skyeng.listening.Categories.model.Tag;
 import ru.skyeng.listening.Categories.model.TagsData;
 import ru.skyeng.listening.Categories.model.TagsRequestParams;
-import ru.skyeng.listening.CommonComponents.RequestParams;
+import ru.skyeng.listening.CommonComponents.Interfaces.RequestParams;
 import ru.skyeng.listening.MVPBase.MVPModel;
 import ru.skyeng.listening.MVPBase.MVPPresenter;
 import ru.skyeng.listening.MVPBase.MVPView;
@@ -34,38 +32,48 @@ public class CategoriesPresenter extends MvpBasePresenter<MVPView<List<Tag>>>
         List<Tag>,
         TagsRequestParams> {
 
+    private CategoriesModel mModel;
+    private Observer<TagsData> mObserver;
+
     @Override
     public Context getAppContext() {
+        if (getView() != null) {
+            return getView().getAppContext();
+        }
         return null;
     }
 
     @Override
     public Context getActivityContext() {
+        if (getView() != null) {
+            return getView().getActivityContext();
+        }
         return null;
     }
 
     @Override
-    public void setModel(MVPModel<TagsData, List<Tag>, TagsRequestParams> models) {
-
+    public void setModel(MVPModel<TagsData, List<Tag>, TagsRequestParams> model) {
+        this.mModel = (CategoriesModel) model;
+        this.mModel.initRetrofitService();
     }
 
     @Override
     public MVPModel<TagsData, List<Tag>, TagsRequestParams> getModel() {
-        return null;
+        return mModel;
     }
 
     @Override
     public List<Tag> getData() {
-        return null;
+        return getModel().getItems();
     }
 
     @Override
     public void loadData(boolean pullToRefresh, RequestParams params) {
-
+        mModel.loadData(mObserver, (TagsRequestParams) params);
     }
 
     @Override
     public void setObserver(Observer<TagsData> observer) {
-
+        mObserver = observer;
     }
 }

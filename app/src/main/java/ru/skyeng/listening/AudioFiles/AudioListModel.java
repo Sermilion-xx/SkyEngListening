@@ -15,6 +15,9 @@ import ru.skyeng.listening.AudioFiles.network.AudioFilesService;
 import ru.skyeng.listening.CommonComponents.ServiceGenerator;
 import ru.skyeng.listening.MVPBase.MVPModel;
 
+import static ru.skyeng.listening.CommonComponents.Constants.CURRENT_PAGE;
+import static ru.skyeng.listening.CommonComponents.Constants.LAST_PAGE;
+
 /**
  * ---------------------------------------------------
  * Created by Sermilion on 10/02/2017.
@@ -27,8 +30,7 @@ import ru.skyeng.listening.MVPBase.MVPModel;
 
 public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, AudioFilesRequestParams> {
 
-    private static final String CURRENT_PAGE = "currentPage";
-    private static final String LAST_PAGE = "lastPage";
+
     private AudioFilesService audioFilesService;
     private AudioData mData;
 
@@ -63,13 +65,13 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
 
     @Override
     public List<AudioFile> processResult(AudioData data) {
-        return data.getAudioFiles();
+        return data.getPrimaryData();
     }
 
     @Override
     public List<AudioFile> getItems() {
         if(mData!=null){
-            return mData.getAudioFiles();
+            return mData.getPrimaryData();
         }
         return null;
     }
@@ -77,8 +79,8 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
     @Override
     public Bundle getExtraData() {
         Bundle bundle = new Bundle();
-        bundle.putInt(CURRENT_PAGE, Integer.parseInt(mData.getMeta().get(CURRENT_PAGE)));
-        bundle.putInt(LAST_PAGE, Integer.parseInt(mData.getMeta().get(LAST_PAGE)));
+        bundle.putInt(CURRENT_PAGE, Integer.parseInt(mData.getMetaData().get(CURRENT_PAGE)));
+        bundle.putInt(LAST_PAGE, Integer.parseInt(mData.getMetaData().get(LAST_PAGE)));
         return bundle;
     }
 

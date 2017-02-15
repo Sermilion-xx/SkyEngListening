@@ -1,4 +1,7 @@
-package ru.skyeng.listening.CommonComponents;
+package ru.skyeng.listening.CommonComponents.Interfaces;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * ---------------------------------------------------
@@ -10,7 +13,7 @@ package ru.skyeng.listening.CommonComponents;
  * ---------------------------------------------------
  */
 
-public interface ActivityExtensions {
-    void showProgress();
-    void hideProgress();
+public interface ModelData<A> {
+    List<A> getPrimaryData();
+    Map<String, String> getMetaData();
 }

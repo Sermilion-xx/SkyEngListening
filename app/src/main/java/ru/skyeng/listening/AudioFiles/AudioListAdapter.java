@@ -60,47 +60,47 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public AudioViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View viewRow = inflater.inflate(R.layout.list_item_audio_file, parent, false);
         return new AudioViewHolder(viewRow);
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        AudioViewHolder viewHolder = (AudioViewHolder) holder;
+    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+        AudioViewHolder holder = (AudioViewHolder) viewHolder;
         AudioFile item = getItems().get(position);
         item.setDurationInMinutes(FacadeCommon.getDateFromMillis(item.getDurationInSeconds() * 1000));
-        viewHolder.mDuration.setText(item.getDurationInMinutes());
-        viewHolder.mDescription.setText(item.getDescription());
-        viewHolder.mName.setText(item.getTitle());
+        holder.mDuration.setText(item.getDurationInMinutes());
+        holder.mDescription.setText(item.getDescription());
+        holder.mName.setText(item.getTitle());
 
         if (item.getState() == 1) {
             playingPosition = position;
-            setupAudioCover(viewHolder, R.drawable.ic_pause_blue, View.VISIBLE);
+            setupAudioCover(holder, R.drawable.ic_pause_blue, View.VISIBLE);
         } else if (item.getState() == 2) {
-            setupAudioCover(viewHolder, R.drawable.ic_play_blue, View.VISIBLE);
+            setupAudioCover(holder, R.drawable.ic_play_blue, View.VISIBLE);
         } else if (item.getState() == 0) {
-            setupAudioCover(viewHolder, -1, View.GONE);
+            setupAudioCover(holder, -1, View.GONE);
         }
 
         String category = getContext().getString(R.string.no_category);
         if (item.getTags().size() > 0) {
             category = item.getTags().get(0).get(KEY_TITLE);
         }
-        viewHolder.mCategory.setText(category);
+        holder.mCategory.setText(category);
 
         if (item.getImageFileUrl() != null && item.getImageBitmap() == null) {
             Glide.with(getContext())
                     .load(item.getImageFileUrl())
-                    .into(viewHolder.mCoverImage);
-            item.setImageBitmap(((BitmapDrawable) viewHolder.mCoverImage.getDrawable()).getBitmap());
+                    .into(holder.mCoverImage);
+            item.setImageBitmap(((BitmapDrawable) holder.mCoverImage.getDrawable()).getBitmap());
         } else {
             if (item.getImageBitmap() != null) {
-                viewHolder.mCoverImage.setImageBitmap(item.getImageBitmap());
+                holder.mCoverImage.setImageBitmap(item.getImageBitmap());
             }
         }
-        viewHolder.mCoverImage.setOnClickListener(getOnClickListener(position, viewHolder, item));
+        holder.mCoverImage.setOnClickListener(getOnClickListener(position, holder, item));
     }
 
     private void setupAudioCover(AudioViewHolder viewHolder, int drawableId, int visibility) {
@@ -177,7 +177,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         return getItems() != null ? getItems().size() : 0;
     }
 
-    private class AudioViewHolder extends RecyclerView.ViewHolder {
+    class AudioViewHolder extends RecyclerView.ViewHolder {
 
         ImageView mCoverImage;
         TextView mCategory;

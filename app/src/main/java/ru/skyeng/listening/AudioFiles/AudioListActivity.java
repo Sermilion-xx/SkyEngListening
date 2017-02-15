@@ -22,6 +22,8 @@ import butterknife.ButterKnife;
 import ru.skyeng.listening.AudioFiles.model.AudioFile;
 import ru.skyeng.listening.AudioFiles.player.ComponentListener;
 import ru.skyeng.listening.AudioFiles.player.PlayerService;
+import ru.skyeng.listening.Categories.CategoriesActivity;
+import ru.skyeng.listening.Categories.CategoriesFragment;
 import ru.skyeng.listening.CommonComponents.BaseActivity;
 import ru.skyeng.listening.R;
 
@@ -70,6 +72,8 @@ public class AudioListActivity extends BaseActivity {
     Button mLengthButton;
     @BindView(R.id.button_category)
     Button mCategoryButton;
+    @BindView(R.id.progressBar)
+    ProgressBar mAudioProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,21 +83,26 @@ public class AudioListActivity extends BaseActivity {
         setupToolbar(getString(R.string.Listening), false);
         mFragment = (AudioListFragment) setupRecyclerFragment(
                 savedInstanceState,
-                TAG_AUDIO_FILES_FRAGMENT,
+                AudioListFragment.class,
                 R.id.fragment_container
         );
         mBottomSheetBehavior = BottomSheetBehavior.from(mLayoutBottomSheet);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         setupPlayPlayer();
         restoreSavedInstanceState(savedInstanceState);
-        mProgress.setIndeterminate(true);
-        mProgress.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(this, R.color.colorWhite), android.graphics.PorterDuff.Mode.MULTIPLY);
+        mProgress = (ProgressBar) findViewById(R.id.loadingView);
+        mAudioProgressBar.setIndeterminate(true);
+        mAudioProgressBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(this, R.color.colorWhite), android.graphics.PorterDuff.Mode.MULTIPLY);
 
         audioSeek.setOnSeekBarChangeListener(mComponentListener);
         audioSeek.setMax(PROGRESS_BAR_MAX);
+        mCategoryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(AudioListActivity.this, CategoriesActivity.class));
+            }
+        });
     }
-
-
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -101,7 +110,7 @@ public class AudioListActivity extends BaseActivity {
             getSupportFragmentManager().putFragment(outState, TAG_AUDIO_FILES_FRAGMENT, mFragment);
         }
         outState.putParcelable(KEY_AUDIO_FILE, mAudioFile);
-        outState.putInt(KEY_PROGRESS_VISIBILITY, mProgress.getVisibility());
+        outState.putInt(KEY_PROGRESS_VISIBILITY, mAudioProgressBar.getVisibility());
         super.onSaveInstanceState(outState);
     }
 
@@ -114,10 +123,10 @@ public class AudioListActivity extends BaseActivity {
             int visibility = savedInstanceState.getInt(KEY_PROGRESS_VISIBILITY, -1);
             if (!broadcastUpdateFinished) {
                 if (visibility == View.VISIBLE) {
-                    mProgress.setVisibility(View.VISIBLE);
+                    mAudioProgressBar.setVisibility(View.VISIBLE);
                     audioPlayPause.setVisibility(View.GONE);
                 } else if (visibility == View.GONE) {
-                    mProgress.setVisibility(View.GONE);
+                    mAudioProgressBar.setVisibility(View.GONE);
                     audioPlayPause.setVisibility(View.VISIBLE);
                 }
             }
@@ -206,10 +215,10 @@ public class AudioListActivity extends BaseActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getBooleanExtra(KEY_PLAYER_STATE, false)) {
-                mProgress.setVisibility(View.VISIBLE);
+                mAudioProgressBar.setVisibility(View.VISIBLE);
                 audioPlayPause.setVisibility(View.GONE);
             } else {
-                mProgress.setVisibility(View.GONE);
+                mAudioProgressBar.setVisibility(View.GONE);
                 audioPlayPause.setVisibility(View.VISIBLE);
             }
             broadcastUpdateFinished = true;

@@ -1,5 +1,6 @@
 package ru.skyeng.listening.CommonComponents;
 
+import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -11,10 +12,10 @@ import com.hannesdorfmann.mosby.mvp.lce.MvpLceFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
-import ru.skyeng.listening.Categories.model.TagsRequestParams;
+import ru.skyeng.listening.CommonComponents.Interfaces.ActivityExtensions;
+import ru.skyeng.listening.CommonComponents.Interfaces.ModelData;
 import ru.skyeng.listening.MVPBase.MVPPresenter;
 import ru.skyeng.listening.MVPBase.MVPView;
 import ru.skyeng.listening.R;
@@ -77,8 +78,8 @@ public abstract class BaseFragment<P,
     }
 
     @Override
-    public Context getAppContext() {
-        return getActivity().getApplicationContext();
+    public Application getAppContext() {
+        return (Application) getActivity().getApplicationContext();
     }
 
     @Override

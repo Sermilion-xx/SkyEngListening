@@ -3,9 +3,7 @@ package ru.skyeng.listening.Categories;
 import android.os.Bundle;
 import android.widget.ProgressBar;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
-import ru.skyeng.listening.CommonComponents.ActivityExtensions;
 import ru.skyeng.listening.CommonComponents.BaseActivity;
 import ru.skyeng.listening.R;
 
@@ -31,8 +29,8 @@ public class CategoriesActivity extends BaseActivity{
         setupToolbar(getString(R.string.select_categories), true, R.drawable.ic_x);
         mFragment = (CategoriesFragment) setupRecyclerFragment(
                 savedInstanceState,
-                TAG_CATEGORIES_FRAGMENT,
-                R.id.activity_categories
+                CategoriesFragment.class,
+                R.id.fragment_container
         );
     }
 

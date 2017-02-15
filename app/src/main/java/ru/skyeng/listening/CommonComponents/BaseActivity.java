@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import ru.skyeng.listening.AudioFiles.AudioListFragment;
+import ru.skyeng.listening.CommonComponents.Interfaces.ActivityExtensions;
 import ru.skyeng.listening.R;
 
 public class BaseActivity extends AppCompatActivity implements ActivityExtensions {
@@ -35,15 +36,15 @@ public class BaseActivity extends AppCompatActivity implements ActivityExtension
         return mToolbar;
     }
 
-    protected Fragment setupRecyclerFragment(Bundle inState, String name, int containerId) {
+    protected Fragment setupRecyclerFragment(Bundle inState, Class<? extends Fragment> fragmentClass, int containerId) {
         Fragment fragment;
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
         if (inState != null) {
-            fragment = manager.getFragment(inState, name);
+            fragment = manager.getFragment(inState, fragmentClass.getName());
         } else {
-            fragment = FragmentFactory.createFragmentWithName(AudioListFragment.class);
-            transaction.add(containerId, fragment, name);
+            fragment = FragmentFactory.createFragmentWithName(fragmentClass);
+            transaction.add(containerId, fragment, fragmentClass.getName());
             transaction.commit();
         }
         return fragment;

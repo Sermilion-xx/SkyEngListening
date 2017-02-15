@@ -9,6 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -30,6 +33,16 @@ import ru.skyeng.listening.R;
  */
 
 public class CategoriesFragment extends BaseFragment<Tag, CategoriesPresenter, CategoriesAdapter, TagsData>  {
+
+    private List<Integer> mSelectedIds;
+
+    public void addSelectedId(Integer id){
+        mSelectedIds.add(id);
+    }
+
+    public void removeSelectedId(Integer id){
+        mSelectedIds.remove(id);
+    }
 
     @Override
     @Inject
@@ -55,6 +68,7 @@ public class CategoriesFragment extends BaseFragment<Tag, CategoriesPresenter, C
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        mSelectedIds = new ArrayList<>();
         ((SEApplication) getAppContext()).getCategoriesDiComponent().inject(this);
     }
 

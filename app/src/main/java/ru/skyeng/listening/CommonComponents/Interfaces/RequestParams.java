@@ -1,4 +1,4 @@
-package ru.skyeng.listening.CommonComponents;
+package ru.skyeng.listening.CommonComponents.Interfaces;
 
 /**
  * ---------------------------------------------------

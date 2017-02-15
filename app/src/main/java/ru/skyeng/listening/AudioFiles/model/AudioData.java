@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 import java.util.Map;
 
-import ru.skyeng.listening.CommonComponents.ModelData;
+import ru.skyeng.listening.CommonComponents.Interfaces.ModelData;
 
 /**
  * ---------------------------------------------------

@@ -2,7 +2,7 @@ package ru.skyeng.listening.AudioFiles.model;
 
 import java.util.List;
 
-import ru.skyeng.listening.CommonComponents.RequestParams;
+import ru.skyeng.listening.CommonComponents.Interfaces.RequestParams;
 
 /**
  * ---------------------------------------------------
