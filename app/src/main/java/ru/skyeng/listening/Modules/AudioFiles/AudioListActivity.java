@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -71,7 +72,7 @@ public class AudioListActivity extends BaseActivity {
     @BindView(R.id.player_dialog)
     RelativeLayout mLayoutBottomSheet;
     @BindView(R.id.audio_cover)
-    ImageView audioCoverImage;
+    RoundedImageView audioCoverImage;
     @BindView(R.id.audio_title)
     TextView audioTitle;
     @BindView(R.id.audio_left)

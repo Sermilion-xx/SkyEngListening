@@ -16,6 +16,7 @@ import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.List;
 
@@ -194,7 +195,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     private class AudioViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView mCoverImage;
+        RoundedImageView mCoverImage;
         TextView mCategory;
         TextView mName;
         TextView mDescription;
@@ -205,7 +206,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         AudioViewHolder(View itemView) {
             super(itemView);
-            mCoverImage = (ImageView) itemView.findViewById(R.id.image_cover);
+            mCoverImage = (RoundedImageView) itemView.findViewById(R.id.image_cover);
             mCategory = (TextView) itemView.findViewById(R.id.text_category);
             mName = (TextView) itemView.findViewById(R.id.text_name);
             mDescription = (TextView) itemView.findViewById(R.id.text_description);
