@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="ParentTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -62,11 +62,20 @@
     </style>
 
     <style name="levelStyle">
-        <item name="android:layout_width">30dp</item>
-        <item name="android:layout_height">30dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:background">@null</item>
-        <item name="android:padding">10dp</item>
-        <item name="android:src">@drawable/seek_thumb</item>
+        <item name="android:src">@drawable/oval_grey</item>
+    </style>
+
+    <style name="checkboxStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentEnd" tools:targetApi="jelly_bean_mr1">true</item>
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:layout_marginEnd" tools:targetApi="jelly_bean_mr1">19dp</item>
+        <item name="android:layout_marginRight">19dp</item>
+        <item name="android:layout_marginTop">19dp</item>
     </style>
 
 
