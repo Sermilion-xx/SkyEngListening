@@ -18,6 +18,7 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -37,6 +38,7 @@ import ru.skyeng.listening.Modules.AudioFiles.model.AudioFilesRequestParams;
 import ru.skyeng.listening.Modules.AudioFiles.player.PlayerService;
 import ru.skyeng.listening.Modules.Categories.CategoriesActivity;
 import ru.skyeng.listening.CommonComponents.BaseActivity;
+import ru.skyeng.listening.Modules.Settings.SettingsActivity;
 import ru.skyeng.listening.R;
 
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.ACTION_AUDIO_STATE;
@@ -94,6 +96,8 @@ public class AudioListActivity extends BaseActivity {
     RelativeLayout mNoContentFoundLayout;
     @BindView(R.id.text_try)
     TextView mResetCategories;
+    @BindView(R.id.action_settings)
+    ImageButton mSettingsButton;
 
     public RelativeLayout getNoContentFoundLayout() {
         return mNoContentFoundLayout;
@@ -136,6 +140,7 @@ public class AudioListActivity extends BaseActivity {
                 mFragment.loadData(false);
             }
         });
+        mSettingsButton.setOnClickListener(v -> startActivity(new Intent(AudioListActivity.this, SettingsActivity.class)));
     }
 
     @Override

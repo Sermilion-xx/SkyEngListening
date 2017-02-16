@@ -9,8 +9,9 @@
     <color name="colorBlue1">#e5e2f5</color>
     <color name="colorBlue2">#3f89ff</color>
     <color name="colorBlue3">#553fff</color>
-    <color name="colorPaleGrey">#f8f9fa</color>
-    <color name="textColorSecondary">#9da5b3</color>
+    <color name="colorGrey1">#f8f9fa</color>
+    <color name="colorGrey3">#b3bed0</color>
+    <color name="colorGrey2">#e4e9f1</color>
     <color name="colorBlack12">#12000000</color>
     <color name="colorWhite">#ffffff</color>
     <color name="almostWhite">#fafafa</color>

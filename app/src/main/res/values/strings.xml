@@ -19,6 +19,11 @@
     <string name="nothing_found">Ничего не найдено</string>
     <string name="remainders">Напоминания</string>
     <string name="level">Уровень</string>
+    <string name="all_accents">Все акценты</string>
+    <string name="international">Интернациональный</string>
+    <string name="british">Британский</string>
+    <string name="ameriacan">Американский</string>
+    <string name="got_problem">Возникли проблемы с приложением?</string>
 
 
 </resources>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_settings"
     android:layout_width="match_parent"
@@ -7,168 +8,329 @@
     android:background="@color/almostWhite"
     tools:context="ru.skyeng.listening.Modules.Settings.SettingsActivity">
 
-    <RelativeLayout
-        android:id="@+id/toolbar_layout"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
-        <include
-            android:id="@+id/toolbar"
-            layout="@layout/toolbar" />
-
-        <include
-            layout="@layout/layout_shadow"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="24dp"
-            android:layout_below="@+id/toolbar" />
-    </RelativeLayout>
-
-
-    <RelativeLayout
-        android:id="@+id/reminder_layout"
-        android:layout_width="match_parent"
-        android:layout_height="53dp"
-        android:layout_below="@+id/toolbar_layout"
-        android:background="@color/colorWhite"
-        android:orientation="vertical">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@drawable/shadow_top_small" />
-
-        <TextView
-            android:id="@+id/text_remainder"
-            style="@style/textStylePrimary"
-            android:layout_centerVertical="true"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
-            android:text="@string/remainders" />
-
-        <Switch
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="19dp"
-            android:layout_marginRight="19dp" />
+            android:orientation="horizontal">
 
-        <View xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/shadow"
-            android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:layout_alignParentBottom="true"
-            android:background="@drawable/shadow110" />
-    </RelativeLayout>
-    
-    <RelativeLayout
-        android:id="@+id/level_layout"
-        android:layout_below="@+id/reminder_layout"
-        android:layout_marginTop="16dp"
-        android:layout_width="match_parent"
-        android:layout_height="117dp">
+            <RelativeLayout
+                android:id="@+id/toolbar_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@drawable/shadow_top_small" />
+                <include
+                    android:id="@+id/toolbar"
+                    layout="@layout/toolbar" />
 
-        <TextView
-            android:text="@string/level"
-            style="@style/textStylePrimary"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="13dp"/>
+                <include
+                    layout="@layout/layout_shadow"
+                    android:layout_width="match_parent"
+                    android:layout_height="24dp"
+                    android:layout_below="@+id/toolbar" />
+            </RelativeLayout>
 
 
-        <View xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:layout_alignParentBottom="true"
-            android:background="@drawable/shadow110" />
+            <RelativeLayout
+                android:id="@+id/reminder_layout"
+                android:layout_width="match_parent"
+                android:layout_height="53dp"
+                android:layout_below="@+id/toolbar_layout"
+                android:background="@color/colorWhite"
+                android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/textStylePrimary"
-            android:textStyle="bold"
-            android:text="Средний"
-            android:textColor="@color/colorAccent"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginTop="13dp"/>
-        
-        <View
-            android:layout_width="wrap_content"
-            android:layout_height="3dp"
-            android:background="#e4e9f1"
-            android:layout_marginTop="63dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@drawable/shadow_top_small" />
 
-        <ImageView
-            android:id="@+id/level_1"
-            style="@style/levelStyle"
-            android:layout_marginTop="50dp"
-            android:layout_marginStart="3dp"
-            android:layout_marginLeft="3dp" />
+                <TextView
+                    android:id="@+id/text_remainder"
+                    style="@style/textStylePrimary"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp"
+                    android:text="@string/remainders" />
 
-        <ImageView
-            android:id="@+id/level_2"
-            style="@style/levelStyle"
-            android:layout_marginTop="50dp"
-            android:layout_marginStart="40dp"
-            android:layout_marginLeft="40dp"
-            android:layout_toRightOf="@+id/level_1"
-            android:layout_toEndOf="@+id/level_1"
-            />
+                <Switch
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="19dp"
+                    android:layout_marginRight="19dp" />
 
-        <ImageView
-            android:id="@+id/level_3"
-            style="@style/levelStyle"
-            android:layout_marginTop="50dp"
-            android:layout_marginStart="40dp"
-            android:layout_marginLeft="40dp"
-            android:layout_toRightOf="@+id/level_2"
-            android:layout_toEndOf="@+id/level_2"
-            />
+                <View xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/shadow"
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@drawable/shadow110" />
+            </RelativeLayout>
 
-        <ImageView
-            android:id="@+id/level_4"
-            style="@style/levelStyle"
-            android:layout_marginTop="50dp"
-            android:layout_marginStart="40dp"
-            android:layout_marginLeft="40dp"
-            android:layout_toRightOf="@+id/level_3"
-            android:layout_toEndOf="@+id/level_3"
-            />
+            <RelativeLayout
+                android:id="@+id/level_layout"
+                android:layout_width="match_parent"
+                android:layout_height="117dp"
+                android:layout_below="@+id/reminder_layout"
+                android:layout_marginTop="16dp">
 
-        <ImageView
-            android:id="@+id/level_5"
-            style="@style/levelStyle"
-            android:layout_marginTop="50dp"
-            android:layout_marginStart="40dp"
-            android:layout_marginLeft="40dp"
-            android:layout_toRightOf="@+id/level_4"
-            android:layout_toEndOf="@+id/level_4"
-            />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@drawable/shadow_top_small" />
 
-        <ImageView
-            android:id="@+id/level_6"
-            style="@style/levelStyle"
-            android:layout_marginTop="50dp"
-            android:layout_marginStart="40dp"
-            android:layout_marginLeft="40dp"
-            android:layout_toRightOf="@+id/level_5"
-            android:layout_toEndOf="@+id/level_5"
-            />
-    </RelativeLayout>
+                <TextView
+                    style="@style/textStylePrimary"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="13dp"
+                    android:text="@string/level" />
 
+
+                <View xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@drawable/shadow110" />
+
+                <TextView
+                    style="@style/textStylePrimary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="13dp"
+                    android:text="Средний"
+                    android:textColor="@color/colorAccent"
+                    android:textStyle="bold" />
+
+                <View
+                    android:layout_width="wrap_content"
+                    android:layout_height="3dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="63dp"
+                    android:background="@color/colorGrey2" />
+
+                <ImageView
+                    android:id="@+id/level_1"
+                    style="@style/levelStyle"
+                    android:layout_marginLeft="3dp"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginTop="50dp" />
+
+                <ImageView
+                    android:id="@+id/level_2"
+                    style="@style/levelStyle"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginTop="50dp"
+                    android:layout_toEndOf="@+id/level_1"
+                    android:layout_toRightOf="@+id/level_1" />
+
+                <ImageView
+                    android:id="@+id/level_3"
+                    style="@style/levelStyle"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginTop="50dp"
+                    android:layout_toEndOf="@+id/level_2"
+                    android:layout_toRightOf="@+id/level_2" />
+
+                <ImageView
+                    android:id="@+id/level_4"
+                    style="@style/levelStyle"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginTop="50dp"
+                    android:layout_toEndOf="@+id/level_3"
+                    android:layout_toRightOf="@+id/level_3" />
+
+                <ImageView
+                    android:id="@+id/level_5"
+                    style="@style/levelStyle"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginTop="50dp"
+                    android:layout_toEndOf="@+id/level_4"
+                    android:layout_toRightOf="@+id/level_4" />
+
+                <ImageView
+                    android:id="@+id/level_6"
+                    style="@style/levelStyle"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginTop="50dp"
+                    android:layout_toEndOf="@+id/level_5"
+                    android:layout_toRightOf="@+id/level_5" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/accents_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/level_layout"
+                android:layout_marginTop="16dp">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@drawable/shadow_top_small" />
+
+                <TextView
+                    android:id="@+id/all_accents"
+                    style="@style/textStylePrimary"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="13dp"
+                    android:text="@string/all_accents" />
+
+                <CheckBox
+                    android:id="@+id/checkbox_all_accents"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/all_accents"
+                    android:layout_alignBottom="@+id/all_accents"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginEnd="19dp"
+                    android:layout_marginRight="19dp"
+                    android:layout_marginTop="19dp"
+                    app:buttonTint="@color/colorGrey3" />
+
+                <View
+                    android:id="@+id/accents_separator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="1dp"
+                    android:layout_below="@+id/all_accents"
+                    android:layout_marginTop="11dp"
+                    android:background="@color/colorBlack12" />
+
+
+                <TextView
+                    android:id="@+id/accent_international"
+                    style="@style/textStylePrimary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/accents_separator"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/international" />
+
+
+                <CheckBox
+                    android:id="@+id/checkbox_all_international"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/accent_international"
+                    android:layout_alignBottom="@+id/accent_international"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginEnd="19dp"
+                    android:layout_marginRight="19dp"
+                    android:layout_marginTop="19dp"
+                    app:buttonTint="@color/colorGrey3" />
+
+                <TextView
+                    android:id="@+id/accent_british"
+                    style="@style/textStylePrimary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/accent_international"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/british" />
+
+                <CheckBox
+                    android:id="@+id/checkbox_all_british"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/accent_british"
+                    android:layout_alignBottom="@+id/accent_british"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginEnd="19dp"
+                    android:layout_marginRight="19dp"
+                    android:layout_marginTop="19dp"
+                    app:buttonTint="@color/colorGrey3" />
+
+
+                <TextView
+                    android:id="@+id/accent_american"
+                    style="@style/textStylePrimary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/accent_british"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/ameriacan" />
+
+                <CheckBox
+                    android:id="@+id/checkbox_all_american"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/accent_american"
+                    android:layout_alignBottom="@+id/accent_american"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginEnd="19dp"
+                    android:layout_marginRight="19dp"
+                    android:layout_marginTop="19dp"
+                    app:buttonTint="@color/colorGrey3" />
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:layout_below="@+id/accent_american"
+                    android:background="@drawable/shadow110" />
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/got_problem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/accents_layout"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:text="@string/got_problem"
+                android:textColor="@color/colorGrey3"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/button_apply"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/got_problem"
+                android:layout_gravity="start"
+                android:layout_marginTop="12dp"
+                android:background="@color/colorAccent"
+                android:drawableEnd="@drawable/right_arrow"
+                android:drawableRight="@drawable/right_arrow"
+                android:paddingEnd="20dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="20dp"
+                android:paddingStart="16dp"
+                android:text="@string/apply"
+                android:textAlignment="textStart"
+                android:textColor="@color/colorWhite" />
+        </RelativeLayout>
+
+    </ScrollView>
 
 </RelativeLayout>

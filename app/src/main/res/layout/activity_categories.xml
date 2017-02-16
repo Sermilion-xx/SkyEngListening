@@ -19,7 +19,7 @@
         android:layout_height="?attr/actionBarSize"
         android:text="@string/reset"
         android:background="@drawable/selector_button_reset_tags"
-        android:textColor="@color/textColorSecondary"
+        android:textColor="@color/colorGrey3"
         android:textSize="14sp"
         android:layout_below="@+id/toolbar"/>
 
