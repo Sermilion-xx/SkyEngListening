@@ -3,8 +3,8 @@ package ru.skyeng.listening.CommonComponents;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
-import ru.skyeng.listening.AudioFiles.AudioListFragment;
-import ru.skyeng.listening.Categories.CategoriesFragment;
+import ru.skyeng.listening.Modules.AudioFiles.AudioListFragment;
+import ru.skyeng.listening.Modules.Categories.CategoriesFragment;
 
 /**
  * ---------------------------------------------------

@@ -10,10 +10,10 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Util;
 
-import ru.skyeng.listening.AudioFiles.dagger.AudioListDiComponent;
-import ru.skyeng.listening.AudioFiles.dagger.DaggerAudioListDiComponent;
-import ru.skyeng.listening.Categories.dagger.CategoriesDiComponent;
-import ru.skyeng.listening.Categories.dagger.DaggerCategoriesDiComponent;
+import ru.skyeng.listening.Modules.AudioFiles.dagger.AudioListDiComponent;
+import ru.skyeng.listening.Modules.AudioFiles.dagger.DaggerAudioListDiComponent;
+import ru.skyeng.listening.Modules.Categories.dagger.CategoriesDiComponent;
+import ru.skyeng.listening.Modules.Categories.dagger.DaggerCategoriesDiComponent;
 
 /**
  * ---------------------------------------------------
