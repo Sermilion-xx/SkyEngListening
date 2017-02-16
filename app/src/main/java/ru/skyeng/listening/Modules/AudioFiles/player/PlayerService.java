@@ -137,6 +137,9 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
+//        Bundle bundle = intent.getExtras();
+//        mPlayer.setPlaySource(bundle.getString(EXTRA_AUDIO_URL));
+//        mPlayer.play();
         return START_NOT_STICKY;
     }
 

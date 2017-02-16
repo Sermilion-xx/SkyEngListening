@@ -109,6 +109,7 @@ public class AudioListActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        startService(new Intent(this, PlayerService.class));
         setupToolbar(getString(R.string.Listening));
         mFragment = (AudioListFragment) setupRecyclerFragment(
                 savedInstanceState,
