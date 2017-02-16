@@ -14,6 +14,9 @@
     <string name="reset">СБРОСИТЬ</string>
     <string name="select_categories">Выберите категории</string>
     <string name="apply">Применить</string>
+    <string name="select_tags">Выберите категорию</string>
+    <string name="try_to_refresh">Попробуйте <font fgcolor="#3f89ff">сбросить</font> фильтры или поменять настройки.</string>
+    <string name="nothing_found">Ничего не найдено</string>
 
 
 </resources>

@@ -69,12 +69,18 @@ public class AudioListFragment extends MvpLceFragment<
     @BindView(R.id.recyclerView) RecyclerView mRecyclerView;
     @BindView(R.id.loadingView) ProgressBar mProgress;
     private boolean isRefreshing;
+    private AudioFilesRequestParams mRequestParams;
+
+    public void setRequestParams(AudioFilesRequestParams mRequestParams) {
+        this.mRequestParams = mRequestParams;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         ((SEApplication) getAppContext()).getAudioListDiComponent().inject(this);
+        mRequestParams = new AudioFilesRequestParams();
     }
 
     @Override
@@ -134,7 +140,7 @@ public class AudioListFragment extends MvpLceFragment<
 
     @Override
     public void loadData(boolean pullToRefresh) {
-        presenter.loadData(pullToRefresh, new AudioFilesRequestParams());
+        presenter.loadData(pullToRefresh, mRequestParams);
     }
 
     @Override
@@ -155,17 +161,20 @@ public class AudioListFragment extends MvpLceFragment<
 
     @Override
     public void onSubscribe(Disposable d) {
-
+        ((AudioListActivity)getActivityContext()).showProgress();
     }
 
     @Override
     public void onNext(AudioData value) {
+        if(value.getPrimaryData().size()==0)
+            ((AudioListActivity)getActivityContext()).getNoContentFoundLayout().setVisibility(View.VISIBLE);
         presenter.getModel().setData(value);
         setData(value.getPrimaryData());
     }
 
     @Override
     public void onError(Throwable e) {
+        ((AudioListActivity)getActivityContext()).hideProgress();
         isRefreshing = false;
         showError(e.getCause(), isRefreshing);
         contentView.setRefreshing(false);
@@ -175,6 +184,7 @@ public class AudioListFragment extends MvpLceFragment<
 
     @Override
     public void onComplete() {
+        ((AudioListActivity)getActivityContext()).hideProgress();
         ((AudioListActivity)getActivityContext()).updateButtonsVisibility();
         if(isRefreshing)
         contentView.setRefreshing(false);

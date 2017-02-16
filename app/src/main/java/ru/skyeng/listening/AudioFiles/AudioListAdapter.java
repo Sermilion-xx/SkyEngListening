@@ -12,6 +12,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import java.util.List;
 
@@ -92,9 +96,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         if (item.getImageFileUrl() != null && item.getImageBitmap() == null) {
             Glide.with(getContext())
-                    .load(item.getImageFileUrl())
-                    .into(holder.mCoverImage);
-            item.setImageBitmap(((BitmapDrawable) holder.mCoverImage.getDrawable()).getBitmap());
+                    .load(item.getImageFileUrl()).into(holder.mCoverImage);
         } else {
             if (item.getImageBitmap() != null) {
                 holder.mCoverImage.setImageBitmap(item.getImageBitmap());

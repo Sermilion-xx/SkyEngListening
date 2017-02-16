@@ -8,7 +8,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import com.cunoraz.tagview.Tag;
 import com.cunoraz.tagview.TagView;
@@ -23,6 +22,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
+import ru.skyeng.listening.AudioFiles.AudioListActivity;
 import ru.skyeng.listening.Categories.model.AudioTag;
 import ru.skyeng.listening.Categories.model.TagsData;
 import ru.skyeng.listening.Categories.model.TagsRequestParams;
@@ -30,6 +30,8 @@ import ru.skyeng.listening.CommonComponents.Interfaces.ActivityExtensions;
 import ru.skyeng.listening.CommonComponents.SEApplication;
 import ru.skyeng.listening.MVPBase.MVPView;
 import ru.skyeng.listening.R;
+
+import static ru.skyeng.listening.AudioFiles.AudioListActivity.categoriesSelected;
 
 
 /**
@@ -50,25 +52,25 @@ public class CategoriesFragment extends MvpLceFragment<
         implements MVPView<List<AudioTag>>,
         SwipeRefreshLayout.OnRefreshListener, Observer<TagsData> {
 
-    private List<Integer> mSelectedIds;
-
     protected boolean isRefreshing;
     @BindView(R.id.tag_group)
     TagView tagGroup;
 
     private List<Integer> selectedTags;
 
-    public void resetSelectedTags(){
+    public void resetSelectedTags() {
+
         selectedTags.clear();
         initTagView(selectedTags);
+        AudioListActivity.categoriesSelected = false;
     }
 
-    public void addSelectedId(Integer id){
-        mSelectedIds.add(id);
+    public void setSelectedTags(List<Integer> selectedTags) {
+        this.selectedTags = selectedTags;
     }
 
-    public void removeSelectedId(Integer id){
-        mSelectedIds.remove(id);
+    public List<Integer> getSelectedTags() {
+        return selectedTags;
     }
 
     @Inject
@@ -86,9 +88,7 @@ public class CategoriesFragment extends MvpLceFragment<
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        mSelectedIds = new ArrayList<>();
         ((SEApplication) getAppContext()).getCategoriesDiComponent().inject(this);
-        selectedTags = new ArrayList<>();
     }
 
     @Override
@@ -108,12 +108,17 @@ public class CategoriesFragment extends MvpLceFragment<
         super.onViewCreated(view, savedInstance);
         ButterKnife.bind(this, view);
         contentView.setOnRefreshListener(this);
+        if (selectedTags != null) {
+            initTagView(selectedTags);
+        }else {
+            selectedTags = new ArrayList<>();
+        }
         tagGroup.setOnTagClickListener(new TagView.OnTagClickListener() {
             @Override
             public void onTagClick(Tag tag, int position) {
-                if(selectedTags.contains(position)){
+                if (selectedTags.contains(position)) {
                     selectedTags.remove(Integer.valueOf(position));
-                }else {
+                } else {
                     selectedTags.add(position);
                 }
                 initTagView(selectedTags);
@@ -122,7 +127,7 @@ public class CategoriesFragment extends MvpLceFragment<
 
         if ((presenter.getModel()).getItems() == null) {
             loadData(false);
-        }else {
+        } else {
             initTagView(selectedTags);
         }
     }
@@ -155,7 +160,6 @@ public class CategoriesFragment extends MvpLceFragment<
     }
 
 
-
     @Override
     public void onRefresh() {
         isRefreshing = true;
@@ -176,15 +180,22 @@ public class CategoriesFragment extends MvpLceFragment<
     }
 
     private void initTagView(List<Integer> selected) {
+
+        if(selected == null) {
+            selected = new ArrayList<>();
+        }else if(selected.size()>0){
+                AudioListActivity.categoriesSelected = true;
+        }
+        if (presenter.getData() == null || tagGroup == null) return;
         tagGroup.removeAll();
-        for(int i=0; i<presenter.getData().size(); i++){
+        for (int i = 0; i < presenter.getData().size(); i++) {
             AudioTag aTag = presenter.getData().get(i);
             Tag tag = new Tag(aTag.getTitle());
             tag.radius = 6;
-            if(selected.contains(i)){
+            if (selected.contains(i)) {
                 tag.background = ContextCompat.getDrawable(getActivityContext(), R.drawable.blue2_with_shadow);
                 tag.tagTextColor = ContextCompat.getColor(getActivityContext(), R.color.colorWhite);
-            }else {
+            } else {
                 tag.layoutColor = ContextCompat.getColor(getActivityContext(), R.color.colorBlue0);
                 tag.tagTextColor = ContextCompat.getColor(getActivityContext(), R.color.colorBlue2);
             }

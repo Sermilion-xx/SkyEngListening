@@ -9,9 +9,17 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Binder;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.Parcelable;
+import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.support.v7.app.NotificationCompat;
+import android.util.Log;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -49,6 +57,8 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
     public static final String EXTRA_TITLE = "title";
     public static final String EXTRA_MESSAGE = "message";
     public static final String EXTRA_AUDIO_URL = "audioUrl";
+    public static final String EXTRA_TIMELINE_REQUEST = "getTimeline";
+    public static final String EXTRA_PLAYBACK_TIMELINE = "playbackTimeLine";
     public static final String ACTION_AUDIO_STATE = DOMAIN + ".ACTION_STARTED";
     public static final String ACTION_UPDATE_PLAYER = DOMAIN + ".ACTION_UPDATE_PLAYER";
     public static final String KEY_PLAYER_STATE = "PLAYER_STATE";
@@ -58,8 +68,48 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
     public static final String CATEGORY_AUDIO_SEEK = DOMAIN + "CATEGORY_AUDIO_SEEK";
     public static final String CATEGORY_AUDIO_PLAYED = DOMAIN + "CATEGORY_AUDIO_PLAYED";
     public static final int PROGRESS_BAR_MAX = 1000;
-    private AudioPlayer mPlayer;
-    private ComponentListener mComponentListener;
+
+    private static AudioPlayer mPlayer;
+
+//    private final IBinder mBinder = new PlayerBinder();
+
+    static Messenger replyMessanger;
+    public final static int MESSAGE = 1;
+
+    static class IncomingHandler extends Handler {
+
+
+
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == MESSAGE) {
+                Bundle bundle = msg.getData();
+                if(bundle.containsKey(EXTRA_AUDIO_URL)){
+                    mPlayer.play(bundle.getString(EXTRA_AUDIO_URL));
+                }else if(bundle.containsKey(EXTRA_TIMELINE_REQUEST)){
+                    replyMessanger = msg.replyTo;
+                }
+                replyMessanger = msg.replyTo; //init reply messenger
+            }
+        }
+    }
+
+    private static void sendPlaybackTime(Timeline timeline) {
+        if (replyMessanger != null && !mPlayer.isPaused())
+            try {
+                Message message = new Message();
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(EXTRA_PLAYBACK_TIMELINE, (Parcelable) timeline);
+                message.obj = timeline;
+                replyMessanger.send(message);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+    }
+    Messenger messenger = new Messenger(new IncomingHandler());
+
+
+
 
     private BroadcastReceiver mPlayerBroadcast = new BroadcastReceiver() {
 
@@ -82,22 +132,24 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
         filter.addAction(ACTION_CONTINUE);
         this.registerReceiver(mPlayerBroadcast, filter);
         mPlayer = new AudioPlayer(this, this);
-        mComponentListener = new ComponentListener(this, mPlayer.getPlayer());
+//        mComponentListener = new ComponentListener(this, mPlayer.getPlayer());
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent.getAction().equals(ACTION_PLAY)) {
-            String url = intent.getStringExtra(EXTRA_AUDIO_URL);
-            mPlayer.play(url);
-        }
         return START_NOT_STICKY;
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return messenger.getBinder();
     }
+
+//    public class PlayerBinder extends Binder {
+//        public PlayerService getService() {
+//            return PlayerService.this;
+//        }
+//    }
 
     @Override
     public void onDestroy() {
@@ -132,7 +184,9 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
 
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest) {
-        System.out.println();
+//        sendPlaybackTime(timeline);
+        Log.d("Timeline", timeline.toString());
+
     }
 
     @Override

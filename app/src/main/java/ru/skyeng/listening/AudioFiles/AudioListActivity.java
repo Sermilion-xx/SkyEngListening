@@ -2,10 +2,17 @@ package ru.skyeng.listening.AudioFiles;
 
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.content.ContextCompat;
@@ -17,20 +24,23 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.skyeng.listening.AudioFiles.model.AudioFile;
-import ru.skyeng.listening.AudioFiles.player.ComponentListener;
+import ru.skyeng.listening.AudioFiles.model.AudioFilesRequestParams;
 import ru.skyeng.listening.AudioFiles.player.PlayerService;
 import ru.skyeng.listening.Categories.CategoriesActivity;
-import ru.skyeng.listening.Categories.CategoriesFragment;
 import ru.skyeng.listening.CommonComponents.BaseActivity;
 import ru.skyeng.listening.R;
 
 import static ru.skyeng.listening.AudioFiles.player.PlayerService.ACTION_AUDIO_STATE;
-import static ru.skyeng.listening.AudioFiles.player.PlayerService.ACTION_CONTINUE;
 import static ru.skyeng.listening.AudioFiles.player.PlayerService.ACTION_PAUSE;
-import static ru.skyeng.listening.AudioFiles.player.PlayerService.ACTION_PLAY;
 import static ru.skyeng.listening.AudioFiles.player.PlayerService.EXTRA_AUDIO_URL;
 import static ru.skyeng.listening.AudioFiles.player.PlayerService.KEY_PLAYER_STATE;
 import static ru.skyeng.listening.AudioFiles.player.PlayerService.PROGRESS_BAR_MAX;
@@ -40,13 +50,20 @@ public class AudioListActivity extends BaseActivity {
     private static final String TAG_AUDIO_FILES_FRAGMENT = AudioListFragment.class.getName();
     private static final String KEY_AUDIO_FILE = "mAudioFile";
     private static final String KEY_PROGRESS_VISIBILITY = "progressVisibility";
+    public static final int TAG_REQUEST_CODE = 0;
+    public static final String TAG_REQUEST_DATA = "tagExtra";
+
+    public static boolean categoriesSelected = false;
 
     private AudioListFragment mFragment;
     private BottomSheetBehavior mBottomSheetBehavior;
     private AudioFile mAudioFile;
+    private List<Integer> mSelectedTags;
+
     private boolean broadcastUpdateFinished;
     private AudioReceiver mPlayerBroadcast;
-    private ComponentListener mComponentListener;
+    boolean mBound = false;
+    Messenger msgService;
 
     @BindView(R.id.appBarLayout)
     AppBarLayout mAppBarLayout;
@@ -74,6 +91,14 @@ public class AudioListActivity extends BaseActivity {
     Button mCategoryButton;
     @BindView(R.id.progressBar)
     ProgressBar mAudioProgressBar;
+    @BindView(R.id.no_content_found)
+    RelativeLayout mNoContentFoundLayout;
+    @BindView(R.id.text_try)
+    TextView mResetCategories;
+
+    public RelativeLayout getNoContentFoundLayout() {
+        return mNoContentFoundLayout;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,14 +119,39 @@ public class AudioListActivity extends BaseActivity {
         mAudioProgressBar.setIndeterminate(true);
         mAudioProgressBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(this, R.color.colorWhite), android.graphics.PorterDuff.Mode.MULTIPLY);
 
-        audioSeek.setOnSeekBarChangeListener(mComponentListener);
+//        audioSeek.setOnSeekBarChangeListener(mComponentListener);
         audioSeek.setMax(PROGRESS_BAR_MAX);
-        mCategoryButton.setOnClickListener(new View.OnClickListener() {
+        mCategoryButton.setOnClickListener(
+                v -> {
+                    Intent intent = new Intent(AudioListActivity.this, CategoriesActivity.class);
+                    Gson gson = new Gson();
+                    String jsonTags = gson.toJson(mSelectedTags);
+                    intent.putExtra(TAG_REQUEST_DATA, jsonTags);
+                    startActivityForResult(intent, TAG_REQUEST_CODE);
+                });
+        mResetCategories.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(AudioListActivity.this, CategoriesActivity.class));
+                mFragment.setRequestParams(new AudioFilesRequestParams());
+                mNoContentFoundLayout.setVisibility(View.GONE);
+                mFragment.loadData(false);
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == TAG_REQUEST_CODE && resultCode == RESULT_OK) {
+            Gson gson = new Gson();
+            Type type = new TypeToken<List<Integer>>() {
+            }.getType();
+            mSelectedTags = gson.fromJson(data.getStringExtra(TAG_REQUEST_DATA), type);
+            AudioFilesRequestParams params = new AudioFilesRequestParams();
+            params.setTagIds(mSelectedTags);
+            mFragment.setRequestParams(params);
+            mFragment.loadData(false);
+        }
     }
 
     @Override
@@ -146,7 +196,7 @@ public class AudioListActivity extends BaseActivity {
                         pausePlayerIntent(buttonIcon);
                         mFragment.mAdapter.setPlayerState(2);
                     } else {
-                        startPlayerIntent(mAudioFile);
+                        startPlayerService(mAudioFile.getAudioFileUrl());
                         mFragment.mAdapter.setPlayerState(1);
                     }
                     if (audioState == 0) {
@@ -164,7 +214,7 @@ public class AudioListActivity extends BaseActivity {
     public void startPlaying(AudioFile item, boolean isNew) {
         try {
             if (isNew) {
-                startPlayerIntent(item);
+                startPlayerService(item.getAudioFileUrl());
             }
             mDarkLayer.setVisibility(View.VISIBLE);
             mAudioFile = item;
@@ -186,16 +236,11 @@ public class AudioListActivity extends BaseActivity {
         }
     }
 
-    private void startPlayerIntent(AudioFile item) {
-        if (item.compareTo(mAudioFile) == 0) {
-            Intent continueIntent = new Intent(ACTION_CONTINUE);
-            sendBroadcast(continueIntent);
-        } else {
-            Intent intent = new Intent(this, PlayerService.class);
-            intent.setAction(ACTION_PLAY);
-            intent.putExtra(EXTRA_AUDIO_URL, item.getAudioFileUrl());
-            startService(intent);
-        }
+    private void startPlayerService(String audioUrl) {
+        bindPlayerService();
+        Bundle bundle = new Bundle();
+        bundle.putString(EXTRA_AUDIO_URL, audioUrl);
+        sendMessage(bundle);
     }
 
     public void pausePlayerIntent(int icon) {
@@ -225,10 +270,12 @@ public class AudioListActivity extends BaseActivity {
         }
     }
 
-
-
     @Override
     public void onResume() {
+        if (!categoriesSelected) {
+            if (mSelectedTags != null)
+                mSelectedTags.clear();
+        }
         mPlayerBroadcast = new AudioReceiver();
         registerReceiver(mPlayerBroadcast, new IntentFilter(ACTION_AUDIO_STATE));
         super.onResume();
@@ -239,7 +286,69 @@ public class AudioListActivity extends BaseActivity {
         if (mPlayerBroadcast != null) {
             unregisterReceiver(mPlayerBroadcast);
         }
+        if (mBound) {
+            unbindService(playerConnection);
+            mBound = false;
+        }
         super.onPause();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        bindPlayerService();
+    }
+
+    public void sendMessage(Bundle bundle) {
+        if (mBound) {
+            try {
+                Message message = Message.obtain(null, PlayerService.MESSAGE, 1, 1);
+                message.replyTo = replyMessenger;
+                message.setData(bundle);
+                msgService.send(message); //sending message to service
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public ServiceConnection playerConnection = new ServiceConnection() {
+
+        public void onServiceConnected(ComponentName className, IBinder binder) {
+            mBound = true;
+            msgService = new Messenger(binder);
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            mBound = false;
+        }
+    };
+
+    Messenger replyMessenger = new Messenger(new HandlerReplyMsg());
+
+    static class HandlerReplyMsg extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            String recdMessage = msg.obj.toString();
+        }
+    }
+
+    private void showServiceData() {
+        //call method od service
+    }
+
+//    public static Handler myHandler = new Handler() {
+//        public void handleMessage(Message message) {
+//            Bundle data = message.getData();
+//        }
+//    };
+
+    public void bindPlayerService() {
+        Intent intent = new Intent(this, PlayerService.class);
+//        Messenger messenger = new Messenger(myHandler);
+//        intent.putExtra("MESSENGER", messenger);
+        bindService(intent, playerConnection, Context.BIND_AUTO_CREATE);
     }
 
 }

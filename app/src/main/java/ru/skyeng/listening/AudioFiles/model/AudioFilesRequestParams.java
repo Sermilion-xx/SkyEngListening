@@ -21,7 +21,7 @@ public class AudioFilesRequestParams implements RequestParams {
     private String title;
     private Integer accentId;
     private Integer levelId;
-    private List<String> tagIds;
+    private List<Integer> tagIds;
     private Integer durationGT;
     private Integer durationLT;
 
@@ -69,11 +69,11 @@ public class AudioFilesRequestParams implements RequestParams {
         this.levelId = levelId;
     }
 
-    public List<String> getTagIds() {
+    public List<Integer> getTagIds() {
         return tagIds;
     }
 
-    public void setTagIds(List<String> tagIds) {
+    public void setTagIds(List<Integer> tagIds) {
         this.tagIds = tagIds;
     }
 
