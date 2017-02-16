@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -74,21 +73,25 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
 //    private final IBinder mBinder = new PlayerBinder();
 
     static Messenger replyMessanger;
-    public final static int MESSAGE = 1;
+    public final static int MESSAGE_STOP = 0;
+    public final static int MESSAGE_PLAY = 1;
+    public final static int MESSAGE_PAUSE = 2;
+    public final static int MESSAGE_CONTINUE = 3;
+    public final static int MESSAGE_PLAYBACK_TIME = 4;
 
     static class IncomingHandler extends Handler {
-
-
-
         @Override
         public void handleMessage(Message msg) {
-            if (msg.what == MESSAGE) {
+            if (msg.what == MESSAGE_PLAY) {
                 Bundle bundle = msg.getData();
-                if(bundle.containsKey(EXTRA_AUDIO_URL)){
-                    mPlayer.play(bundle.getString(EXTRA_AUDIO_URL));
-                }else if(bundle.containsKey(EXTRA_TIMELINE_REQUEST)){
-                    replyMessanger = msg.replyTo;
-                }
+                mPlayer.setPlaySource(bundle.getString(EXTRA_AUDIO_URL));
+                mPlayer.play();
+            } else if (msg.what == MESSAGE_PAUSE) {
+                mPlayer.pause();
+            } else if (msg.what == MESSAGE_CONTINUE) {
+                mPlayer.play();
+            } else if (msg.what == MESSAGE_PLAYBACK_TIME) {
+                replyMessanger = msg.replyTo;
                 replyMessanger = msg.replyTo; //init reply messenger
             }
         }
@@ -106,10 +109,8 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
                 e.printStackTrace();
             }
     }
+
     Messenger messenger = new Messenger(new IncomingHandler());
-
-
-
 
     private BroadcastReceiver mPlayerBroadcast = new BroadcastReceiver() {
 
@@ -157,30 +158,6 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
         this.unregisterReceiver(mPlayerBroadcast);
     }
 
-    private Notification playbackStartedNotification(String title, String message, Bitmap largeIcon) {
-        Intent intent = new Intent(this, AudioListActivity.class);
-        intent.setAction(ACTION_PLAY);
-        intent.putExtra(EXTRA_TITLE, title);
-        intent.putExtra(EXTRA_MESSAGE, message);
-        NotificationCompat.Builder builder = initBasicBuilder(title, message, intent);
-        if (largeIcon == null) {
-            largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_play_white);
-        }
-        builder.setLargeIcon(largeIcon);
-        return builder.build();
-    }
-
-    private NotificationCompat.Builder initBasicBuilder(String title, String text, Intent intent) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setSmallIcon(R.drawable.ic_play_white)
-                .setContentTitle(title)
-                .setContentText(text);
-        if (intent != null) {
-            TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(this);
-            taskStackBuilder.addNextIntentWithParentStack(intent);
-        }
-        return builder;
-    }
 
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest) {
@@ -210,7 +187,6 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
             intent.putExtra(KEY_PLAYER_STATE, false);
             sendBroadcast(intent);
         }
-
     }
 
     @Override
@@ -265,5 +241,29 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
                 : (int) ((position * PROGRESS_BAR_MAX) / duration);
     }
 
+    private Notification playbackStartedNotification(String title, String message, Bitmap largeIcon) {
+        Intent intent = new Intent(this, AudioListActivity.class);
+        intent.setAction(ACTION_PLAY);
+        intent.putExtra(EXTRA_TITLE, title);
+        intent.putExtra(EXTRA_MESSAGE, message);
+        NotificationCompat.Builder builder = initBasicBuilder(title, message, intent);
+        if (largeIcon == null) {
+            largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_play_white);
+        }
+        builder.setLargeIcon(largeIcon);
+        return builder.build();
+    }
+
+    private NotificationCompat.Builder initBasicBuilder(String title, String text, Intent intent) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        builder.setSmallIcon(R.drawable.ic_play_white)
+                .setContentTitle(title)
+                .setContentText(text);
+        if (intent != null) {
+            TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(this);
+            taskStackBuilder.addNextIntentWithParentStack(intent);
+        }
+        return builder;
+    }
 }
 

@@ -70,6 +70,8 @@ public class CategoriesActivity extends BaseActivity implements View.OnClickList
                 break;
             case R.id.button_reset:
                 mFragment.resetSelectedTags();
+                setResult(Activity.RESULT_OK, new Intent());
+                finish();
                 break;
         }
     }

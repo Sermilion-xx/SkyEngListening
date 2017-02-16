@@ -40,7 +40,6 @@ import ru.skyeng.listening.CommonComponents.BaseActivity;
 import ru.skyeng.listening.R;
 
 import static ru.skyeng.listening.AudioFiles.player.PlayerService.ACTION_AUDIO_STATE;
-import static ru.skyeng.listening.AudioFiles.player.PlayerService.ACTION_PAUSE;
 import static ru.skyeng.listening.AudioFiles.player.PlayerService.EXTRA_AUDIO_URL;
 import static ru.skyeng.listening.AudioFiles.player.PlayerService.KEY_PLAYER_STATE;
 import static ru.skyeng.listening.AudioFiles.player.PlayerService.PROGRESS_BAR_MAX;
@@ -143,9 +142,9 @@ public class AudioListActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == TAG_REQUEST_CODE && resultCode == RESULT_OK) {
+            mNoContentFoundLayout.setVisibility(View.GONE);
             Gson gson = new Gson();
-            Type type = new TypeToken<List<Integer>>() {
-            }.getType();
+            Type type = new TypeToken<List<Integer>>() {}.getType();
             mSelectedTags = gson.fromJson(data.getStringExtra(TAG_REQUEST_DATA), type);
             AudioFilesRequestParams params = new AudioFilesRequestParams();
             params.setTagIds(mSelectedTags);
@@ -168,7 +167,7 @@ public class AudioListActivity extends BaseActivity {
         if (savedInstanceState != null) {
             mAudioFile = savedInstanceState.getParcelable(KEY_AUDIO_FILE);
             if (mAudioFile != null) {
-                startPlaying(mAudioFile, false);
+                updatePlayerUI();
             }
             int visibility = savedInstanceState.getInt(KEY_PROGRESS_VISIBILITY, -1);
             if (!broadcastUpdateFinished) {
@@ -190,65 +189,70 @@ public class AudioListActivity extends BaseActivity {
             public void onClick(View v) {
                 if (mFragment.mAdapter.getPlayingPosition() != -1) {
                     int audioState = mFragment.getPresenter().getData().get(mFragment.mAdapter.getPlayingPosition()).getState();
-                    int buttonIcon = R.drawable.ic_pause_white;
+                    int icon;
+                    int state;
                     if (audioState == 1) {
-                        buttonIcon = R.drawable.ic_play_white;
-                        pausePlayerIntent(buttonIcon);
-                        mFragment.mAdapter.setPlayerState(2);
+                        state = 2;
+                        icon = R.drawable.ic_play_white;
+                        pausePlayerMessage();
                     } else {
-                        startPlayerService(mAudioFile.getAudioFileUrl());
-                        mFragment.mAdapter.setPlayerState(1);
+                        state = 1;
+                        icon = R.drawable.ic_pause_white;
+                        continuePlayingMessage();
                     }
+                    mFragment.mAdapter.setPlayerState(state);
+                    audioPlayPause.setImageDrawable(ContextCompat.getDrawable(AudioListActivity.this, icon));
+
                     if (audioState == 0) {
                         mDarkLayer.setVisibility(View.GONE);
                         audioPlayPause.setVisibility(View.VISIBLE);
                     } else {
                         mDarkLayer.setVisibility(View.VISIBLE);
                     }
-                    audioPlayPause.setImageDrawable(ContextCompat.getDrawable(AudioListActivity.this, buttonIcon));
                 }
             }
         });
     }
 
-    public void startPlaying(AudioFile item, boolean isNew) {
-        try {
-            if (isNew) {
-                startPlayerService(item.getAudioFileUrl());
-            }
-            mDarkLayer.setVisibility(View.VISIBLE);
-            mAudioFile = item;
-            audioTitle.setText(item.getTitle());
-            audioPlayed.setText(getString(R.string.audio_default_time));
-            audioLeft.setText("-" + item.getDurationInMinutes());
-            if (item.getImageBitmap() != null) {
-                audioCoverImage.setImageBitmap(item.getImageBitmap());
-            }
-            audioPlayPause.setVisibility(View.VISIBLE);
-            int playPauseIcon = R.drawable.ic_play_white;
-            if (item.getState() == 1) {
-                playPauseIcon = R.drawable.ic_pause_white;
-            }
-            audioPlayPause.setImageDrawable(ContextCompat.getDrawable(this, playPauseIcon));
-            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        } catch (Exception e) {
-            e.printStackTrace();
+    private void updatePlayerUI(){
+        mDarkLayer.setVisibility(View.VISIBLE);
+        audioTitle.setText(mAudioFile.getTitle());
+        audioPlayed.setText(getString(R.string.audio_default_time));
+        audioLeft.setText("-" + mAudioFile.getDurationInMinutes());
+        if (mAudioFile.getImageBitmap() != null) {
+            audioCoverImage.setImageBitmap(mAudioFile.getImageBitmap());
         }
+        audioPlayPause.setVisibility(View.VISIBLE);
+        int icon = -1;
+        if(mAudioFile.getState()==1){
+            icon = R.drawable.ic_pause_white;
+        }else if(mAudioFile.getState()==2){
+            icon = R.drawable.ic_play_white;
+        }
+        audioPlayPause.setImageDrawable(ContextCompat.getDrawable(this, icon));
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
-    private void startPlayerService(String audioUrl) {
+    public void startPlayerMessage(AudioFile audioFile) {
+        mAudioFile = audioFile;
+        updatePlayerUI();
         bindPlayerService();
         Bundle bundle = new Bundle();
-        bundle.putString(EXTRA_AUDIO_URL, audioUrl);
-        sendMessage(bundle);
+        bundle.putString(EXTRA_AUDIO_URL, audioFile.getAudioFileUrl());
+        sendMessage(bundle, PlayerService.MESSAGE_PLAY);
     }
 
-    public void pausePlayerIntent(int icon) {
-        Intent intent = new Intent(ACTION_PAUSE);
-        sendBroadcast(intent);
-        audioPlayPause.setImageDrawable(ContextCompat.getDrawable(this, icon));
+    public void continuePlayingMessage(){
+        updatePlayerUI();
+        mAudioFile.setState(1);
+        sendMessage(null, PlayerService.MESSAGE_CONTINUE);
     }
 
+    public void pausePlayerMessage() {
+        mAudioFile.setState(2);
+        updatePlayerUI();
+        sendMessage(null, PlayerService.MESSAGE_PAUSE);
+    }
 
     public void updateButtonsVisibility() {
         mLengthButton.setText(getString(R.string.length));
@@ -256,7 +260,6 @@ public class AudioListActivity extends BaseActivity {
     }
 
     private class AudioReceiver extends BroadcastReceiver {
-
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getBooleanExtra(KEY_PLAYER_STATE, false)) {
@@ -273,8 +276,9 @@ public class AudioListActivity extends BaseActivity {
     @Override
     public void onResume() {
         if (!categoriesSelected) {
-            if (mSelectedTags != null)
+            if (mSelectedTags != null) {
                 mSelectedTags.clear();
+            }
             mFragment.loadData(false);
         }
         mPlayerBroadcast = new AudioReceiver();
@@ -300,10 +304,10 @@ public class AudioListActivity extends BaseActivity {
         bindPlayerService();
     }
 
-    public void sendMessage(Bundle bundle) {
+    public void sendMessage(Bundle bundle, int type) {
         if (mBound) {
             try {
-                Message message = Message.obtain(null, PlayerService.MESSAGE, 1, 1);
+                Message message = Message.obtain(null, type, 1, 1);
                 message.replyTo = replyMessenger;
                 message.setData(bundle);
                 msgService.send(message); //sending message to service
@@ -346,10 +350,12 @@ public class AudioListActivity extends BaseActivity {
 //    };
 
     public void bindPlayerService() {
-        Intent intent = new Intent(this, PlayerService.class);
+        if (!mBound) {
+            Intent intent = new Intent(this, PlayerService.class);
 //        Messenger messenger = new Messenger(myHandler);
 //        intent.putExtra("MESSENGER", messenger);
-        bindService(intent, playerConnection, Context.BIND_AUTO_CREATE);
+            bindService(intent, playerConnection, Context.BIND_AUTO_CREATE);
+        }
     }
 
 }

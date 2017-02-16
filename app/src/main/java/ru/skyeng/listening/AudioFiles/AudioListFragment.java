@@ -107,11 +107,15 @@ public class AudioListFragment extends MvpLceFragment<
     }
 
     public void startPlaying(AudioFile item) {
-        ((AudioListActivity) getActivity()).startPlaying(item, true);
+        ((AudioListActivity) getActivity()).startPlayerMessage(item);
     }
 
-    public void pausePlayer(int icon) {
-        ((AudioListActivity) getActivity()).pausePlayerIntent(icon);
+    public void continuePlaying(){
+        ((AudioListActivity) getActivity()).continuePlayingMessage();
+    }
+
+    public void pausePlayer() {
+        ((AudioListActivity) getActivity()).pausePlayerMessage();
     }
 
     @Override

@@ -2,7 +2,6 @@ package ru.skyeng.listening.AudioFiles;
 
 import android.content.Context;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -150,29 +149,29 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                     getItems().get(playingPosition).setState(0);
                     notifyItemChanged(playingPosition);
                     item.setState(1);
-                    showItemPlaying(position, item);
+                    notifyItemPlaying(position);
+                    mFragment.startPlaying(item);
                 } else if (playingPosition == position) { //currently playing audio clicked
                     //0 - stopped, 1 - playing, 2 - paused
                     item.setState(item.getState() == 1 ? 2 : 1);
                     notifyItemChanged(position);
                     int actionType = setPlayPauseIcon(viewHolder, item);
                     if (actionType == 1) {
-                        mFragment.pausePlayer(R.drawable.ic_play_white);
-                    } else if (actionType == 0) {
-                        mFragment.startPlaying(item);
+                        mFragment.pausePlayer();
+                    } else if (actionType == 2) {
+                        mFragment.continuePlaying();
                     }
                 } else { // playing new audio
                     item.setState(1);
-                    showItemPlaying(position, item);
+                    notifyItemPlaying(position);
+                    mFragment.startPlaying(item);
                 }
             }
         };
-
     }
 
-    private void showItemPlaying(int position, AudioFile item) {
+    private void notifyItemPlaying(int position) {
         playingPosition = position;
-        mFragment.startPlaying(item);
         notifyItemChanged(position);
     }
 
@@ -181,7 +180,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         int icon = R.drawable.ic_play_blue;
         if (item.getState() == 1) {
             icon = R.drawable.ic_pause_blue;
-            actionType = 0;
+            actionType = 2;
         }
         viewHolder.mPlayPause.setImageDrawable(ContextCompat.getDrawable(getContext(), icon));
         return actionType;
@@ -193,7 +192,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         return getItems() != null ? getItems().size() : 0;
     }
 
-    class AudioViewHolder extends RecyclerView.ViewHolder {
+    private class AudioViewHolder extends RecyclerView.ViewHolder {
 
         ImageView mCoverImage;
         TextView mCategory;

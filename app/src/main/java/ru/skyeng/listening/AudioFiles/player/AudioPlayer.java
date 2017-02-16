@@ -58,9 +58,9 @@ class AudioPlayer {
         initializePlayer();
     }
 
-    void play(String url){
+    void setPlaySource(String url){
         extraData = url;
-        state = 1;
+        state = 0;
         setMediaSource(url);
     }
 
@@ -76,6 +76,10 @@ class AudioPlayer {
 
     void setState(int state) {
         this.state = state;
+    }
+
+    public int getState() {
+        return state;
     }
 
     void pause() {
