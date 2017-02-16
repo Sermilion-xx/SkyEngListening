@@ -8,105 +8,104 @@
         android:id="@+id/dark_image_layer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
         android:layout_marginLeft="17dp"
         android:layout_marginStart="17dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="24dp" >
-
-        <View
-            android:id="@+id/cover_dark_layer"
-            android:layout_width="86dp"
-            android:layout_height="86dp"
-            android:background="@drawable/dark_image_layer"
-            android:visibility="gone"
-            android:layout_alignBottom="@+id/image_cover"
-            android:layout_alignRight="@+id/image_cover"
-            android:layout_alignEnd="@+id/image_cover"
-            android:layout_alignTop="@+id/image_cover"
-            android:layout_alignLeft="@+id/image_cover"
-            android:layout_alignStart="@+id/image_cover" />
+        android:layout_marginTop="24dp">
 
         <ImageView
             android:id="@+id/image_cover"
             android:layout_width="86dp"
             android:layout_height="86dp"
-            android:src="@drawable/ic_player_cover"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
             android:background="@drawable/round_image_background"
             android:contentDescription="@string/track_cover"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:src="@drawable/ic_player_cover" />
+
+        <View
+            android:id="@+id/cover_dark_layer"
+            android:layout_width="86dp"
+            android:layout_height="86dp"
+            android:layout_alignBottom="@+id/image_cover"
+            android:layout_alignEnd="@+id/image_cover"
+            android:layout_alignLeft="@+id/image_cover"
+            android:layout_alignRight="@+id/image_cover"
+            android:layout_alignStart="@+id/image_cover"
+            android:layout_alignTop="@+id/image_cover"
+            android:background="@drawable/dark_image_layer"
+            android:visibility="gone" />
 
     </RelativeLayout>
-
 
 
     <TextView
         android:id="@+id/text_category"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
+        android:layout_marginEnd="38dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="38dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="24dp"
+        android:layout_toEndOf="@id/dark_image_layer"
+        android:layout_toRightOf="@id/dark_image_layer"
         android:text="Кино"
         android:textColor="@color/colorAccent"
-        android:textStyle="bold"
-        android:layout_toRightOf="@id/dark_image_layer"
-        android:layout_toEndOf="@id/dark_image_layer"
-        android:layout_marginTop="24dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginLeft="12dp"
-        android:layout_marginEnd="38dp"
-        android:layout_marginRight="38dp" />
+        android:textSize="14sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/text_length"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="2:36"
-        android:textSize="12sp"
-        android:textColor="@color/colorBlue3"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_marginTop="24dp"
         android:layout_alignTop="@+id/dark_image_layer"
         android:layout_marginEnd="38dp"
-        android:layout_marginRight="38dp"/>
+        android:layout_marginRight="38dp"
+        android:layout_marginTop="24dp"
+        android:text="2:36"
+        android:textColor="@color/colorBlue3"
+        android:textSize="12sp" />
 
     <TextView
         android:id="@+id/text_name"
-        android:text="Название аудио"
         style="@style/textStylePrimary"
-        android:layout_toRightOf="@id/dark_image_layer"
-        android:layout_toEndOf="@id/dark_image_layer"
         android:layout_below="@+id/text_category"
-        android:layout_marginTop="6dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginLeft="12dp"
         android:layout_marginEnd="38dp"
-        android:layout_marginRight="38dp"/>
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="38dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="6dp"
+        android:layout_toEndOf="@id/dark_image_layer"
+        android:layout_toRightOf="@id/dark_image_layer"
+        android:text="Название аудио" />
 
     <TextView
         android:id="@+id/text_description"
         style="@style/textStyleSecondary"
-        android:text="Описание"
-        android:layout_toRightOf="@id/dark_image_layer"
-        android:layout_toEndOf="@id/dark_image_layer"
         android:layout_below="@+id/text_name"
-        android:layout_marginTop="6dp"
-        android:layout_marginLeft="12dp"
-        android:layout_marginStart="12dp"
         android:layout_marginEnd="38dp"
-        android:layout_marginRight="38dp" />
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="38dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="6dp"
+        android:layout_toEndOf="@id/dark_image_layer"
+        android:layout_toRightOf="@id/dark_image_layer"
+        android:text="Описание" />
 
     <ImageView
         android:id="@+id/audio_play_pause"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:src="@drawable/ic_pause_blue"
-        android:padding="10dp"
-        android:background="@drawable/round_image_background"
         android:layout_centerInParent="true"
+        android:layout_marginEnd="26dp"
+        android:layout_marginRight="26dp"
         android:layout_toLeftOf="@+id/text_name"
         android:layout_toStartOf="@+id/text_name"
-        android:layout_marginRight="26dp"
-        android:layout_marginEnd="26dp" />
+        android:background="@drawable/round_image_background"
+        android:padding="10dp"
+        android:src="@drawable/ic_pause_blue" />
 </RelativeLayout>

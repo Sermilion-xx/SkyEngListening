@@ -275,6 +275,7 @@ public class AudioListActivity extends BaseActivity {
         if (!categoriesSelected) {
             if (mSelectedTags != null)
                 mSelectedTags.clear();
+            mFragment.loadData(false);
         }
         mPlayerBroadcast = new AudioReceiver();
         registerReceiver(mPlayerBroadcast, new IntentFilter(ACTION_AUDIO_STATE));

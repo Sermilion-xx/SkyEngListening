@@ -1,6 +1,7 @@
 package ru.skyeng.listening.AudioFiles;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -87,20 +88,33 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         } else if (item.getState() == 0) {
             setupAudioCover(holder, -1, View.GONE);
         }
-
         String category = getContext().getString(R.string.no_category);
         if (item.getTags().size() > 0) {
             category = item.getTags().get(0).get(KEY_TITLE);
         }
         holder.mCategory.setText(category);
+        if (item.getImageFileUrl() != null) {
+            if(item.getImageBitmap()==null) {
+                Glide.with(getContext())
+                        .load(item.getImageFileUrl()).listener(new RequestListener<String, GlideDrawable>() {
+                    @Override
+                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        return false;
+                    }
 
-        if (item.getImageFileUrl() != null && item.getImageBitmap() == null) {
-            Glide.with(getContext())
-                    .load(item.getImageFileUrl()).into(holder.mCoverImage);
-        } else {
-            if (item.getImageBitmap() != null) {
+                    @Override
+                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        item.setImageBitmap(((GlideBitmapDrawable) resource).getBitmap());
+                        return false;
+                    }
+                }).into(holder.mCoverImage);
+            }else {
                 holder.mCoverImage.setImageBitmap(item.getImageBitmap());
             }
+        }else {
+            holder.mCoverImage.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_player_cover));
+            item.setImageBitmap(BitmapFactory.decodeResource(getContext().getResources(),
+                    R.drawable.ic_player_cover));
         }
         holder.mCoverImage.setOnClickListener(getOnClickListener(position, holder, item));
     }
