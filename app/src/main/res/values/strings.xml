@@ -25,6 +25,7 @@
     <string name="ameriacan">Американский</string>
     <string name="got_problem">Возникли проблемы с приложением?</string>
     <string name="beginner">Начальный</string>
+    <string name="leftTime">- %s</string>
 
 
 </resources>

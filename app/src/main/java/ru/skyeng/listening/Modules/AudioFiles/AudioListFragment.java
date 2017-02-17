@@ -188,8 +188,10 @@ public class AudioListFragment extends MvpLceFragment<
 
     @Override
     public void onComplete() {
-        ((AudioListActivity)getActivityContext()).hideProgress();
-        ((AudioListActivity)getActivityContext()).updateButtonsVisibility();
+        if(getActivityContext()!=null) {
+            ((AudioListActivity) getActivityContext()).hideProgress();
+            ((AudioListActivity) getActivityContext()).updateButtonsVisibility();
+        }
         if(isRefreshing)
         contentView.setRefreshing(false);
     }

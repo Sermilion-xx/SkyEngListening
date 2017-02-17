@@ -3,8 +3,6 @@ package ru.skyeng.listening.Modules.AudioFiles.player;
 import android.app.Notification;
 import android.app.Service;
 import android.app.TaskStackBuilder;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -14,11 +12,9 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.Parcelable;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.support.v7.app.NotificationCompat;
-import android.util.Log;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -67,62 +63,22 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
     public static final String CATEGORY_AUDIO_SEEK = DOMAIN + "CATEGORY_AUDIO_SEEK";
     public static final String CATEGORY_AUDIO_PLAYED = DOMAIN + "CATEGORY_AUDIO_PLAYED";
     public static final int PROGRESS_BAR_MAX = 1000;
-
-    private static AudioPlayer mPlayer;
-
-//    private final IBinder mBinder = new PlayerBinder();
-
-    static Messenger replyMessanger;
     public final static int MESSAGE_STOP = 0;
     public final static int MESSAGE_PLAY = 1;
     public final static int MESSAGE_PAUSE = 2;
     public final static int MESSAGE_CONTINUE = 3;
     public final static int MESSAGE_PLAYBACK_TIME = 4;
+    public final static int MESSAGE_PLAYBACK_SEARCH = 5;
+    private int mPlaybackInterval = 1000;
+    private Handler mPlaybackHandler;
 
-    static class IncomingHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == MESSAGE_PLAY) {
-                Bundle bundle = msg.getData();
-                mPlayer.setPlaySource(bundle.getString(EXTRA_AUDIO_URL));
-                mPlayer.play();
-            } else if (msg.what == MESSAGE_PAUSE) {
-                mPlayer.pause();
-            } else if (msg.what == MESSAGE_CONTINUE) {
-                mPlayer.play();
-            } else if (msg.what == MESSAGE_PLAYBACK_TIME) {
-                replyMessanger = msg.replyTo;
-                replyMessanger = msg.replyTo; //init reply messenger
-            }
-        }
+    private AudioPlayer mPlayer;
+    Messenger messenger;
+    private Messenger outMessenger;
+
+    public AudioPlayer getPlayer() {
+        return mPlayer;
     }
-
-    private static void sendPlaybackTime(Timeline timeline) {
-        if (replyMessanger != null && !mPlayer.isPaused())
-            try {
-                Message message = new Message();
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(EXTRA_PLAYBACK_TIMELINE, (Parcelable) timeline);
-                message.obj = timeline;
-                replyMessanger.send(message);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-    }
-
-    Messenger messenger = new Messenger(new IncomingHandler());
-
-    private BroadcastReceiver mPlayerBroadcast = new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(ACTION_PAUSE)) {
-                mPlayer.pause();
-            } else if (intent.getAction().equals(ACTION_CONTINUE)) {
-                mPlayer.play();
-            }
-        }
-    };
 
     @Override
     public void onCreate() {
@@ -131,41 +87,74 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
         filter.addAction(ACTION_PAUSE);
         filter.addAction(ACTION_PLAY);
         filter.addAction(ACTION_CONTINUE);
-        this.registerReceiver(mPlayerBroadcast, filter);
         mPlayer = new AudioPlayer(this, this);
-//        mComponentListener = new ComponentListener(this, mPlayer.getPlayer());
+        mPlaybackHandler = new Handler();
+        messenger = new Messenger(new IncomingHandler(this));
+    }
+
+    public void startSendingPlaybackTime(){
+        mPlaybackSenderRunnable.run();
+    }
+
+    public void stopSendingPlaybackTime(){
+        mPlaybackHandler.removeCallbacks(mPlaybackSenderRunnable);
+    }
+
+    Runnable mPlaybackSenderRunnable = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                Message playbackTime = new Message();
+                playbackTime.what = MESSAGE_PLAYBACK_TIME;
+                playbackTime.obj = sendPlaybackTime();
+                outMessenger.send(playbackTime);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            } finally {
+                mPlaybackHandler.postDelayed(mPlaybackSenderRunnable, mPlaybackInterval);
+            }
+        }
+    };
+
+    private long sendPlaybackTime() {
+        return mPlayer.getCurrentPosition();
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
-//        Bundle bundle = intent.getExtras();
-//        mPlayer.setPlaySource(bundle.getString(EXTRA_AUDIO_URL));
-//        mPlayer.play();
         return START_NOT_STICKY;
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            outMessenger = (Messenger) extras.get("MESSENGER");
+        }
         return messenger.getBinder();
     }
 
-//    public class PlayerBinder extends Binder {
-//        public PlayerService getService() {
-//            return PlayerService.this;
-//        }
+    @Override
+    public void onDestroy() {
+        stopSendingPlaybackTime();
+        mPlayer.release();
+    }
+
+    //    private void sendPlaybackTime(Timeline timeline) {
+//        if (replyMessanger != null && !mPlayer.isPaused())
+//            try {
+//                Message message = new Message();
+//                Bundle bundle = new Bundle();
+//                bundle.putParcelable(EXTRA_PLAYBACK_TIMELINE, (Parcelable) timeline);
+//                message.obj = timeline;
+//                replyMessanger.send(message);
+//            } catch (RemoteException e) {
+//                e.printStackTrace();
+//            }
 //    }
 
     @Override
-    public void onDestroy() {
-        mPlayer.release();
-        this.unregisterReceiver(mPlayerBroadcast);
-    }
-
-
-    @Override
     public void onTimelineChanged(Timeline timeline, Object manifest) {
-//        sendPlaybackTime(timeline);
-        Log.d("Timeline", timeline.toString());
 
     }
 

@@ -70,6 +70,10 @@ class AudioPlayer {
         mPlayer.prepare(mediaSource, true, true);
     }
 
+    public long getCurrentPosition(){
+        return mPlayer.getCurrentPosition();
+    }
+
     boolean isPaused() {
         return state == 2;
     }

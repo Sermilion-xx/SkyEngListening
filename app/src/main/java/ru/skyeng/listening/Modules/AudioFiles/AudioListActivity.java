@@ -34,17 +34,19 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ru.skyeng.listening.CommonComponents.BaseActivity;
+import ru.skyeng.listening.CommonComponents.FacadeCommon;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFilesRequestParams;
 import ru.skyeng.listening.Modules.AudioFiles.player.PlayerService;
 import ru.skyeng.listening.Modules.Categories.CategoriesActivity;
-import ru.skyeng.listening.CommonComponents.BaseActivity;
 import ru.skyeng.listening.Modules.Settings.SettingsActivity;
 import ru.skyeng.listening.R;
 
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.ACTION_AUDIO_STATE;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.EXTRA_AUDIO_URL;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.KEY_PLAYER_STATE;
+import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAGE_PLAYBACK_TIME;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.PROGRESS_BAR_MAX;
 
 public class AudioListActivity extends BaseActivity {
@@ -65,7 +67,7 @@ public class AudioListActivity extends BaseActivity {
     private boolean broadcastUpdateFinished;
     private AudioReceiver mPlayerBroadcast;
     boolean mBound = false;
-    Messenger msgService;
+    private Messenger msgService;
 
     @BindView(R.id.appBarLayout)
     AppBarLayout mAppBarLayout;
@@ -123,9 +125,10 @@ public class AudioListActivity extends BaseActivity {
         mProgress = (ProgressBar) findViewById(R.id.loadingView);
         mAudioProgressBar.setIndeterminate(true);
         mAudioProgressBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(this, R.color.colorWhite), android.graphics.PorterDuff.Mode.MULTIPLY);
+        setupListeners();
+    }
 
-//        audioSeek.setOnSeekBarChangeListener(mComponentListener);
-        audioSeek.setMax(PROGRESS_BAR_MAX);
+    private void setupListeners() {
         mCategoryButton.setOnClickListener(
                 v -> {
                     Intent intent = new Intent(AudioListActivity.this, CategoriesActivity.class);
@@ -142,6 +145,23 @@ public class AudioListActivity extends BaseActivity {
                 mFragment.loadData(false);
             }
         });
+        audioSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int currentProgress;
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                currentProgress = progress;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                sendMessage(null, PlayerService.MESSAGE_PLAYBACK_SEARCH, (long)currentProgress*1000);
+            }
+        });
         mSettingsButton.setOnClickListener(v -> startActivity(new Intent(AudioListActivity.this, SettingsActivity.class)));
     }
 
@@ -151,7 +171,8 @@ public class AudioListActivity extends BaseActivity {
         if (requestCode == TAG_REQUEST_CODE && resultCode == RESULT_OK) {
             mNoContentFoundLayout.setVisibility(View.GONE);
             Gson gson = new Gson();
-            Type type = new TypeToken<List<Integer>>() {}.getType();
+            Type type = new TypeToken<List<Integer>>() {
+            }.getType();
             mSelectedTags = gson.fromJson(data.getStringExtra(TAG_REQUEST_DATA), type);
             AudioFilesRequestParams params = new AudioFilesRequestParams();
             params.setTagIds(mSelectedTags);
@@ -221,19 +242,18 @@ public class AudioListActivity extends BaseActivity {
         });
     }
 
-    private void updatePlayerUI(){
+    private void updatePlayerUI() {
         mDarkLayer.setVisibility(View.VISIBLE);
         audioTitle.setText(mAudioFile.getTitle());
-        audioPlayed.setText(getString(R.string.audio_default_time));
-        audioLeft.setText("-" + mAudioFile.getDurationInMinutes());
+        audioSeek.setMax(mAudioFile.getDurationInSeconds());
         if (mAudioFile.getImageBitmap() != null) {
             audioCoverImage.setImageBitmap(mAudioFile.getImageBitmap());
         }
         audioPlayPause.setVisibility(View.VISIBLE);
         int icon = -1;
-        if(mAudioFile.getState()==1){
+        if (mAudioFile.getState() == 1) {
             icon = R.drawable.ic_pause_white;
-        }else if(mAudioFile.getState()==2){
+        } else if (mAudioFile.getState() == 2) {
             icon = R.drawable.ic_play_white;
         }
         audioPlayPause.setImageDrawable(ContextCompat.getDrawable(this, icon));
@@ -249,7 +269,7 @@ public class AudioListActivity extends BaseActivity {
         sendMessage(bundle, PlayerService.MESSAGE_PLAY);
     }
 
-    public void continuePlayingMessage(){
+    public void continuePlayingMessage() {
         updatePlayerUI();
         mAudioFile.setState(1);
         sendMessage(null, PlayerService.MESSAGE_CONTINUE);
@@ -311,11 +331,13 @@ public class AudioListActivity extends BaseActivity {
         bindPlayerService();
     }
 
-    public void sendMessage(Bundle bundle, int type) {
+    public void sendMessage(Bundle bundle, int type, Object ... obj) {
         if (mBound) {
             try {
                 Message message = Message.obtain(null, type, 1, 1);
-                message.replyTo = replyMessenger;
+                if(obj.length!=0){
+                    message.obj = obj[0];
+                }
                 message.setData(bundle);
                 msgService.send(message); //sending message to service
             } catch (RemoteException e) {
@@ -336,31 +358,23 @@ public class AudioListActivity extends BaseActivity {
         }
     };
 
-    Messenger replyMessenger = new Messenger(new HandlerReplyMsg());
-
-    static class HandlerReplyMsg extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            String recdMessage = msg.obj.toString();
+    public Handler playbackHandler = new Handler() {
+        public void handleMessage(Message message) {
+            if(message.what == MESSAGE_PLAYBACK_TIME){
+                long time = (long) message.obj/1000;
+                audioSeek.setProgress((int) time);
+                audioPlayed.setText(FacadeCommon.getDateFromMillis((Long) message.obj));
+                long duration = mAudioFile.getDurationInSeconds();
+                audioLeft.setText(String.format(getString(R.string.leftTime), FacadeCommon.getDateFromMillis(duration*1000 - (long)message.obj)));
+            }
         }
-    }
-
-    private void showServiceData() {
-        //call method od service
-    }
-
-//    public static Handler myHandler = new Handler() {
-//        public void handleMessage(Message message) {
-//            Bundle data = message.getData();
-//        }
-//    };
+    };
 
     public void bindPlayerService() {
         if (!mBound) {
             Intent intent = new Intent(this, PlayerService.class);
-//        Messenger messenger = new Messenger(myHandler);
-//        intent.putExtra("MESSENGER", messenger);
+            Messenger messenger = new Messenger(playbackHandler);
+            intent.putExtra("MESSENGER", messenger);
             bindService(intent, playerConnection, Context.BIND_AUTO_CREATE);
         }
     }
