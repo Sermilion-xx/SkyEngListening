@@ -114,7 +114,6 @@ class AudioPlayer {
             mPlayer.addListener(eventLogger);
             mPlayer.setAudioDebugListener(eventLogger);
             mPlayer.setMetadataOutput(eventLogger);
-            mPlayer.setPlayWhenReady(shouldAutoPlay);
         }
     }
 

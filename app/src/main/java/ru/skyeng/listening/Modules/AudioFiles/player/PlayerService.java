@@ -69,7 +69,10 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
     public final static int MESSAGE_CONTINUE = 3;
     public final static int MESSAGE_PLAYBACK_TIME = 4;
     public final static int MESSAGE_PLAYBACK_SEARCH = 5;
+    public static final int MESSAGE_START_BUFFERING = 6;
+    public static final int MESSAGE_SUBTITLE_TIME = 7;
     private int mPlaybackInterval = 1000;
+    private int mSubtitleInterval = 100;
     private Handler mPlaybackHandler;
 
     private AudioPlayer mPlayer;
@@ -89,15 +92,18 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
         filter.addAction(ACTION_CONTINUE);
         mPlayer = new AudioPlayer(this, this);
         mPlaybackHandler = new Handler();
+
         messenger = new Messenger(new IncomingHandler(this));
     }
 
     public void startSendingPlaybackTime(){
         mPlaybackSenderRunnable.run();
+        mSubtitleRunnable.run();
     }
 
     public void stopSendingPlaybackTime(){
         mPlaybackHandler.removeCallbacks(mPlaybackSenderRunnable);
+        mPlaybackHandler.removeCallbacks(mSubtitleRunnable);
     }
 
     Runnable mPlaybackSenderRunnable = new Runnable() {
@@ -112,6 +118,22 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
                 e.printStackTrace();
             } finally {
                 mPlaybackHandler.postDelayed(mPlaybackSenderRunnable, mPlaybackInterval);
+            }
+        }
+    };
+
+    Runnable mSubtitleRunnable = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                Message subtitleTime = new Message();
+                subtitleTime.what = MESSAGE_SUBTITLE_TIME;
+                subtitleTime.obj = sendPlaybackTime();
+                outMessenger.send(subtitleTime);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            } finally {
+                mPlaybackHandler.postDelayed(mSubtitleRunnable, mSubtitleInterval);
             }
         }
     };

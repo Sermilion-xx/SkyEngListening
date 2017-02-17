@@ -1,10 +1,10 @@
-package ru.skyeng.listening.Modules.Categories.model;
+package ru.skyeng.listening.CommonComponents;
 
 import ru.skyeng.listening.CommonComponents.Interfaces.RequestParams;
 
 /**
  * ---------------------------------------------------
- * Created by Sermilion on 15/02/2017.
+ * Created by Sermilion on 17/02/2017.
  * Project: Listening
  * ---------------------------------------------------
  * <a href="http://www.skyeng.ru">www.skyeng.ru</a>
@@ -12,16 +12,16 @@ import ru.skyeng.listening.CommonComponents.Interfaces.RequestParams;
  * ---------------------------------------------------
  */
 
-public class TagsRequestParams implements RequestParams {
+public class BaseRequestParams implements RequestParams {
     private int page;
     private int pageSize;
 
-    public TagsRequestParams(int page, int pageSize) {
+    public BaseRequestParams(int page, int pageSize) {
         this.page = page;
         this.pageSize = pageSize;
     }
 
-    public TagsRequestParams() {
+    public BaseRequestParams() {
         page = 1;
         pageSize = 15;
     }

@@ -8,12 +8,12 @@ import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import ru.skyeng.listening.Modules.Categories.model.AudioTag;
-import ru.skyeng.listening.Modules.Categories.model.TagsData;
-import ru.skyeng.listening.Modules.Categories.model.TagsRequestParams;
-import ru.skyeng.listening.Modules.Categories.network.TagsService;
+import ru.skyeng.listening.CommonComponents.BaseRequestParams;
 import ru.skyeng.listening.CommonComponents.ServiceGenerator;
 import ru.skyeng.listening.MVPBase.MVPModel;
+import ru.skyeng.listening.Modules.Categories.model.AudioTag;
+import ru.skyeng.listening.Modules.Categories.model.TagsData;
+import ru.skyeng.listening.Modules.Categories.network.TagsService;
 
 import static ru.skyeng.listening.CommonComponents.Constants.CURRENT_PAGE;
 import static ru.skyeng.listening.CommonComponents.Constants.LAST_PAGE;
@@ -28,7 +28,7 @@ import static ru.skyeng.listening.CommonComponents.Constants.LAST_PAGE;
  * ---------------------------------------------------
  */
 
-public class CategoriesModel implements MVPModel<TagsData, List<AudioTag>, TagsRequestParams> {
+public class CategoriesModel implements MVPModel<TagsData, List<AudioTag>, BaseRequestParams> {
 
     private TagsService mTagsService;
     private TagsData mData;
@@ -40,15 +40,15 @@ public class CategoriesModel implements MVPModel<TagsData, List<AudioTag>, TagsR
     }
 
     @Override
-    public void loadData(Observer<TagsData> observable, TagsRequestParams params) {
+    public void loadData(Observer<TagsData> observable, BaseRequestParams params) {
         if(params==null)
-            params = new TagsRequestParams();
-        Observable<TagsData> audioDataObservable = mTagsService.getTags(
+            params = new BaseRequestParams();
+        Observable<TagsData> tagsDataObservable = mTagsService.getTags(
                 params.getPage(),
                 params.getPageSize())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
-        audioDataObservable.subscribe(observable);
+        tagsDataObservable.subscribe(observable);
     }
 
     @Override

@@ -143,6 +143,7 @@
         android:background="@color/almostWhite"
         app:behavior_hideable="true"
         app:elevation="16dp"
+
         app:layout_behavior="@string/bottom_sheet_behavior">
 
         <FrameLayout
@@ -242,6 +243,7 @@
             android:layout_marginLeft="24dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="14dp"
+            android:layout_marginBottom="24dp"
             android:text="@string/audio_default_time" />
 
         <TextView
@@ -254,7 +256,6 @@
             android:layout_marginRight="32dp"
             android:layout_marginEnd="32dp"
             android:layout_marginTop="12dp"
-            android:layout_marginBottom="20dp"
             android:layout_toRightOf="@+id/audio_played"
             android:layout_toEndOf="@+id/audio_played"
             android:text="@string/dash"

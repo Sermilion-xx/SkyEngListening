@@ -7,6 +7,7 @@ import dagger.Provides;
 import ru.skyeng.listening.Modules.AudioFiles.AudioListAdapter;
 import ru.skyeng.listening.Modules.AudioFiles.AudioListModel;
 import ru.skyeng.listening.Modules.AudioFiles.AudioListPresenter;
+import ru.skyeng.listening.Modules.AudioFiles.SubtitlesModel;
 
 /**
  * ---------------------------------------------------
@@ -30,6 +31,12 @@ class AudioListModule {
     @Singleton
     AudioListModel getAudioListModel(){
         return new AudioListModel();
+    }
+
+    @Provides
+    @Singleton
+    SubtitlesModel getSubtitlesModel(){
+        return new SubtitlesModel();
     }
 
     @Provides

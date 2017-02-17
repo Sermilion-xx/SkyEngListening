@@ -20,11 +20,11 @@ import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.List;
 
+import ru.skyeng.listening.CommonComponents.FacadeCommon;
+import ru.skyeng.listening.MVPBase.MVPPresenter;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioData;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFilesRequestParams;
-import ru.skyeng.listening.CommonComponents.FacadeCommon;
-import ru.skyeng.listening.MVPBase.MVPPresenter;
 import ru.skyeng.listening.R;
 
 /**
@@ -94,7 +94,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
         holder.mCategory.setText(category);
         if (item.getImageFileUrl() != null) {
-            if(item.getImageBitmap()==null) {
+            if (item.getImageBitmap() == null) {
                 Glide.with(getContext())
                         .load(item.getImageFileUrl()).listener(new RequestListener<String, GlideDrawable>() {
                     @Override
@@ -108,10 +108,10 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                         return false;
                     }
                 }).into(holder.mCoverImage);
-            }else {
+            } else {
                 holder.mCoverImage.setImageBitmap(item.getImageBitmap());
             }
-        }else {
+        } else {
             holder.mCoverImage.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_player_cover));
             item.setImageBitmap(BitmapFactory.decodeResource(getContext().getResources(),
                     R.drawable.ic_player_cover));
@@ -129,6 +129,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     /**
      * Метод для установки состояния проигрования аудио файла
+     *
      * @param state: 0 - остановленно, 1 - проигрование, 2 - пауза
      */
     void setPlayerState(int state) {
@@ -147,7 +148,8 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             public void onClick(View v) {
                 //playing different audio
                 if (playingPosition != -1 && playingPosition != position) {
-                    getItems().get(playingPosition).setState(0);
+                    if (playingPosition < getItems().size())
+                        getItems().get(playingPosition).setState(0);
                     notifyItemChanged(playingPosition);
                     item.setState(1);
                     notifyItemPlaying(position);

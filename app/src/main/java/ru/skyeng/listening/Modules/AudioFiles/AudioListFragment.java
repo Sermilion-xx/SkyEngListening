@@ -23,11 +23,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
+import ru.skyeng.listening.CommonComponents.SEApplication;
+import ru.skyeng.listening.MVPBase.MVPView;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioData;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFilesRequestParams;
-import ru.skyeng.listening.CommonComponents.SEApplication;
-import ru.skyeng.listening.MVPBase.MVPView;
+import ru.skyeng.listening.Modules.AudioFiles.model.SubtitlesRequestParams;
 import ru.skyeng.listening.R;
 
 /**
@@ -65,14 +66,27 @@ public class AudioListFragment extends MvpLceFragment<
     void setModel(AudioListModel model) {
         presenter.setModel(model);
     }
-    @Inject AudioListAdapter mAdapter;
-    @BindView(R.id.recyclerView) RecyclerView mRecyclerView;
-    @BindView(R.id.loadingView) ProgressBar mProgress;
+
+    @Inject
+    void setSubtitleModel(SubtitlesModel model) {
+        presenter.setSubtitlesModel(model);
+    }
+
+    @Inject
+    AudioListAdapter mAdapter;
+    @BindView(R.id.recyclerView)
+    RecyclerView mRecyclerView;
+    @BindView(R.id.loadingView)
+    ProgressBar mProgress;
     private boolean isRefreshing;
     private AudioFilesRequestParams mRequestParams;
 
     public void setRequestParams(AudioFilesRequestParams mRequestParams) {
         this.mRequestParams = mRequestParams;
+    }
+
+    public AudioListAdapter getAdapter() {
+        return mAdapter;
     }
 
     @Override
@@ -81,6 +95,7 @@ public class AudioListFragment extends MvpLceFragment<
         setRetainInstance(true);
         ((SEApplication) getAppContext()).getAudioListDiComponent().inject(this);
         mRequestParams = new AudioFilesRequestParams();
+        presenter.setSubtitlesObserver((AudioListActivity)getActivity());
     }
 
     @Override
@@ -107,10 +122,11 @@ public class AudioListFragment extends MvpLceFragment<
     }
 
     public void startPlaying(AudioFile item) {
-        ((AudioListActivity) getActivity()).startPlayerMessage(item);
+        presenter.loadSubtitles(new SubtitlesRequestParams(item.getId()));
+        ((AudioListActivity) getActivity()).startBufferingMessage(item);
     }
 
-    public void continuePlaying(){
+    public void continuePlaying() {
         ((AudioListActivity) getActivity()).continuePlayingMessage();
     }
 
@@ -165,20 +181,20 @@ public class AudioListFragment extends MvpLceFragment<
 
     @Override
     public void onSubscribe(Disposable d) {
-        ((AudioListActivity)getActivityContext()).showProgress();
+        ((AudioListActivity) getActivityContext()).showProgress();
     }
 
     @Override
     public void onNext(AudioData value) {
-        if(value.getPrimaryData().size()==0)
-            ((AudioListActivity)getActivityContext()).getNoContentFoundLayout().setVisibility(View.VISIBLE);
+        if (value.getPrimaryData().size() == 0)
+            ((AudioListActivity) getActivityContext()).getNoContentFoundLayout().setVisibility(View.VISIBLE);
         presenter.getModel().setData(value);
         setData(value.getPrimaryData());
     }
 
     @Override
     public void onError(Throwable e) {
-        ((AudioListActivity)getActivityContext()).hideProgress();
+        ((AudioListActivity) getActivityContext()).hideProgress();
         isRefreshing = false;
         showError(e.getCause(), isRefreshing);
         contentView.setRefreshing(false);
@@ -188,11 +204,11 @@ public class AudioListFragment extends MvpLceFragment<
 
     @Override
     public void onComplete() {
-        if(getActivityContext()!=null) {
+        if (getActivityContext() != null) {
             ((AudioListActivity) getActivityContext()).hideProgress();
             ((AudioListActivity) getActivityContext()).updateButtonsVisibility();
         }
-        if(isRefreshing)
-        contentView.setRefreshing(false);
+        if (isRefreshing)
+            contentView.setRefreshing(false);
     }
 }

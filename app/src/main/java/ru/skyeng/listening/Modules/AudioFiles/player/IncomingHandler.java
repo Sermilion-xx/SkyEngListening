@@ -13,6 +13,7 @@ import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAG
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAGE_PLAY;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAGE_PLAYBACK_SEARCH;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAGE_PLAYBACK_TIME;
+import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAGE_START_BUFFERING;
 
 /**
  * ---------------------------------------------------
@@ -25,6 +26,7 @@ import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAG
  */
 
 public class IncomingHandler extends Handler {
+
 
     private PlayerService mService;
     private Messenger replyMessenger;
@@ -40,8 +42,7 @@ public class IncomingHandler extends Handler {
     @Override
     public void handleMessage(Message msg) {
         if (msg.what == MESSAGE_PLAY) {
-            Bundle bundle = msg.getData();
-            mService.getPlayer().setPlaySource(bundle.getString(EXTRA_AUDIO_URL));
+            mService.stopSendingPlaybackTime();
             mService.getPlayer().play();
             mService.startSendingPlaybackTime();
         } else if (msg.what == MESSAGE_PAUSE) {
@@ -52,6 +53,9 @@ public class IncomingHandler extends Handler {
             mService.startSendingPlaybackTime();
         } else if(msg.what == MESSAGE_PLAYBACK_SEARCH){
             mService.getPlayer().getPlayer().seekTo((long)msg.obj);
+        } else if(msg.what == MESSAGE_START_BUFFERING){
+            Bundle bundle = msg.getData();
+            mService.getPlayer().setPlaySource(bundle.getString(EXTRA_AUDIO_URL));
         }
     }
 }

@@ -12,19 +12,24 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Modules.AudioFiles.AudioListActivity">
+        <activity android:name=".Modules.AudioFiles.AudioListActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CommonComponents.BaseActivity" />
 
-        <service android:name=".Modules.AudioFiles.player.PlayerService" />
+        <activity android:name=".CommonComponents.BaseActivity"
+            android:screenOrientation="portrait"/>
 
-        <activity android:name=".Modules.Categories.CategoriesActivity" />
-        <activity android:name=".Modules.Settings.SettingsActivity"></activity>
+        <service android:name=".Modules.AudioFiles.player.PlayerService"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".Modules.Categories.CategoriesActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Modules.Settings.SettingsActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

@@ -14,6 +14,9 @@ import ru.skyeng.listening.CommonComponents.Interfaces.RequestParams;
 import ru.skyeng.listening.MVPBase.MVPModel;
 import ru.skyeng.listening.MVPBase.MVPPresenter;
 import ru.skyeng.listening.MVPBase.MVPView;
+import ru.skyeng.listening.Modules.AudioFiles.model.SubtitleFile;
+import ru.skyeng.listening.Modules.AudioFiles.model.SubtitlesData;
+import ru.skyeng.listening.Modules.AudioFiles.model.SubtitlesRequestParams;
 
 /**
  * ---------------------------------------------------
@@ -33,17 +36,28 @@ public class AudioListPresenter
         AudioFilesRequestParams> {
 
     private AudioListModel mModel;
+    private SubtitlesModel mSubtitlesModel;
     private Observer<AudioData> mObserver;
+    private Observer<List<SubtitleFile>> mSubtitlesObserver;
 
     @Override
     public void setObserver(Observer<AudioData> observer) {
         mObserver = observer;
     }
 
+    public void setSubtitlesObserver(Observer<List<SubtitleFile>> observer) {
+        mSubtitlesObserver = observer;
+    }
+
     @Override
     public void setModel(MVPModel<AudioData, List<AudioFile>, AudioFilesRequestParams> model) {
         this.mModel = (AudioListModel) model;
         this.mModel.initRetrofitService();
+    }
+
+    public void setSubtitlesModel(MVPModel<List<SubtitleFile>, List<SubtitleFile>, SubtitlesRequestParams> model) {
+        this.mSubtitlesModel = (SubtitlesModel) model;
+        this.mSubtitlesModel.initRetrofitService();
     }
 
     @Override
@@ -53,14 +67,30 @@ public class AudioListPresenter
         return mModel;
     }
 
+    public MVPModel<List<SubtitleFile>,
+            List<SubtitleFile>,
+            SubtitlesRequestParams> getSubtitlesModel() {
+        return mSubtitlesModel;
+    }
+
     @Override
     public List<AudioFile> getData() {
         return getModel().getItems();
     }
 
+    public List<SubtitleFile> getSubtitlesData() {
+        return getSubtitlesModel().getItems();
+    }
+
+
+
     @Override
     public void loadData(final boolean pullToRefresh, RequestParams params) {
         mModel.loadData(mObserver, (AudioFilesRequestParams) params);
+    }
+
+    public void loadSubtitles(SubtitlesRequestParams params){
+        mSubtitlesModel.loadData(mSubtitlesObserver, params);
     }
 
 

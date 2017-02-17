@@ -22,13 +22,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
-import ru.skyeng.listening.Modules.AudioFiles.AudioListActivity;
-import ru.skyeng.listening.Modules.Categories.model.AudioTag;
-import ru.skyeng.listening.Modules.Categories.model.TagsData;
-import ru.skyeng.listening.Modules.Categories.model.TagsRequestParams;
+import ru.skyeng.listening.CommonComponents.BaseRequestParams;
 import ru.skyeng.listening.CommonComponents.Interfaces.ActivityExtensions;
 import ru.skyeng.listening.CommonComponents.SEApplication;
 import ru.skyeng.listening.MVPBase.MVPView;
+import ru.skyeng.listening.Modules.AudioFiles.AudioListActivity;
+import ru.skyeng.listening.Modules.Categories.model.AudioTag;
+import ru.skyeng.listening.Modules.Categories.model.TagsData;
 import ru.skyeng.listening.R;
 
 
@@ -83,6 +83,11 @@ public class CategoriesFragment extends MvpLceFragment<
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
@@ -108,7 +113,7 @@ public class CategoriesFragment extends MvpLceFragment<
         contentView.setOnRefreshListener(this);
         if (selectedTags != null) {
             initTagView(selectedTags);
-        }else {
+        } else {
             selectedTags = new ArrayList<>();
         }
         tagGroup.setOnTagClickListener(new TagView.OnTagClickListener() {
@@ -154,7 +159,7 @@ public class CategoriesFragment extends MvpLceFragment<
     public void loadData(boolean pullToRefresh) {
         if (!pullToRefresh)
             ((ActivityExtensions) getActivity()).showProgress();
-        presenter.loadData(pullToRefresh, new TagsRequestParams());
+        presenter.loadData(pullToRefresh, new BaseRequestParams());
     }
 
 
@@ -179,10 +184,10 @@ public class CategoriesFragment extends MvpLceFragment<
 
     private void initTagView(List<Integer> selected) {
 
-        if(selected == null) {
+        if (selected == null) {
             selected = new ArrayList<>();
-        }else if(selected.size()>0){
-                AudioListActivity.categoriesSelected = true;
+        } else if (selected.size() > 0) {
+            AudioListActivity.categoriesSelected = true;
         }
         if (presenter.getData() == null || tagGroup == null) return;
         tagGroup.removeAll();
@@ -190,12 +195,14 @@ public class CategoriesFragment extends MvpLceFragment<
             AudioTag aTag = presenter.getData().get(i);
             Tag tag = new Tag(aTag.getTitle());
             tag.radius = 6;
-            if (selected.contains(i)) {
-                tag.background = ContextCompat.getDrawable(getActivityContext(), R.drawable.blue2_with_shadow);
-                tag.tagTextColor = ContextCompat.getColor(getActivityContext(), R.color.colorWhite);
-            } else {
-                tag.layoutColor = ContextCompat.getColor(getActivityContext(), R.color.colorBlue0);
-                tag.tagTextColor = ContextCompat.getColor(getActivityContext(), R.color.colorBlue2);
+            if (getActivityContext() != null) {
+                if (selected.contains(i)) {
+                    tag.background = ContextCompat.getDrawable(getActivityContext(), R.drawable.blue2_with_shadow);
+                    tag.tagTextColor = ContextCompat.getColor(getActivityContext(), R.color.colorWhite);
+                } else {
+                    tag.layoutColor = ContextCompat.getColor(getActivityContext(), R.color.colorBlue0);
+                    tag.tagTextColor = ContextCompat.getColor(getActivityContext(), R.color.colorBlue2);
+                }
             }
             tag.tagTextSize = 16;
             tagGroup.addTag(tag);
