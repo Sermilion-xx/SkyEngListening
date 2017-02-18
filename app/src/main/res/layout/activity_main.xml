@@ -15,8 +15,6 @@
         android:layout_gravity="center"
         xmlns:android="http://schemas.android.com/apk/res/android"/>
 
-
-
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"

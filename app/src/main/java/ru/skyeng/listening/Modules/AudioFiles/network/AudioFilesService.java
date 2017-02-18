@@ -29,5 +29,7 @@ public interface AudioFilesService {
             @Query("tagIds[]") List<Integer> tagIds,
             @Query("durationGT") Integer  durationGT,
             @Query("durationLT") Integer  durationLT
+//            @Query("durations") Integer  durations
+
     );
 }

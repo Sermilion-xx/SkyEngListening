@@ -30,6 +30,11 @@
     <string name="days">Дни</string>
     <string name="time">Время</string>
     <string name="only_week_days">Только будни</string>
+    <string name="afternoon">12:00</string>
+    <string name="settings_saved">Настройки сохранены</string>
+    <string name="select_duration">Выберите продолжительность</string>
+    <string name="select">Выбрать</string>
+    <string name="cancel">Отмена</string>
 
 
 </resources>

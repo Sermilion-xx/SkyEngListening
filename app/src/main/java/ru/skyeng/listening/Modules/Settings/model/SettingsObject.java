@@ -1,8 +1,17 @@
 package ru.skyeng.listening.Modules.Settings.model;
 
+import android.util.SparseIntArray;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -23,6 +32,9 @@ public class SettingsObject {
     private boolean intAccent;
     private boolean britishAccent;
     private boolean americanAccent;
+    private int remainderDays;
+    private SparseIntArray duration;
+    private Calendar time;
 
 
     public SettingsObject() {
@@ -35,6 +47,47 @@ public class SettingsObject {
         accentIds.add(2);
         accentIds.add(4);
         accentIds.add(3);
+        remainderDays = 7;
+        time = defaultCalendar();
+        duration = new SparseIntArray(4);
+        duration.put(0,5);
+    }
+
+    public static Calendar defaultCalendar() {
+        Calendar currentDate = Calendar.getInstance();
+        currentDate.set(Calendar.HOUR, 12);
+        currentDate.set(Calendar.MINUTE, 0);
+        return currentDate;
+    }
+
+    public void setDuration(boolean[] index) {
+        int one = 0;
+        int two = 5;
+        for(int i=0; i<index.length; i++){
+            if(index[i]){
+                this.duration.put(one,two);
+                one = two;
+                two = one*2;
+                if(i==3){
+                    two = 360;
+                }
+            }
+        }
+    }
+
+    public SparseIntArray getDuration(){
+        return duration;
+    }
+
+    public boolean[] getDurationsBooleanArray() {
+        int[] keys = new int[]{0,5,10,20};
+        boolean[] values = new boolean[4];
+        for(int i:keys){
+            if(duration.get(i, -1)!=-1){
+                values[i] = true;
+            }
+        }
+        return values;
     }
 
     public Set<Integer> getAccentIds() {

@@ -4,6 +4,7 @@ package ru.skyeng.listening.Modules.AudioFiles;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -16,6 +17,7 @@ import android.os.RemoteException;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -44,7 +46,10 @@ import ru.skyeng.listening.Modules.AudioFiles.model.SubtitleFile;
 import ru.skyeng.listening.Modules.AudioFiles.player.PlayerService;
 import ru.skyeng.listening.Modules.Categories.CategoriesActivity;
 import ru.skyeng.listening.Modules.Settings.SettingsActivity;
+import ru.skyeng.listening.Modules.Settings.model.SettingsObject;
 import ru.skyeng.listening.R;
+import ru.skyeng.listening.Utility.FacadePreferences;
+import ru.skyeng.listening.Utility.asynctask.CommonAsyncTask;
 
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.ACTION_AUDIO_STATE;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.ACTION_DID_NOT_STAR;
@@ -147,6 +152,16 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
                     intent.putExtra(TAG_REQUEST_DATA, jsonTags);
                     startActivityForResult(intent, TAG_REQUEST_CODE);
                 });
+
+        mLengthButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SettingsObject settings = FacadePreferences.getSettingsFromPref(AudioListActivity.this);
+                showDurationPicker(settings);
+            }
+        });
+
+
         mResetCategories.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -174,6 +189,40 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
             }
         });
         mSettingsButton.setOnClickListener(v -> startActivity(new Intent(AudioListActivity.this, SettingsActivity.class)));
+    }
+
+    private void showDurationPicker(SettingsObject settings) {
+        CharSequence durations[] = new CharSequence[]{
+                "От 0 до 5 минут",
+                "От 5 до 10 минут",
+                "От 10 до 20 минут",
+                "От 20 и больше минут"};
+        boolean[] checkedReceivers = new boolean[durations.length];
+        AlertDialog.Builder builder = new AlertDialog.Builder(AudioListActivity.this);
+        builder.setTitle(R.string.select_duration)
+                .setMultiChoiceItems(durations, settings.getDurationsBooleanArray(), new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        checkedReceivers[which] = isChecked;
+                    }
+                })
+                .setPositiveButton(R.string.select, (dialog, id) -> {
+                            settings.setDuration(checkedReceivers);
+                            CommonAsyncTask<Void, Void, Void> saveSettingsTask = new CommonAsyncTask<>();
+                            saveSettingsTask.setDoInBackground(param -> {
+                                FacadePreferences.setSettingsToPref(AudioListActivity.this, settings);
+                                return null;
+                            });
+                            saveSettingsTask.setConsumer(param -> {
+                                showToast(R.string.settings_saved);
+                                mFragment.loadData(false);
+                            });
+                            saveSettingsTask.execute();
+                        }
+                ).setCancelable(true)
+                .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.cancel());
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     @Override

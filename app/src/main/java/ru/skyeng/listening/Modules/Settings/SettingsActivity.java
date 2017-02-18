@@ -4,6 +4,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.Button;
@@ -24,6 +25,7 @@ import ru.skyeng.listening.Modules.Settings.model.SettingsObject;
 import ru.skyeng.listening.R;
 import ru.skyeng.listening.Utility.FacadePreferences;
 import ru.skyeng.listening.Utility.HelperMethod;
+import ru.skyeng.listening.Utility.asynctask.CommonAsyncTask;
 
 public class SettingsActivity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
@@ -63,17 +65,12 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
     CheckBox mAmericanAccentsCheckBox;
     @BindView(R.id.button_apply)
     Button mApplyButton;
-
     @BindView(R.id.sliding_part_1)
     RelativeLayout mSlidingPart1;
-
     @BindView(R.id.sliding_part_2)
     RelativeLayout mSlidingPart2;
-
     @BindView(R.id.sliding_area)
     View mSlidingArea;
-
-
 
     private SettingsObject mSettings;
     private List<ImageView> mLevelViews;
@@ -98,6 +95,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
     private void applySettings(SettingsObject settings) {
         if (settings.isRemainderOn()) {
             mNotificationSwitch.setChecked(true);
+            new Handler().postDelayed(this::showNotificationPanel, 500);
         } else {
             mNotificationSwitch.setChecked(false);
         }
@@ -228,12 +226,17 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
             case R.id.button_apply:
                 saveSettings(mSettings);
                 break;
-
         }
     }
 
     private void saveSettings(SettingsObject mSettings) {
-        FacadePreferences.setSettingsToPref(this, mSettings);
+        CommonAsyncTask<Void, Void, Void> saveSettingsTask = new CommonAsyncTask<>();
+        saveSettingsTask.setDoInBackground(param -> {
+            FacadePreferences.setSettingsToPref(SettingsActivity.this, mSettings);
+            return null;
+        });
+        saveSettingsTask.setConsumer(param -> showToast(R.string.settings_saved));
+        saveSettingsTask.execute();
     }
 
     boolean doNotTriggerAllAccents = false;
@@ -246,19 +249,27 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         }
     }
 
+    private void showNotificationPanel(){
+        mSlidingArea.setVisibility(View.VISIBLE);
+        mSlidingPart1.animate().translationY(300);
+        mSlidingPart2.animate().translationY(300);
+    }
+
+    private void hideNotificationPanel(){
+        mSlidingArea.setVisibility(View.GONE);
+        mSlidingPart1.animate().translationY(0);
+        mSlidingPart2.animate().translationY(0);
+    }
+
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         switch (buttonView.getId()) {
             case R.id.notification_switch:
                 mSettings.setRemainderOn(isChecked);
                 if(isChecked) {
-                    mSlidingArea.setVisibility(View.VISIBLE);
-                    mSlidingPart1.animate().translationY(300);
-                    mSlidingPart2.animate().translationY(300);
+                    showNotificationPanel();
                 }else {
-                    mSlidingArea.setVisibility(View.GONE);
-                    mSlidingPart1.animate().translationY(0);
-                    mSlidingPart2.animate().translationY(0);
+                    hideNotificationPanel();
                 }
                 break;
             case R.id.checkbox_all_accents:

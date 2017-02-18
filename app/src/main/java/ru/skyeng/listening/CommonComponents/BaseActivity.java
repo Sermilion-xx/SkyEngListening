@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import ru.skyeng.listening.CommonComponents.Interfaces.ActivityExtensions;
 import ru.skyeng.listening.R;
@@ -82,5 +83,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityExtension
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    protected void showToast(int message){
+        Toast.makeText(this, getString(message), Toast.LENGTH_LONG).show();
     }
 }
