@@ -26,6 +26,7 @@
     <string name="got_problem">Возникли проблемы с приложением?</string>
     <string name="beginner">Начальный</string>
     <string name="leftTime">- %s</string>
+    <string name="audio_did_not_start">Аудио грузиться слишком громко, попробуйте другое аудио</string>
 
 
 </resources>

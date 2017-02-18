@@ -35,6 +35,9 @@ public class AudioFile implements Parcelable, Comparable<AudioFile>{
     private int state;
     private List<SubtitleFile> mSubtitles;
 
+    public AudioFile() {
+    }
+
     public void setSubtitles(List<SubtitleFile> mSubtitles) {
         this.mSubtitles = mSubtitles;
     }

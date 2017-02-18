@@ -83,11 +83,6 @@ public class CategoriesFragment extends MvpLceFragment<
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
@@ -220,8 +215,10 @@ public class CategoriesFragment extends MvpLceFragment<
 
     @Override
     public void onComplete() {
-        ((ActivityExtensions) getActivity()).hideProgress();
-        contentView.setRefreshing(isRefreshing);
+        if(getActivity()!=null) {
+            ((ActivityExtensions) getActivity()).hideProgress();
+            contentView.setRefreshing(isRefreshing);
+        }
     }
 
     @Override

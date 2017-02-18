@@ -74,6 +74,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         AudioViewHolder holder = (AudioViewHolder) viewHolder;
+//        AudioFile item = new AudioFile();
         AudioFile item = getItems().get(position);
         item.setDurationInMinutes(FacadeCommon.getDateFromMillis(item.getDurationInSeconds() * 1000));
         holder.mDuration.setText(item.getDurationInMinutes());
@@ -139,6 +140,33 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         notifyItemChanged(playingPosition);
     }
 
+    public void onSwitchAudio(AudioFile item, int position){
+        if (playingPosition < getItems().size()) {
+            getItems().get(playingPosition).setState(0);
+        }
+        notifyItemChanged(playingPosition);
+        item.setState(1);
+        notifyItemPlaying(position);
+        mFragment.startPlaying(item);
+    }
+
+    public void onPlayingAudioClicked(AudioFile item, AudioViewHolder viewHolder, int position){
+        item.setState(item.getState() == 1 ? 2 : 1);
+        notifyItemChanged(position);
+        int actionType = setPlayPauseIcon(viewHolder, item);
+        if (actionType == 1) {
+            mFragment.pausePlayer();
+        } else if (actionType == 2) {
+            mFragment.continuePlaying();
+        }
+    }
+
+    public void onPlayingNewAudio(AudioFile item, int position){
+        item.setState(1);
+        notifyItemPlaying(position);
+        mFragment.startPlaying(item);
+    }
+
     @NonNull
     private View.OnClickListener getOnClickListener(int position,
                                                     AudioViewHolder viewHolder,
@@ -146,28 +174,12 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //playing different audio
                 if (playingPosition != -1 && playingPosition != position) {
-                    if (playingPosition < getItems().size())
-                        getItems().get(playingPosition).setState(0);
-                    notifyItemChanged(playingPosition);
-                    item.setState(1);
-                    notifyItemPlaying(position);
-                    mFragment.startPlaying(item);
-                } else if (playingPosition == position) { //currently playing audio clicked
-                    //0 - stopped, 1 - playing, 2 - paused
-                    item.setState(item.getState() == 1 ? 2 : 1);
-                    notifyItemChanged(position);
-                    int actionType = setPlayPauseIcon(viewHolder, item);
-                    if (actionType == 1) {
-                        mFragment.pausePlayer();
-                    } else if (actionType == 2) {
-                        mFragment.continuePlaying();
-                    }
-                } else { // playing new audio
-                    item.setState(1);
-                    notifyItemPlaying(position);
-                    mFragment.startPlaying(item);
+                    onSwitchAudio(item, position);
+                } else if (playingPosition == position) {
+                    onPlayingAudioClicked(item, viewHolder, position);
+                } else {
+                    onPlayingNewAudio(item, position);
                 }
             }
         };

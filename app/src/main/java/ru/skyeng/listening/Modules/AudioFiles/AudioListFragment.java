@@ -2,6 +2,7 @@ package ru.skyeng.listening.Modules.AudioFiles;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
@@ -49,6 +50,15 @@ public class AudioListFragment extends MvpLceFragment<
         implements MVPView<List<AudioFile>>,
         SwipeRefreshLayout.OnRefreshListener, Observer<AudioData> {
 
+    @Inject
+    AudioListAdapter mAdapter;
+    @BindView(R.id.recyclerView)
+    RecyclerView mRecyclerView;
+    @BindView(R.id.loadingView)
+    ProgressBar mProgress;
+    private boolean isRefreshing;
+    private AudioFilesRequestParams mRequestParams;
+
     @Override
     @Inject
     public void setPresenter(@NonNull AudioListPresenter presenter) {
@@ -72,15 +82,6 @@ public class AudioListFragment extends MvpLceFragment<
         presenter.setSubtitlesModel(model);
     }
 
-    @Inject
-    AudioListAdapter mAdapter;
-    @BindView(R.id.recyclerView)
-    RecyclerView mRecyclerView;
-    @BindView(R.id.loadingView)
-    ProgressBar mProgress;
-    private boolean isRefreshing;
-    private AudioFilesRequestParams mRequestParams;
-
     public void setRequestParams(AudioFilesRequestParams mRequestParams) {
         this.mRequestParams = mRequestParams;
     }
@@ -89,13 +90,19 @@ public class AudioListFragment extends MvpLceFragment<
         return mAdapter;
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         ((SEApplication) getAppContext()).getAudioListDiComponent().inject(this);
         mRequestParams = new AudioFilesRequestParams();
-        presenter.setSubtitlesObserver((AudioListActivity)getActivity());
+        presenter.setSubtitlesObserver((AudioListActivity) getActivity());
     }
 
     @Override
@@ -195,11 +202,14 @@ public class AudioListFragment extends MvpLceFragment<
     @Override
     public void onError(Throwable e) {
         ((AudioListActivity) getActivityContext()).hideProgress();
+        if (presenter.getModel().getItems().size() == 0)
+            ((AudioListActivity) getActivityContext()).getNoContentFoundLayout().setVisibility(View.VISIBLE);
         isRefreshing = false;
         showError(e.getCause(), isRefreshing);
         contentView.setRefreshing(false);
         e.printStackTrace();
         setData(new ArrayList<>());
+
     }
 
     @Override

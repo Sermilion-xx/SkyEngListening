@@ -34,6 +34,10 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
     private AudioFilesService audioFilesService;
     private AudioData mData;
 
+    AudioData getAudioData(){
+        return mData;
+    }
+
     @Override
     public void initRetrofitService() {
         ServiceGenerator serviceGenerator = new ServiceGenerator();

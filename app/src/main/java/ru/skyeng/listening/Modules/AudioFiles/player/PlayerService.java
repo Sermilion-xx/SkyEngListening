@@ -56,6 +56,7 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
     public static final String EXTRA_PLAYBACK_TIMELINE = "playbackTimeLine";
     public static final String ACTION_AUDIO_STATE = DOMAIN + ".ACTION_STARTED";
     public static final String ACTION_UPDATE_PLAYER = DOMAIN + ".ACTION_UPDATE_PLAYER";
+    public static final String ACTION_DID_NOT_STAR = DOMAIN + ".ACTION_PLAYER_DOD_NOT_START";
     public static final String KEY_PLAYER_STATE = "PLAYER_STATE";
     public static final String PLAYER_UPDATE_VALUE_1 = "updateValue1";
     public static final String PLAYER_UPDATE_VALUE_2 = "updateValue2";
@@ -71,6 +72,7 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
     public final static int MESSAGE_PLAYBACK_SEARCH = 5;
     public static final int MESSAGE_START_BUFFERING = 6;
     public static final int MESSAGE_SUBTITLE_TIME = 7;
+    public static final String BINDER_MESSENGER = "MESSENGER";
     private int mPlaybackInterval = 1000;
     private int mSubtitleInterval = 100;
     private Handler mPlaybackHandler;
@@ -142,8 +144,13 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
         return mPlayer.getCurrentPosition();
     }
 
+    public void sendAudioDidNotStartBroadcast(){
+        Intent intent = new Intent(ACTION_DID_NOT_STAR);
+        sendBroadcast(intent);
+    }
+
     public int onStartCommand(Intent intent, int flags, int startId) {
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Nullable
@@ -151,7 +158,7 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
     public IBinder onBind(Intent intent) {
         Bundle extras = intent.getExtras();
         if (extras != null) {
-            outMessenger = (Messenger) extras.get("MESSENGER");
+            outMessenger = (Messenger) extras.get(BINDER_MESSENGER);
         }
         return messenger.getBinder();
     }
@@ -161,19 +168,6 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
         stopSendingPlaybackTime();
         mPlayer.release();
     }
-
-    //    private void sendPlaybackTime(Timeline timeline) {
-//        if (replyMessanger != null && !mPlayer.isPaused())
-//            try {
-//                Message message = new Message();
-//                Bundle bundle = new Bundle();
-//                bundle.putParcelable(EXTRA_PLAYBACK_TIMELINE, (Parcelable) timeline);
-//                message.obj = timeline;
-//                replyMessanger.send(message);
-//            } catch (RemoteException e) {
-//                e.printStackTrace();
-//            }
-//    }
 
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest) {
@@ -278,6 +272,22 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
             taskStackBuilder.addNextIntentWithParentStack(intent);
         }
         return builder;
+    }
+
+    public void setPlayerSource(Bundle bundle) {
+        mPlayer.setPlaySource(bundle.getString(EXTRA_AUDIO_URL));
+        Handler timer = new Handler();
+        timer.postDelayed(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        if(mPlayer.getState()!=1) {
+                            mPlayer.pause();
+                            sendAudioDidNotStartBroadcast();
+                        }
+                    }
+                }
+        , 10000);
     }
 }
 

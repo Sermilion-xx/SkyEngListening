@@ -1,5 +1,7 @@
 package ru.skyeng.listening.Modules.AudioFiles;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -18,13 +20,29 @@ import ru.skyeng.listening.Modules.AudioFiles.model.SubtitleFile;
  * ---------------------------------------------------
  */
 
-class SubtitleEngine implements Comparable<Long> {
+public class SubtitleEngine implements Comparable<Long>, Parcelable {
 
     private int index = -1;
     private List<SubtitleFile> subtitleFileList;
     private SubtitleFile current;
 
-    int size() {
+    protected SubtitleEngine(Parcel in) {
+        index = in.readInt();
+    }
+
+    public static final Creator<SubtitleEngine> CREATOR = new Creator<SubtitleEngine>() {
+        @Override
+        public SubtitleEngine createFromParcel(Parcel in) {
+            return new SubtitleEngine(in);
+        }
+
+        @Override
+        public SubtitleEngine[] newArray(int size) {
+            return new SubtitleEngine[size];
+        }
+    };
+
+    public int size() {
         if (subtitleFileList == null) return 0;
         return subtitleFileList.size();
     }
@@ -37,7 +55,7 @@ class SubtitleEngine implements Comparable<Long> {
         subtitleFileList.clear();
     }
 
-    SubtitleFile updateSubtitles(long currentTime) {
+    public SubtitleFile updateSubtitles(long currentTime) {
         int result = this.compareTo(currentTime);
         if (result == -1 || result == 0) {
             index++;
@@ -48,7 +66,9 @@ class SubtitleEngine implements Comparable<Long> {
 
     void setSubtitles(List<SubtitleFile> subtitleFileList) {
         this.subtitleFileList = subtitleFileList;
-        current = subtitleFileList.get(0);
+        if(subtitleFileList.size()>0) {
+            current = subtitleFileList.get(0);
+        }
     }
 
     @Override
@@ -62,5 +82,15 @@ class SubtitleEngine implements Comparable<Long> {
         } else {
             return 1;
         }
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(index);
     }
 }
