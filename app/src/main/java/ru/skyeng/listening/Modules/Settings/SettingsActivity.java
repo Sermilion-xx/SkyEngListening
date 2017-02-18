@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -60,6 +61,12 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     CheckBox mAmericanAccentsCheckBox;
     @BindView(R.id.button_apply)
     Button mApplyButton;
+
+    @BindView(R.id.sliding_part_1)
+    RelativeLayout mSlidingPart1;
+
+    @BindView(R.id.sliding_part_2)
+    RelativeLayout mSlidingPart2;
 
     private SettingsObject mSettings;
     private List<ImageView> mLevelViews;
@@ -234,6 +241,13 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         switch (buttonView.getId()) {
             case R.id.notification_switch:
                 mSettings.setRemainderOn(isChecked);
+                if(isChecked) {
+                    mSlidingPart1.animate().translationY(300);
+                    mSlidingPart2.animate().translationY(300);
+                }else {
+                    mSlidingPart1.animate().translationY(0);
+                    mSlidingPart2.animate().translationY(0);
+                }
                 break;
             case R.id.checkbox_all_accents:
                 mAllAccentsCheckBox.setChecked(isChecked);

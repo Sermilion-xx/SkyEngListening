@@ -27,6 +27,9 @@
     <string name="beginner">Начальный</string>
     <string name="leftTime">- %s</string>
     <string name="audio_did_not_start">Аудио грузиться слишком громко, попробуйте другое аудио</string>
+    <string name="days">Дни</string>
+    <string name="time">Время</string>
+    <string name="only_week_days">Только будни</string>
 
 
 </resources>
