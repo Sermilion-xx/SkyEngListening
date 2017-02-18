@@ -19,7 +19,7 @@ public class AudioFilesRequestParams implements RequestParams {
     private Integer page;
     private Integer pageSize;
     private String title;
-    private Integer accentId;
+    private List<Integer> accentIds;
     private Integer levelId;
     private List<Integer> tagIds;
     private Integer durationGT;
@@ -53,12 +53,12 @@ public class AudioFilesRequestParams implements RequestParams {
         this.title = title;
     }
 
-    public Integer getAccentId() {
-        return accentId;
+    public List<Integer> getAccentIds() {
+        return accentIds;
     }
 
-    public void setAccentId(Integer accentId) {
-        this.accentId = accentId;
+    public void setAccentIds(List<Integer> accentIds) {
+        this.accentIds = accentIds;
     }
 
     public Integer getLevelId() {

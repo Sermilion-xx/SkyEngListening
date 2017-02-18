@@ -24,7 +24,7 @@ public interface AudioFilesService {
             @Query("page") Integer  page,
             @Query("pageSize") Integer  pageSize,
             @Query("title") String title,
-            @Query("accentId") Integer  accentId,
+            @Query("accentIds[]") List<Integer>  accentIds,
             @Query("levelId") Integer  levelId,
             @Query("tagIds[]") List<Integer> tagIds,
             @Query("durationGT") Integer  durationGT,

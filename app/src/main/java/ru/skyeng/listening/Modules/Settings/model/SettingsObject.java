@@ -1,5 +1,10 @@
 package ru.skyeng.listening.Modules.Settings.model;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * ---------------------------------------------------
  * Created by Sermilion on 17/02/2017.
@@ -14,37 +19,26 @@ public class SettingsObject {
 
     private boolean remainderOn;
     private int level;
-    private boolean allAccents;
-    private final int americanAccentId;
+    private Set<Integer> accentIds;
     private boolean intAccent;
-    private final int intAccentId;
     private boolean britishAccent;
-    private final int britishAccentId;
     private boolean americanAccent;
 
 
-    public SettingsObject(){
+    public SettingsObject() {
+        accentIds = new HashSet<>();
         remainderOn = false;
         level = 1;
-        allAccents = true;
-        intAccent = true;
-        intAccentId = 0;
-        britishAccent = true;
-        britishAccentId = 2;
-        americanAccent = true;
-        americanAccentId = 1;
+        intAccent = true; //5
+        britishAccent = true; //4
+        americanAccent = true; //3
+        accentIds.add(2);
+        accentIds.add(4);
+        accentIds.add(3);
     }
 
-    public int getAmericanAccentId() {
-        return americanAccentId;
-    }
-
-    public int getIntAccentId() {
-        return intAccentId;
-    }
-
-    public int getBritishAccentId() {
-        return britishAccentId;
+    public Set<Integer> getAccentIds() {
+        return accentIds;
     }
 
     public boolean isRemainderOn() {
@@ -64,16 +58,20 @@ public class SettingsObject {
     }
 
     public boolean isAllAccents() {
-        return allAccents;
+        return accentIds.size()==3;
     }
 
-    public void setAllAccents(boolean allAccents) {
-        this.allAccents = allAccents;
-        if(allAccents) {
+    public void setAllAccents(boolean allAccents) {;
+        if (allAccents) {
             intAccent = true;
             britishAccent = true;
             americanAccent = true;
-        }else {
+            accentIds.clear();
+            accentIds.add(5);
+            accentIds.add(4);
+            accentIds.add(3);
+        } else {
+            accentIds.clear();
             intAccent = false;
             britishAccent = false;
             americanAccent = false;
@@ -86,7 +84,11 @@ public class SettingsObject {
 
     public void setIntAccent(boolean intAccent) {
         this.intAccent = intAccent;
-        this.allAccents = false;
+        if (!intAccent) {
+            accentIds.remove(Integer.valueOf(5));
+        }else {
+            accentIds.add(5);
+        }
     }
 
     public boolean isBritishAccent() {
@@ -95,7 +97,11 @@ public class SettingsObject {
 
     public void setBritishAccent(boolean britishAccent) {
         this.britishAccent = britishAccent;
-        this.allAccents = false;
+        if (britishAccent) {
+            accentIds.add(4);
+        }else {
+            accentIds.remove(Integer.valueOf(4));
+        }
     }
 
     public boolean isAmericanAccent() {
@@ -104,6 +110,10 @@ public class SettingsObject {
 
     public void setAmericanAccent(boolean americanAccent) {
         this.americanAccent = americanAccent;
-        this.allAccents = false;
+        if(americanAccent){
+            accentIds.add(3);
+        }else {
+            accentIds.remove(Integer.valueOf(3));
+        }
     }
 }

@@ -2,6 +2,7 @@ package ru.skyeng.listening.Modules.AudioFiles;
 
 import android.os.Bundle;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -14,6 +15,8 @@ import ru.skyeng.listening.Modules.AudioFiles.model.AudioFilesRequestParams;
 import ru.skyeng.listening.Modules.AudioFiles.network.AudioFilesService;
 import ru.skyeng.listening.CommonComponents.ServiceGenerator;
 import ru.skyeng.listening.MVPBase.MVPModel;
+import ru.skyeng.listening.Modules.Settings.model.SettingsObject;
+import ru.skyeng.listening.Utility.FacadePreferences;
 
 import static ru.skyeng.listening.CommonComponents.Constants.CURRENT_PAGE;
 import static ru.skyeng.listening.CommonComponents.Constants.LAST_PAGE;
@@ -48,11 +51,14 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
     public void loadData(Observer<AudioData> observable, AudioFilesRequestParams params) {
         if(params==null)
             params = new AudioFilesRequestParams();
+        SettingsObject settingsObject = FacadePreferences.getSettingsFromPref(((AudioListFragment)observable).getActivityContext());
+        params.setAccentIds(new ArrayList<>(settingsObject.getAccentIds()));
+        params.setLevelId(settingsObject.getLevel());
         Observable<AudioData> audioDataObservable = audioFilesService.getAudioFiles(
                 params.getPage(),
                 params.getPageSize(),
                 params.getTitle(),
-                params.getAccentId(),
+                params.getAccentIds(),
                 params.getLevelId(),
                 params.getTagIds(),
                 params.getDurationGT(),

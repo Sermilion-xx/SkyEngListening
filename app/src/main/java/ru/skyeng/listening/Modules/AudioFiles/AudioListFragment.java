@@ -1,8 +1,9 @@
 package ru.skyeng.listening.Modules.AudioFiles;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcelable;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
@@ -88,12 +89,6 @@ public class AudioListFragment extends MvpLceFragment<
 
     public AudioListAdapter getAdapter() {
         return mAdapter;
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 
     @Override
@@ -202,7 +197,7 @@ public class AudioListFragment extends MvpLceFragment<
     @Override
     public void onError(Throwable e) {
         ((AudioListActivity) getActivityContext()).hideProgress();
-        if (presenter.getModel().getItems().size() == 0)
+        if (presenter.getModel().getItems()==null)
             ((AudioListActivity) getActivityContext()).getNoContentFoundLayout().setVisibility(View.VISIBLE);
         isRefreshing = false;
         showError(e.getCause(), isRefreshing);

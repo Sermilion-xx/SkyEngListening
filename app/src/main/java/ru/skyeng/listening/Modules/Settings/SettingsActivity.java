@@ -127,22 +127,22 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         String text = "";
         switch (selectedLevel) {
             case 1:
-                text = "Начальный";
+                text = "Beginner";
                 break;
             case 2:
-                text = "Элементарный";
+                text = "Elementary";
                 break;
             case 3:
-                text = "Средний";
+                text = "Pre-Intermediate";
                 break;
             case 4:
-                text = "Высший средний";
+                text = "Intermediate";
                 break;
             case 5:
-                text = "Сложный";
+                text = "Upper-Intermediate";
                 break;
             case 6:
-                text = "Самый сложный";
+                text = "Advanced";
                 break;
         }
         mLevelViews.get(mSettings.getLevel() - 1).setImageDrawable(ContextCompat.getDrawable(this, R.drawable.oval_grey));
@@ -167,6 +167,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         mAmericanAccentsCheckBox.setChecked(checked);
         mBritishAccentsCheckBox.setChecked(checked);
         mIntAccentsCheckBox.setChecked(checked);
+        mSettings.setAllAccents(checked);
     }
 
     @HelperMethod("updateAccentsViewsAndCheckBoxes")
@@ -218,6 +219,16 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         FacadePreferences.setSettingsToPref(this, mSettings);
     }
 
+    boolean doNotTriggerAllAccents = false;
+    public void updateSingleCheckboxClicked(){
+        doNotTriggerAllAccents = true;
+        if(mSettings.getAccentIds().size()==3){
+            mAllAccentsCheckBox.setChecked(true);
+        }else {
+            mAllAccentsCheckBox.setChecked(false);
+        }
+    }
+
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         switch (buttonView.getId()) {
@@ -225,42 +236,54 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 mSettings.setRemainderOn(isChecked);
                 break;
             case R.id.checkbox_all_accents:
-                if (mSettings.isAllAccents()) {
-                    mSettings.setAllAccents(false);
-                    updateAccentsViewsAndCheckBoxes(false);
-                } else {
-                    mSettings.setAllAccents(true);
-                    updateAccentsViewsAndCheckBoxes(true);
+                mAllAccentsCheckBox.setChecked(isChecked);
+                if(!doNotTriggerAllAccents) {
+                    if (!isChecked && mSettings.isAllAccents()) {
+                        mSettings.setAllAccents(false);
+                        updateAccentsViewsAndCheckBoxes(false);
+                    } else {
+                        mSettings.setAllAccents(true);
+                        updateAccentsViewsAndCheckBoxes(true);
+                    }
+
                 }
+                doNotTriggerAllAccents = false;
                 break;
             case R.id.checkbox_all_international:
-                if (mIntAccentsCheckBox.isChecked()) {
+                mIntAccentsCheckBox.setChecked(isChecked);
+                if (isChecked) {
                     mSettings.setIntAccent(true);
                     setTextColor(mAccentsInternational, selectedColor, true);
                 }else {
                     mSettings.setIntAccent(false);
                     setTextColor(mAccentsInternational, deselectedColor, false);
                 }
+                updateSingleCheckboxClicked();
                 break;
             case R.id.checkbox_all_british:
-                if (mBritishAccentsCheckBox.isChecked()) {
+                mBritishAccentsCheckBox.setChecked(isChecked);
+                if (isChecked) {
                     mSettings.setBritishAccent(true);
                     setTextColor(mAccentBritish, selectedColor, true);
                 }else {
                     mSettings.setBritishAccent(false);
                     setTextColor(mAccentBritish, deselectedColor, false);
                 }
+                updateSingleCheckboxClicked();
                 break;
             case R.id.checkbox_all_american:
-                if (mAmericanAccentsCheckBox.isChecked()) {
+                mAmericanAccentsCheckBox.setChecked(isChecked);
+                if (isChecked) {
                     mSettings.setAmericanAccent(true);
                     setTextColor(mAccentAmerican, selectedColor, true);
                 }else {
                     mSettings.setAmericanAccent(true);
                     setTextColor(mAccentAmerican, deselectedColor, false);
                 }
+                updateSingleCheckboxClicked();
                 break;
         }
+
     }
 
 }
