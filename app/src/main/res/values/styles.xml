@@ -14,7 +14,7 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="actionMenuTextColor">@color/textColorDark</item>
         <item name="android:textColorPrimary">@color/textColorDark</item>
-        <item name="android:textColorSecondary">@color/colorBlue2</item>
+        <item name="android:textColorSecondary">@color/colorAccent</item>
         <item name="android:textColor">@color/textColorDark</item>
         <item name="textColorAlertDialogListItem">@color/colorBlack</item>
         <item name="android:textViewStyle">@style/RobotoTextViewStyle</item>

@@ -1,5 +1,6 @@
 package ru.skyeng.listening.CommonComponents;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -35,6 +36,19 @@ public class BaseActivity extends AppCompatActivity implements ActivityExtension
                 getSupportActionBar().setDisplayShowHomeEnabled(true);
             }
         }
+        return mToolbar;
+    }
+
+    protected Toolbar setupToolbar(String title, Drawable drawable) {
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbar.setTitle(title);
+        setSupportActionBar(mToolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setHomeAsUpIndicator(drawable);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
         return mToolbar;
     }
 

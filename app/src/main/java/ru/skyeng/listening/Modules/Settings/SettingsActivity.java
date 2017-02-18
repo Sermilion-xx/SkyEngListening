@@ -1,9 +1,10 @@
 package ru.skyeng.listening.Modules.Settings;
 
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -18,14 +19,15 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ru.skyeng.listening.CommonComponents.BaseActivity;
 import ru.skyeng.listening.Modules.Settings.model.SettingsObject;
 import ru.skyeng.listening.R;
 import ru.skyeng.listening.Utility.FacadePreferences;
 import ru.skyeng.listening.Utility.HelperMethod;
 
-public class SettingsActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+public class SettingsActivity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
-    private static final int selectedColor = R.color.colorBlue2;
+    private static final int selectedColor = R.color.colorAccent;
     private static final int deselectedColor = R.color.textColorDark;
     @BindView(R.id.notification_switch)
     Switch mNotificationSwitch;
@@ -68,6 +70,11 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     @BindView(R.id.sliding_part_2)
     RelativeLayout mSlidingPart2;
 
+    @BindView(R.id.sliding_area)
+    View mSlidingArea;
+
+
+
     private SettingsObject mSettings;
     private List<ImageView> mLevelViews;
 
@@ -75,6 +82,9 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
+        upArrow.setColorFilter(getResources().getColor(R.color.colorGrey4), PorterDuff.Mode.SRC_ATOP);
+        setupToolbar(getString(R.string.settings), upArrow);
         ButterKnife.bind(this);
         initLevelViewsList();
         mSettings = FacadePreferences.getSettingsFromPref(this);
@@ -242,9 +252,11 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             case R.id.notification_switch:
                 mSettings.setRemainderOn(isChecked);
                 if(isChecked) {
+                    mSlidingArea.setVisibility(View.VISIBLE);
                     mSlidingPart1.animate().translationY(300);
                     mSlidingPart2.animate().translationY(300);
                 }else {
+                    mSlidingArea.setVisibility(View.GONE);
                     mSlidingPart1.animate().translationY(0);
                     mSlidingPart2.animate().translationY(0);
                 }

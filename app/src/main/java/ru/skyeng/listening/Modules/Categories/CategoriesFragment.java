@@ -196,7 +196,7 @@ public class CategoriesFragment extends MvpLceFragment<
                     tag.tagTextColor = ContextCompat.getColor(getActivityContext(), R.color.colorWhite);
                 } else {
                     tag.layoutColor = ContextCompat.getColor(getActivityContext(), R.color.colorBlue0);
-                    tag.tagTextColor = ContextCompat.getColor(getActivityContext(), R.color.colorBlue2);
+                    tag.tagTextColor = ContextCompat.getColor(getActivityContext(), R.color.colorAccent);
                 }
             }
             tag.tagTextSize = 16;

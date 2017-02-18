@@ -276,7 +276,8 @@
                     android:paddingStart="16dp"
                     android:text="@string/apply"
                     android:textAlignment="textStart"
-                    android:textColor="@color/colorWhite" />
+                    android:textColor="@color/colorWhite"
+                    android:layout_marginBottom="20dp"/>
 
                 <RelativeLayout
                     android:id="@+id/level_layout"
@@ -284,7 +285,6 @@
                     android:layout_height="117dp"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
-                    android:layout_below="@+id/sliding_part_1"
                     android:layout_marginTop="15dp">
 
                     <View
@@ -382,6 +382,13 @@
 
                 </RelativeLayout>
             </RelativeLayout>
+
+            <View
+                android:visibility="gone"
+                android:id="@+id/sliding_area"
+                android:layout_below="@+id/sliding_part_2"
+                android:layout_width="wrap_content"
+                android:layout_height="93dp"/>
         </RelativeLayout>
     </ScrollView>
 
