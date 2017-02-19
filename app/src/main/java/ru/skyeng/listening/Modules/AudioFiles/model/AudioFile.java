@@ -33,9 +33,18 @@ public class AudioFile implements Parcelable, Comparable<AudioFile>{
     private String durationInMinutes;
     //0 - stopped, 1 - playing, 2 - paused
     private int state;
+    private boolean loading;
     private List<SubtitleFile> mSubtitles;
 
     public AudioFile() {
+    }
+
+    public boolean isLoading() {
+        return loading;
+    }
+
+    public void setLoading(boolean loading) {
+        this.loading = loading;
     }
 
     public void setSubtitles(List<SubtitleFile> mSubtitles) {

@@ -35,13 +35,16 @@ public class IncomingHandler extends Handler {
     @Override
     public void handleMessage(Message msg) {
         if (msg.what == MESSAGE_PLAY) {
+            mService.getPlayer().setState(1);
             mService.stopSendingPlaybackTime();
             mService.getPlayer().play();
             mService.startSendingPlaybackTime();
         } else if (msg.what == MESSAGE_PAUSE) {
+            mService.getPlayer().setState(2);
             mService.getPlayer().pause();
             mService.stopSendingPlaybackTime();
         } else if (msg.what == MESSAGE_CONTINUE) {
+            mService.getPlayer().setState(1);
             mService.getPlayer().play();
             mService.startSendingPlaybackTime();
         } else if (msg.what == MESSAGE_PLAYBACK_SEARCH) {

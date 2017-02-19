@@ -191,6 +191,7 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         if (playbackState == 3) {
+            mPlayer.setState(1);
             Intent intent = new Intent(ACTION_AUDIO_STATE);
             intent.putExtra(KEY_PLAYER_STATE, false);
             sendBroadcast(intent);
@@ -242,12 +243,6 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
         System.out.println();
     }
 
-
-    private int progressBarValue(long position) {
-        long duration = mPlayer == null ? C.TIME_UNSET : mPlayer.getDuration();
-        return duration == C.TIME_UNSET || duration == 0 ? 0
-                : (int) ((position * PROGRESS_BAR_MAX) / duration);
-    }
 
     private Notification playbackStartedNotification(String title, String message, Bitmap largeIcon) {
         Intent intent = new Intent(this, AudioListActivity.class);

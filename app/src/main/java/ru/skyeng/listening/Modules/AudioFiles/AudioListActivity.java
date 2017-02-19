@@ -55,6 +55,7 @@ import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.ACTION
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.ACTION_DID_NOT_STAR;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.BINDER_MESSENGER;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.EXTRA_AUDIO_URL;
+import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.KEY_PLAYER_STATE;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAGE_PLAYBACK_TIME;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAGE_SUBTITLE_TIME;
 
@@ -204,7 +205,7 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
                 "От 5 до 10 минут",
                 "От 10 до 20 минут",
                 "От 20 и больше минут"};
-        boolean[] durationsArrya = new boolean[durations.length];
+
         AlertDialog.Builder builder = new AlertDialog.Builder(AudioListActivity.this);
         SettingsObject finalSettings = settings;
         boolean[] selected = settings.getDurationsBooleanArray();
@@ -212,11 +213,11 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
                 .setMultiChoiceItems(durations, selected, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                        durationsArrya[which] = isChecked;
+                        selected[which] = isChecked;
                     }
                 })
                 .setPositiveButton(R.string.select, (dialog, id) -> {
-                            finalSettings.setDuration(durationsArrya);
+                            finalSettings.setDuration(selected);
                             CommonAsyncTask<Void, Void, Void> saveSettingsTask = new CommonAsyncTask<>();
                             saveSettingsTask.setDoInBackground(param -> {
                                 FacadePreferences.setSettingsToPref(AudioListActivity.this, finalSettings);
@@ -312,25 +313,30 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
             if (mAudioFile.getImageBitmap() != null) {
                 audioCoverImage.setImageBitmap(mAudioFile.getImageBitmap());
             }
-            int icon = -1;
-            if (mAudioFile.getState() == 1) {
-                mAudioProgressBar.setVisibility(View.GONE);
-                icon = R.drawable.ic_pause_white;
+            int icon = R.drawable.ic_pause_white;
+            if (mAudioFile.getState() == 1 && !mAudioFile.isLoading()) {
+                hideAudioLoading();
                 audioPlayPause.setVisibility(View.VISIBLE);
-                mDarkLayer.setVisibility(View.VISIBLE);
-            } else if (mAudioFile.getState() == 2) {
+            } else if (mAudioFile.getState() == 2 && !mAudioFile.isLoading()) {
                 icon = R.drawable.ic_play_white;
-                mAudioProgressBar.setVisibility(View.GONE);
+                hideAudioLoading();
                 audioPlayPause.setVisibility(View.VISIBLE);
-                mDarkLayer.setVisibility(View.VISIBLE);
             } else {
-                mAudioProgressBar.setVisibility(View.VISIBLE);
+                showAudioLoading();
                 audioPlayPause.setVisibility(View.GONE);
-                mDarkLayer.setVisibility(View.GONE);
             }
+            mDarkLayer.setVisibility(View.VISIBLE);
             audioPlayPause.setImageDrawable(ContextCompat.getDrawable(this, icon));
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         }
+    }
+
+    private void hideAudioLoading() {
+        mAudioProgressBar.setVisibility(View.GONE);
+    }
+
+    private void showAudioLoading() {
+        mAudioProgressBar.setVisibility(View.VISIBLE);
     }
 
     public void startPlayerMessage() {
@@ -338,10 +344,10 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
     }
 
     public void startBufferingMessage(AudioFile audioFile) {
-        audioPlayPause.setVisibility(View.GONE);
         mSubtitleEngine = new SubtitleEngine();
         audioSubtitles.setText(getString(R.string.dash));
         mAudioFile = audioFile;
+        mAudioFile.setLoading(true);
         updatePlayerUI();
         bindPlayerService();
         Bundle bundle = new Bundle();
@@ -422,7 +428,6 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
             mBound = true;
             msgService = new Messenger(binder);
         }
-
         public void onServiceDisconnected(ComponentName className) {
             mBound = false;
         }
@@ -458,11 +463,11 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(ACTION_AUDIO_STATE)) {
+                mAudioFile.setLoading(intent.getBooleanExtra(KEY_PLAYER_STATE, false));
                 updatePlayerUI();
                 broadcastUpdateFinished = true;
             } else if (intent.getAction().equals(ACTION_DID_NOT_STAR)) {
-                mAudioProgressBar.setVisibility(View.GONE);
-//                Toast.makeText(AudioListActivity.this, getString(R.string.audio_did_not_start), Toast.LENGTH_LONG).show();
+                hideAudioLoading();
             }
         }
     }

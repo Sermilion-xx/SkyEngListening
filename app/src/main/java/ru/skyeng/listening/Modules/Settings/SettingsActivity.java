@@ -1,14 +1,10 @@
 package ru.skyeng.listening.Modules.Settings;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
 import android.view.View;
@@ -24,7 +20,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
-import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
 
@@ -275,7 +270,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         mGcmNetworkManager = GcmNetworkManager.getInstance(this);
         Task task = new PeriodicTask.Builder()
                 .setService(NotificationService.class)
-                .setPeriod(30)
+                .setPeriod(mSettings.getTime().getTimeInMillis())
                 .setFlex(10)
                 .setTag(TAG_TASK_PERIODIC_LOG)
                 .setPersisted(true)
