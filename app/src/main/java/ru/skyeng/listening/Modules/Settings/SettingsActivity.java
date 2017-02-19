@@ -1,21 +1,35 @@
 package ru.skyeng.listening.Modules.Settings;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v4.content.ContextCompat;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.google.android.gms.gcm.GcmNetworkManager;
+import com.google.android.gms.gcm.OneoffTask;
+import com.google.android.gms.gcm.PeriodicTask;
+import com.google.android.gms.gcm.Task;
+
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import butterknife.BindView;
@@ -25,12 +39,17 @@ import ru.skyeng.listening.Modules.Settings.model.SettingsObject;
 import ru.skyeng.listening.R;
 import ru.skyeng.listening.Utility.FacadePreferences;
 import ru.skyeng.listening.Utility.HelperMethod;
+import ru.skyeng.listening.Utility.NotificationService;
 import ru.skyeng.listening.Utility.asynctask.CommonAsyncTask;
 
-public class SettingsActivity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+import static ru.skyeng.listening.Utility.NotificationService.TAG_TASK_PERIODIC_LOG;
+
+public class SettingsActivity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
 
     private static final int selectedColor = R.color.colorAccent;
     private static final int deselectedColor = R.color.textColorDark;
+    private static final String NOTIFICATION_RECEIVER = "ru.skyeng.listening.NotificationReceiver";
+
     @BindView(R.id.notification_switch)
     Switch mNotificationSwitch;
     @BindView(R.id.level_value)
@@ -72,8 +91,14 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
     @BindView(R.id.sliding_area)
     View mSlidingArea;
 
+    @BindView(R.id.text_remainder_days_value)
+    Spinner mDaysSpinner;
+    @BindView(R.id.text_remainder_time_value)
+    Spinner mTimeSpinner;
+
     private SettingsObject mSettings;
     private List<ImageView> mLevelViews;
+    private GcmNetworkManager mGcmNetworkManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,11 +110,24 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         ButterKnife.bind(this);
         initLevelViewsList();
         mSettings = FacadePreferences.getSettingsFromPref(this);
-        if(mSettings==null){
+        if (mSettings == null) {
             mSettings = new SettingsObject();
         }
         applySettings(mSettings);
         setClickListeners();
+
+        ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(this,
+                R.array.notification_days, android.R.layout.simple_spinner_item);
+        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mDaysSpinner.setAdapter(adapter1);
+        mDaysSpinner.setSelection(mSettings.getRemindEvery());
+        mDaysSpinner.setOnItemSelectedListener(this);
+        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this,
+                R.array.notification_time, android.R.layout.simple_spinner_item);
+        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mTimeSpinner.setAdapter(adapter2);
+        mTimeSpinner.setSelection(mSettings.getTime().get(Calendar.HOUR));
+        mTimeSpinner.setOnItemSelectedListener(this);
     }
 
     private void applySettings(SettingsObject settings) {
@@ -229,7 +267,28 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         }
     }
 
+    private void removeNotification() {
+        mGcmNetworkManager.cancelAllTasks(NotificationService.class);
+    }
+
+    private void setNotification() {
+        mGcmNetworkManager = GcmNetworkManager.getInstance(this);
+        Task task = new PeriodicTask.Builder()
+                .setService(NotificationService.class)
+                .setPeriod(30)
+                .setFlex(10)
+                .setTag(TAG_TASK_PERIODIC_LOG)
+                .setPersisted(true)
+                .build();
+        mGcmNetworkManager.schedule(task);
+    }
+
     private void saveSettings(SettingsObject mSettings) {
+        if (mSettings.isRemainderOn()) {
+            setNotification();
+        }else {
+            removeNotification();
+        }
         CommonAsyncTask<Void, Void, Void> saveSettingsTask = new CommonAsyncTask<>();
         saveSettingsTask.setDoInBackground(param -> {
             FacadePreferences.setSettingsToPref(SettingsActivity.this, mSettings);
@@ -240,22 +299,23 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
     }
 
     boolean doNotTriggerAllAccents = false;
-    public void updateSingleCheckboxClicked(){
+
+    public void updateSingleCheckboxClicked() {
         doNotTriggerAllAccents = true;
-        if(mSettings.getAccentIds().size()==3){
+        if (mSettings.getAccentIds().size() == 3) {
             mAllAccentsCheckBox.setChecked(true);
-        }else {
+        } else {
             mAllAccentsCheckBox.setChecked(false);
         }
     }
 
-    private void showNotificationPanel(){
+    private void showNotificationPanel() {
         mSlidingArea.setVisibility(View.VISIBLE);
         mSlidingPart1.animate().translationY(300);
         mSlidingPart2.animate().translationY(300);
     }
 
-    private void hideNotificationPanel(){
+    private void hideNotificationPanel() {
         mSlidingArea.setVisibility(View.GONE);
         mSlidingPart1.animate().translationY(0);
         mSlidingPart2.animate().translationY(0);
@@ -266,15 +326,15 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         switch (buttonView.getId()) {
             case R.id.notification_switch:
                 mSettings.setRemainderOn(isChecked);
-                if(isChecked) {
+                if (isChecked) {
                     showNotificationPanel();
-                }else {
+                } else {
                     hideNotificationPanel();
                 }
                 break;
             case R.id.checkbox_all_accents:
                 mAllAccentsCheckBox.setChecked(isChecked);
-                if(!doNotTriggerAllAccents) {
+                if (!doNotTriggerAllAccents) {
                     if (!isChecked && mSettings.isAllAccents()) {
                         mSettings.setAllAccents(false);
                         updateAccentsViewsAndCheckBoxes(false);
@@ -291,7 +351,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                 if (isChecked) {
                     mSettings.setIntAccent(true);
                     setTextColor(mAccentsInternational, selectedColor, true);
-                }else {
+                } else {
                     mSettings.setIntAccent(false);
                     setTextColor(mAccentsInternational, deselectedColor, false);
                 }
@@ -302,7 +362,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                 if (isChecked) {
                     mSettings.setBritishAccent(true);
                     setTextColor(mAccentBritish, selectedColor, true);
-                }else {
+                } else {
                     mSettings.setBritishAccent(false);
                     setTextColor(mAccentBritish, deselectedColor, false);
                 }
@@ -313,7 +373,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                 if (isChecked) {
                     mSettings.setAmericanAccent(true);
                     setTextColor(mAccentAmerican, selectedColor, true);
-                }else {
+                } else {
                     mSettings.setAmericanAccent(true);
                     setTextColor(mAccentAmerican, deselectedColor, false);
                 }
@@ -322,5 +382,38 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         }
 
     }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        TextView textView = ((TextView) parent.getChildAt(0));
+        textView.setTextColor(ContextCompat.getColor(SettingsActivity.this, R.color.colorAccent));
+        textView.setTypeface(Typeface.DEFAULT_BOLD);
+        textView.setGravity(Gravity.END);
+        if (parent.getId() == R.id.text_remainder_days_value) {
+            mSettings.setRemindEvery(position);
+        } else if (parent.getId() == R.id.text_remainder_time_value) {
+            createNotificationTime(textView.getText().toString());
+        }
+    }
+
+    private void createNotificationTime(String time) {
+        String[] timeString = time.split(":");
+        int hours = Integer.parseInt(timeString[0]);
+        int minutes;
+        String minutesString = "";
+        try {
+            minutesString = timeString[1];
+            minutes = Integer.parseInt(minutesString);
+        } catch (Exception e) {
+            minutes = Integer.parseInt(minutesString.substring(1, 2));
+        }
+        mSettings.setTime(hours, minutes);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
 
 }

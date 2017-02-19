@@ -59,14 +59,15 @@ public class SubtitleEngine implements Comparable<Long>, Parcelable {
         int result = this.compareTo(currentTime);
         if (result == -1 || result == 0) {
             index++;
-            current = subtitleFileList.get(index);
+            if (index < subtitleFileList.size())
+                current = subtitleFileList.get(index);
         }
         return current;
     }
 
     void setSubtitles(List<SubtitleFile> subtitleFileList) {
         this.subtitleFileList = subtitleFileList;
-        if(subtitleFileList.size()>0) {
+        if (subtitleFileList.size() > 0) {
             current = subtitleFileList.get(0);
         }
     }

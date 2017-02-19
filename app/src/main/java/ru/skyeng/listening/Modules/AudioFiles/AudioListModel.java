@@ -52,8 +52,11 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
         if(params==null)
             params = new AudioFilesRequestParams();
         SettingsObject settingsObject = FacadePreferences.getSettingsFromPref(((AudioListFragment)observable).getActivityContext());
-        params.setAccentIds(new ArrayList<>(settingsObject.getAccentIds()));
-        params.setLevelId(settingsObject.getLevel());
+        if(settingsObject!=null) {
+            params.setAccentIds(new ArrayList<>(settingsObject.getAccentIds()));
+            params.setLevelId(settingsObject.getLevel());
+            params.setDuration(settingsObject.getDuration());
+        }
         Observable<AudioData> audioDataObservable = audioFilesService.getAudioFiles(
                 params.getPage(),
                 params.getPageSize(),
@@ -62,7 +65,8 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
                 params.getLevelId(),
                 params.getTagIds(),
                 params.getDurationGT(),
-                params.getDurationLT())
+                params.getDurationLT(),
+                params.getDuration())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
         audioDataObservable.subscribe(observable);

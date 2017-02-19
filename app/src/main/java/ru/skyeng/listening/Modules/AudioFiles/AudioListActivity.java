@@ -120,6 +120,10 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
         return mNoContentFoundLayout;
     }
 
+    public AudioFile getAudioFile() {
+        return mAudioFile;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -192,25 +196,30 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
     }
 
     private void showDurationPicker(SettingsObject settings) {
+        if(settings == null){
+            settings = new SettingsObject();
+        }
         CharSequence durations[] = new CharSequence[]{
                 "От 0 до 5 минут",
                 "От 5 до 10 минут",
                 "От 10 до 20 минут",
                 "От 20 и больше минут"};
-        boolean[] checkedReceivers = new boolean[durations.length];
+        boolean[] durationsArrya = new boolean[durations.length];
         AlertDialog.Builder builder = new AlertDialog.Builder(AudioListActivity.this);
+        SettingsObject finalSettings = settings;
+        boolean[] selected = settings.getDurationsBooleanArray();
         builder.setTitle(R.string.select_duration)
-                .setMultiChoiceItems(durations, settings.getDurationsBooleanArray(), new DialogInterface.OnMultiChoiceClickListener() {
+                .setMultiChoiceItems(durations, selected, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                        checkedReceivers[which] = isChecked;
+                        durationsArrya[which] = isChecked;
                     }
                 })
                 .setPositiveButton(R.string.select, (dialog, id) -> {
-                            settings.setDuration(checkedReceivers);
+                            finalSettings.setDuration(durationsArrya);
                             CommonAsyncTask<Void, Void, Void> saveSettingsTask = new CommonAsyncTask<>();
                             saveSettingsTask.setDoInBackground(param -> {
-                                FacadePreferences.setSettingsToPref(AudioListActivity.this, settings);
+                                FacadePreferences.setSettingsToPref(AudioListActivity.this, finalSettings);
                                 return null;
                             });
                             saveSettingsTask.setConsumer(param -> {
@@ -262,13 +271,6 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
             int visibility = savedInstanceState.getInt(KEY_PROGRESS_VISIBILITY, -1);
             if (!broadcastUpdateFinished) {
                 updatePlayerUI();
-//                if (visibility == View.VISIBLE) {
-//                    mAudioProgressBar.setVisibility(View.VISIBLE);
-//                    audioPlayPause.setVisibility(View.GONE);
-//                } else if (visibility == View.GONE) {
-//                    mAudioProgressBar.setVisibility(View.GONE);
-//                    audioPlayPause.setVisibility(View.VISIBLE);
-//                }
             }
         }
     }
@@ -368,12 +370,6 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
 
     @Override
     public void onResume() {
-        if (!categoriesSelected) {
-            if (mSelectedTags != null) {
-                mSelectedTags.clear();
-            }
-            mFragment.loadData(false);
-        }
         mPlayerBroadcast = new AudioReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ACTION_DID_NOT_STAR);
@@ -441,10 +437,6 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
                 long duration = mAudioFile.getDurationInSeconds();
                 audioLeft.setText(String.format(getString(R.string.leftTime), FacadeCommon.getDateFromMillis(duration * 1000 - (long) message.obj)));
             } else if (message.what == MESSAGE_SUBTITLE_TIME) {
-                //TODO : убрать этот доланный костыль
-                //Отображение активного аудио не отображается после перехода
-                // на другой экрна и возврата, в какой то момент появляется
-                mFragment.mAdapter.setPlayerState(mAudioFile.getState());
                 long time = (long) message.obj * 1000;
                 if (mSubtitleEngine.size() > 0)
                     audioSubtitles.setText(mSubtitleEngine.updateSubtitles(time).getTextEn());

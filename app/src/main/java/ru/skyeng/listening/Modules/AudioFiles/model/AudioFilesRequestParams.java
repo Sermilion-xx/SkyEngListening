@@ -1,6 +1,8 @@
 package ru.skyeng.listening.Modules.AudioFiles.model;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ru.skyeng.listening.CommonComponents.Interfaces.RequestParams;
 
@@ -24,9 +26,18 @@ public class AudioFilesRequestParams implements RequestParams {
     private List<Integer> tagIds;
     private Integer durationGT;
     private Integer durationLT;
+    private  List<Map<Integer, Integer>> duration;
 
     public AudioFilesRequestParams(){
 
+    }
+
+    public List<Map<Integer, Integer>> getDuration() {
+        return duration;
+    }
+
+    public void setDuration(List<Map<Integer, Integer>> duration) {
+        this.duration = duration;
     }
 
     public Integer getPage() {

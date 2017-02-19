@@ -44,33 +44,42 @@
                     android:layout_marginTop="16dp"
                     android:text="@string/time" />
 
-                <TextView
-                    android:id="@+id/text_remainder_days_value"
-                    style="@style/textStylePrimary"
+                <!--<TextView-->
+                    <!--android:id="@+id/text_remainder_days_value"-->
+                    <!--style="@style/textStylePrimary"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_alignParentEnd="true"-->
+                    <!--android:layout_alignParentRight="true"-->
+                    <!--android:layout_marginEnd="16dp"-->
+                    <!--android:layout_marginRight="16dp"-->
+                    <!--android:text="@string/only_week_days"-->
+                    <!--android:textColor="@color/colorAccent"-->
+                    <!--android:textStyle="bold" />-->
+
+                <Spinner android:id="@+id/text_remainder_days_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    style="@style/textStylePrimary"
+                    android:background="@color/almostWhite"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
-                    android:text="@string/only_week_days"
-                    android:textColor="@color/colorAccent"
-                    android:textStyle="bold" />
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="16dp"
+                    android:minWidth="200dp"/>
 
-                <TextView
-                    android:id="@+id/text_remainder_time_value"
-                    style="@style/textStylePrimary"
+                <Spinner android:id="@+id/text_remainder_time_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    style="@style/textStylePrimary"
+                    android:background="@color/almostWhite"
                     android:layout_alignBaseline="@+id/text_remainder_time"
                     android:layout_alignParentEnd="true"
-                    android:text="@string/afternoon"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
-                    android:textColor="@color/colorAccent"
-                    android:textStyle="bold"
                     android:layout_alignParentRight="true"
-                     />
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginRight="10dp"
+                    android:minWidth="200dp" />
 
                 <View xmlns:android="http://schemas.android.com/apk/res/android"
                     android:id="@+id/shadow"
@@ -82,6 +91,7 @@
 
 
             <RelativeLayout
+
                 android:id="@+id/toolbar_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -267,7 +277,7 @@
                     android:layout_below="@+id/got_problem"
                     android:layout_gravity="start"
                     android:layout_marginTop="12dp"
-                    android:background="@color/colorAccent"
+                    android:background="@drawable/selector_button_apply"
                     android:drawableEnd="@drawable/right_arrow"
                     android:drawableRight="@drawable/right_arrow"
                     android:paddingEnd="20dp"

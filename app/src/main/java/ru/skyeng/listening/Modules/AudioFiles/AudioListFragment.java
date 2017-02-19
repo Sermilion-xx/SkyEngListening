@@ -1,9 +1,7 @@
 package ru.skyeng.listening.Modules.AudioFiles;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
@@ -66,6 +64,7 @@ public class AudioListFragment extends MvpLceFragment<
         presenter.setObserver(this);
         super.setPresenter(presenter);
     }
+
 
     @NonNull
     @Override
@@ -157,6 +156,14 @@ public class AudioListFragment extends MvpLceFragment<
 
     @Override
     public void setData(List<AudioFile> data) {
+        AudioFile audioFile = ((AudioListActivity) getActivity()).getAudioFile();
+        if (audioFile != null) {
+            for (int i = 0; i < data.size(); i++) {
+                if (data.get(i).getId() == audioFile.getId()) {
+                    data.get(i).setState(1);
+                }
+            }
+        }
         mAdapter.notifyDataSetChanged();
     }
 
@@ -197,7 +204,7 @@ public class AudioListFragment extends MvpLceFragment<
     @Override
     public void onError(Throwable e) {
         ((AudioListActivity) getActivityContext()).hideProgress();
-        if (presenter.getModel().getItems()==null)
+        if (presenter.getModel().getItems() == null)
             ((AudioListActivity) getActivityContext()).getNoContentFoundLayout().setVisibility(View.VISIBLE);
         isRefreshing = false;
         showError(e.getCause(), isRefreshing);

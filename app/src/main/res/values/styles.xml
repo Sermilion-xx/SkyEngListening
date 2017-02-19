@@ -78,5 +78,8 @@
         <item name="android:layout_marginTop">19dp</item>
     </style>
 
+    <style name="SpinnerAsEditText" parent="@android:style/Widget.Spinner">
+        <item name="android:background">@android:drawable/edit_text</item>
+    </style>
 
 </resources>

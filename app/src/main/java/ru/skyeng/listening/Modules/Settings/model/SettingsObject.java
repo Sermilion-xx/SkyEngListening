@@ -1,18 +1,22 @@
 package ru.skyeng.listening.Modules.Settings.model;
 
-import android.util.SparseIntArray;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import ru.skyeng.listening.R;
+
+import static android.content.Context.NOTIFICATION_SERVICE;
 
 /**
  * ---------------------------------------------------
@@ -26,14 +30,17 @@ import java.util.Set;
 
 public class SettingsObject {
 
-    private boolean remainderOn;
     private int level;
     private Set<Integer> accentIds;
     private boolean intAccent;
     private boolean britishAccent;
     private boolean americanAccent;
-    private int remainderDays;
-    private SparseIntArray duration;
+
+    private boolean remainderOn;
+    //0 - weekends, 1 - weekdays, 2 - everyday
+    //3,4,5,6,7,8,9 - mon - sun
+    private int remindEvery;
+    private List<Map<Integer, Integer>> duration;
     private Calendar time;
 
 
@@ -47,47 +54,78 @@ public class SettingsObject {
         accentIds.add(2);
         accentIds.add(4);
         accentIds.add(3);
-        remainderDays = 7;
-        time = defaultCalendar();
-        duration = new SparseIntArray(4);
-        duration.put(0,5);
+        time = setNotificationTime(12, 0);
+        duration =new ArrayList<>();
+        Map<Integer, Integer> defaultDuration = new HashMap<>();
+        defaultDuration.put(0, 100);
+        duration.add(defaultDuration);
     }
 
-    public static Calendar defaultCalendar() {
+    public static Calendar setNotificationTime(int hours, int minutes) {
         Calendar currentDate = Calendar.getInstance();
-        currentDate.set(Calendar.HOUR, 12);
-        currentDate.set(Calendar.MINUTE, 0);
+        currentDate.set(Calendar.HOUR, hours);
+        currentDate.set(Calendar.MINUTE, minutes);
         return currentDate;
     }
 
     public void setDuration(boolean[] index) {
+        duration.clear();
         int one = 0;
-        int two = 5;
+        int two = 5*60;
         for(int i=0; i<index.length; i++){
             if(index[i]){
-                this.duration.put(one,two);
-                one = two;
-                two = one*2;
-                if(i==3){
-                    two = 360;
-                }
+                Map<Integer, Integer> aList = new HashMap<>();
+                aList.put(one, two);
+                duration.add(aList);
+            }
+            one = two;
+            two = one*2;
+            if(i==3){
+                two = 360;
             }
         }
     }
 
-    public SparseIntArray getDuration(){
+    public List<Map<Integer, Integer>> getDuration() {
         return duration;
     }
 
     public boolean[] getDurationsBooleanArray() {
-        int[] keys = new int[]{0,5,10,20};
+        int[] keys = new int[]{0 ,5*60, 10*60, 20*60};
         boolean[] values = new boolean[4];
-        for(int i:keys){
-            if(duration.get(i, -1)!=-1){
-                values[i] = true;
+        for(int i=0; i<duration.size(); i++){
+            Map<Integer, Integer> map = duration.get(i);
+            for(int j = 0; j<keys.length; j++){
+                if(map.containsKey(keys[j])){
+                    values[j] = true;
+                }
             }
         }
         return values;
+    }
+
+    public void setAccentIds(Set<Integer> accentIds) {
+        this.accentIds = accentIds;
+    }
+
+    public int getRemindEvery() {
+        return remindEvery;
+    }
+
+    public void setRemindEvery(int remindEvery) {
+        this.remindEvery = remindEvery;
+    }
+
+    public void setDuration(List<Map<Integer, Integer>> duration) {
+        this.duration = duration;
+    }
+
+    public Calendar getTime() {
+        return time;
+    }
+
+    public void setTime(int hours, int minutes) {
+        this.time = setNotificationTime(hours, minutes);
     }
 
     public Set<Integer> getAccentIds() {
@@ -169,4 +207,7 @@ public class SettingsObject {
             accentIds.remove(Integer.valueOf(3));
         }
     }
+
+
+
 }

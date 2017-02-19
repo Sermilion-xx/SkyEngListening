@@ -1,6 +1,8 @@
 package ru.skyeng.listening.Modules.AudioFiles.network;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observable;
 import retrofit2.http.GET;
@@ -28,8 +30,7 @@ public interface AudioFilesService {
             @Query("levelId") Integer  levelId,
             @Query("tagIds[]") List<Integer> tagIds,
             @Query("durationGT") Integer  durationGT,
-            @Query("durationLT") Integer  durationLT
-//            @Query("durations") Integer  durations
-
+            @Query("durationLT") Integer  durationLT,
+            @Query("durations") List<Map<Integer, Integer>>  durations
     );
 }
