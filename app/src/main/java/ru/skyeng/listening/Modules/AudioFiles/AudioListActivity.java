@@ -81,7 +81,6 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
     private AudioReceiver mPlayerBroadcast;
 
     boolean mBound = false;
-    boolean adapterUpdated;
     private Messenger msgService;
 
     @BindView(R.id.appBarLayout)
@@ -123,6 +122,10 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
 
     public AudioFile getAudioFile() {
         return mAudioFile;
+    }
+
+    public void setAudioFile(AudioFile mAudioFile) {
+        this.mAudioFile = mAudioFile;
     }
 
     @Override
@@ -376,6 +379,9 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
 
     @Override
     public void onResume() {
+        if(mFragment.modelHasData()){
+            updateButtonsVisibility();
+        }
         if (mAudioFile != null) {
             if (mAudioFile.isLoading()) {
                 mAudioFile.setLoading(false);

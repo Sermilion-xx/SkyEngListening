@@ -65,6 +65,10 @@ public class AudioListFragment extends MvpLceFragment<
         super.setPresenter(presenter);
     }
 
+    public boolean modelHasData(){
+        return presenter.getData()!=null;
+    }
+
 
     @NonNull
     @Override
@@ -195,9 +199,12 @@ public class AudioListFragment extends MvpLceFragment<
 
     @Override
     public void onNext(AudioData value) {
-        if (value.getPrimaryData().size() == 0)
-            ((AudioListActivity) getActivityContext()).getNoContentFoundLayout().setVisibility(View.VISIBLE);
         presenter.getModel().setData(value);
+        if (value.getPrimaryData().size() == 0) {
+            ((AudioListActivity) getActivityContext()).getNoContentFoundLayout().setVisibility(View.VISIBLE);
+        } else {
+            mAdapter.setPlayingPosition(-1);
+        }
         setData(value.getPrimaryData());
     }
 

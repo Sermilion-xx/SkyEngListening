@@ -48,6 +48,10 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         return mPresenter.getModel().getItems();
     }
 
+    public void setPlayingPosition(int playingPosition) {
+        this.playingPosition = playingPosition;
+    }
+
     int getPlayingPosition() {
         return playingPosition;
     }
