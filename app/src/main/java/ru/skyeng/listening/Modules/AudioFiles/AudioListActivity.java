@@ -197,7 +197,7 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
     }
 
     private void showDurationPicker(SettingsObject settings) {
-        if(settings == null){
+        if (settings == null) {
             settings = new SettingsObject();
         }
         CharSequence durations[] = new CharSequence[]{
@@ -376,6 +376,13 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
 
     @Override
     public void onResume() {
+        if (mAudioFile != null) {
+            if (mAudioFile.isLoading()) {
+                mAudioFile.setLoading(false);
+                mAudioFile.setState(1);
+                updatePlayerUI();
+            }
+        }
         mPlayerBroadcast = new AudioReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ACTION_DID_NOT_STAR);
@@ -428,6 +435,7 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
             mBound = true;
             msgService = new Messenger(binder);
         }
+
         public void onServiceDisconnected(ComponentName className) {
             mBound = false;
         }
@@ -470,6 +478,11 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
                 hideAudioLoading();
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     //Callback методы запроса на субтитры
