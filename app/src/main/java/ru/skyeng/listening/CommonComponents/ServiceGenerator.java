@@ -3,6 +3,7 @@ package ru.skyeng.listening.CommonComponents;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -21,7 +22,9 @@ public class ServiceGenerator {
     private static final String SCHEMA = "https://";
     private static final String BASE_URL = SCHEMA + "api.listening.skyeng.ru/";
 
-    private OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+    private HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+    private OkHttpClient.Builder httpClient = new OkHttpClient.Builder().addInterceptor(interceptor.setLevel(HttpLoggingInterceptor.Level.BASIC));
+
 
     private Retrofit.Builder builder =
             new Retrofit.Builder()

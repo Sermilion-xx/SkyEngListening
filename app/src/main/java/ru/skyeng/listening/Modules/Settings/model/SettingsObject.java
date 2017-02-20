@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.util.SparseIntArray;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -40,7 +41,7 @@ public class SettingsObject {
     //0 - weekends, 1 - weekdays, 2 - everyday
     //3,4,5,6,7,8,9 - mon - sun
     private int remindEvery;
-    private List<Map<Integer, Integer>> duration;
+    private List<Integer> duration;
     private Calendar time;
 
 
@@ -55,10 +56,8 @@ public class SettingsObject {
         accentIds.add(4);
         accentIds.add(3);
         time = setNotificationTime(12, 0);
-        duration =new ArrayList<>();
-        Map<Integer, Integer> defaultDuration = new HashMap<>();
-        defaultDuration.put(0, 100);
-        duration.add(defaultDuration);
+        duration = new ArrayList<>();
+
     }
 
     public static Calendar setNotificationTime(int hours, int minutes) {
@@ -74,9 +73,8 @@ public class SettingsObject {
         int two = 5*60;
         for(int i=0; i<index.length; i++){
             if(index[i]){
-                Map<Integer, Integer> aList = new HashMap<>();
-                aList.put(one, two);
-                duration.add(aList);
+                duration.add(one);
+                duration.add(two);
             }
             one = two;
             two = one*2;
@@ -86,19 +84,20 @@ public class SettingsObject {
         }
     }
 
-    public List<Map<Integer, Integer>> getDuration() {
+    public List<Integer> getDuration() {
         return duration;
     }
 
     public boolean[] getDurationsBooleanArray() {
-        int[] keys = new int[]{0 ,5*60, 10*60, 20*60};
+        SparseIntArray map = new SparseIntArray();
+        map.put(0, 300);
+        map.put(300, 600);
+        map.put(600, 1200);
+        map.put(1200, 2400);
         boolean[] values = new boolean[4];
         for(int i=0; i<duration.size(); i++){
-            Map<Integer, Integer> map = duration.get(i);
-            for(int j = 0; j<keys.length; j++){
-                if(map.containsKey(keys[j])){
-                    values[j] = true;
-                }
+            if(map.get(duration.get(i)) == duration.get(i+1)){
+                values[i] = true;
             }
         }
         return values;
@@ -116,7 +115,7 @@ public class SettingsObject {
         this.remindEvery = remindEvery;
     }
 
-    public void setDuration(List<Map<Integer, Integer>> duration) {
+    public void setDuration(List<Integer> duration) {
         this.duration = duration;
     }
 

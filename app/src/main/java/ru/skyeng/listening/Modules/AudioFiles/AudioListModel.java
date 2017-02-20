@@ -3,7 +3,9 @@ package ru.skyeng.listening.Modules.AudioFiles;
 import android.os.Bundle;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -55,9 +57,20 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
         if(settingsObject!=null) {
             params.setAccentIds(new ArrayList<>(settingsObject.getAccentIds()));
             params.setLevelId(settingsObject.getLevel());
-            params.setDuration(settingsObject.getDuration());
+            List<Integer> durationValues = settingsObject.getDuration();
+            Map<String, Integer> paramsMap = new HashMap<>();
+            int valueIndex = 0;
+            for(int i = 0; i<durationValues.size()/2; i++){
+                for(int j = 0; j<2; j++){
+                    paramsMap.put("durations["+i+"]["+j+"]", durationValues.get(valueIndex));
+                    valueIndex++;
+                }
+            }
+            params.setDuration(paramsMap);
         }
+
         Observable<AudioData> audioDataObservable = audioFilesService.getAudioFiles(
+                params.getDuration(),
                 params.getPage(),
                 params.getPageSize(),
                 params.getTitle(),
@@ -65,8 +78,8 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
                 params.getLevelId(),
                 params.getTagIds(),
                 params.getDurationGT(),
-                params.getDurationLT(),
-                params.getDuration())
+                params.getDurationLT()
+                )
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
         audioDataObservable.subscribe(observable);

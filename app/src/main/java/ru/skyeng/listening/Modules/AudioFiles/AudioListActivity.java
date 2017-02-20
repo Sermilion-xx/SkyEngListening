@@ -120,6 +120,14 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
         return mNoContentFoundLayout;
     }
 
+    public void hideNoContentView(){
+        mNoContentFoundLayout.setVisibility(View.GONE);
+    }
+
+    public void showNoContentView(){
+        mNoContentFoundLayout.setVisibility(View.VISIBLE);
+    }
+
     public AudioFile getAudioFile() {
         return mAudioFile;
     }

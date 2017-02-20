@@ -65,9 +65,7 @@ public class AudioListFragment extends MvpLceFragment<
         super.setPresenter(presenter);
     }
 
-    public boolean modelHasData(){
-        return presenter.getData()!=null;
-    }
+
 
 
     @NonNull
@@ -84,6 +82,13 @@ public class AudioListFragment extends MvpLceFragment<
     @Inject
     void setSubtitleModel(SubtitlesModel model) {
         presenter.setSubtitlesModel(model);
+    }
+
+    public boolean modelHasData(){
+        if(presenter!=null && presenter.getData()!=null) {
+            return presenter.getData().size() > 0;
+        }
+        return false;
     }
 
     public void setRequestParams(AudioFilesRequestParams mRequestParams) {
@@ -201,8 +206,9 @@ public class AudioListFragment extends MvpLceFragment<
     public void onNext(AudioData value) {
         presenter.getModel().setData(value);
         if (value.getPrimaryData().size() == 0) {
-            ((AudioListActivity) getActivityContext()).getNoContentFoundLayout().setVisibility(View.VISIBLE);
+            ((AudioListActivity) getActivityContext()).showNoContentView();
         } else {
+            ((AudioListActivity) getActivityContext()).hideNoContentView();
             mAdapter.setPlayingPosition(-1);
         }
         setData(value.getPrimaryData());

@@ -1,5 +1,7 @@
 package ru.skyeng.listening.Modules.AudioFiles.model;
 
+import android.support.v4.util.Pair;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,17 +28,17 @@ public class AudioFilesRequestParams implements RequestParams {
     private List<Integer> tagIds;
     private Integer durationGT;
     private Integer durationLT;
-    private  List<Map<Integer, Integer>> duration;
+    private Map<String, Integer> duration;
 
     public AudioFilesRequestParams(){
-
+        this.duration = new HashMap<>();
     }
 
-    public List<Map<Integer, Integer>> getDuration() {
+    public Map<String, Integer> getDuration() {
         return duration;
     }
 
-    public void setDuration(List<Map<Integer, Integer>> duration) {
+    public void setDuration(Map<String, Integer> duration) {
         this.duration = duration;
     }
 
