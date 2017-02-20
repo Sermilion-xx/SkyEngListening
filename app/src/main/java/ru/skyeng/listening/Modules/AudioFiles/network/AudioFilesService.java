@@ -1,18 +1,13 @@
 package ru.skyeng.listening.Modules.AudioFiles.network;
 
-import android.support.v4.util.Pair;
-
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
 import retrofit2.http.GET;
-import retrofit2.http.Path;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioData;
-import ru.skyeng.listening.Modules.AudioFiles.model.DurationParam;
 
 /**
  * ---------------------------------------------------

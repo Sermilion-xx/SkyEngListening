@@ -110,13 +110,8 @@ class AudioPlayer {
             mPlayer = ExoPlayerFactory.newSimpleInstance(mContext, trackSelector, loadControl,
                     null);
             mPlayer.addListener(mEventListener);
-            EventLogger eventLogger = new EventLogger(trackSelector);
-            mPlayer.addListener(eventLogger);
-            mPlayer.setAudioDebugListener(eventLogger);
-            mPlayer.setMetadataOutput(eventLogger);
         }
     }
-
 
     private DataSource.Factory buildDataSourceFactory(boolean useBandwidthMeter) {
         return ((SEApplication) mContext.getApplicationContext())

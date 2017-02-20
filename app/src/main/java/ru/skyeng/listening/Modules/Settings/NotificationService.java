@@ -1,15 +1,16 @@
-package ru.skyeng.listening.Utility;
+package ru.skyeng.listening.Modules.Settings;
 
-import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.google.android.gms.gcm.GcmNetworkManager;
+import com.google.android.gms.gcm.GcmTaskService;
+import com.google.android.gms.gcm.TaskParams;
+
 import ru.skyeng.listening.Modules.AudioFiles.AudioListActivity;
-import ru.skyeng.listening.Modules.Settings.model.SettingsObject;
 import ru.skyeng.listening.R;
 
 /**
@@ -22,13 +23,20 @@ import ru.skyeng.listening.R;
  * ---------------------------------------------------
  */
 
-public class NotificationReceiver extends BroadcastReceiver {
+public class NotificationService extends GcmTaskService {
 
+    public static final String TAG_TASK_PERIODIC_LOG = "notificationTask";
     private static int NOTIFICATION_ID = 0;
 
     @Override
-    public void onReceive(Context context, Intent intent) {
-        createNotification("Пора учить английский", context,  AudioListActivity.class);
+    public int onRunTask(TaskParams taskParams) {
+        switch (taskParams.getTag()) {
+            case TAG_TASK_PERIODIC_LOG:
+                createNotification("Пора учить английский", this,  AudioListActivity.class);
+                return GcmNetworkManager.RESULT_SUCCESS;
+            default:
+                return GcmNetworkManager.RESULT_FAILURE;
+        }
     }
 
     public static void createNotification(String message, Context context, Class aClass) {

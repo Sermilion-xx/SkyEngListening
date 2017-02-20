@@ -1,8 +1,12 @@
 package ru.skyeng.listening.Modules.Settings;
 
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
@@ -34,10 +38,8 @@ import ru.skyeng.listening.Modules.Settings.model.SettingsObject;
 import ru.skyeng.listening.R;
 import ru.skyeng.listening.Utility.FacadePreferences;
 import ru.skyeng.listening.Utility.HelperMethod;
-import ru.skyeng.listening.Utility.NotificationService;
-import ru.skyeng.listening.Utility.asynctask.CommonAsyncTask;
 
-import static ru.skyeng.listening.Utility.NotificationService.TAG_TASK_PERIODIC_LOG;
+import static ru.skyeng.listening.Modules.Settings.NotificationService.TAG_TASK_PERIODIC_LOG;
 
 public class SettingsActivity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
 
@@ -103,6 +105,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         upArrow.setColorFilter(getResources().getColor(R.color.colorGrey4), PorterDuff.Mode.SRC_ATOP);
         setupToolbar(getString(R.string.settings), upArrow);
         ButterKnife.bind(this);
+        mGcmNetworkManager = GcmNetworkManager.getInstance(this);
         initLevelViewsList();
         mSettings = FacadePreferences.getSettingsFromPref(this);
         if (mSettings == null) {
@@ -175,22 +178,22 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         String text = "";
         switch (selectedLevel) {
             case 1:
-                text = "Beginner";
+                text = getString(R.string.beginner);
                 break;
             case 2:
-                text = "Elementary";
+                text = getString(R.string.elementary);
                 break;
             case 3:
-                text = "Pre-Intermediate";
+                text = getString(R.string.preintermediate);
                 break;
             case 4:
-                text = "Intermediate";
+                text = getString(R.string.intermediate);
                 break;
             case 5:
-                text = "Upper-Intermediate";
+                text = getString(R.string.upperintermediate);
                 break;
             case 6:
-                text = "Advanced";
+                text = getString(R.string.advanced);
                 break;
         }
         mLevelViews.get(mSettings.getLevel() - 1).setImageDrawable(ContextCompat.getDrawable(this, R.drawable.oval_grey));
@@ -255,10 +258,27 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                 break;
             case R.id.level_6:
                 updateLevelViews(6);
+
                 break;
             case R.id.button_apply:
-                saveSettings(mSettings);
+                writeToDevs();
                 break;
+        }
+        saveSettings(mSettings);
+    }
+
+    private void writeToDevs() {
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                "mailto","ibragim.gapuraev@skyeng.ru", null));
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Проблема: ");
+        emailIntent.putExtra(Intent.EXTRA_TEXT, "");
+
+        PackageManager manager = getPackageManager();
+        List<ResolveInfo> infos = manager.queryIntentActivities(emailIntent, 0);
+        if (infos.size() > 0) {
+            startActivity(Intent.createChooser(emailIntent, "Send email..."));
+        } else {
+            showToast(R.string.no_email_client);
         }
     }
 
@@ -267,7 +287,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void setNotification() {
-        mGcmNetworkManager = GcmNetworkManager.getInstance(this);
+
         Task task = new PeriodicTask.Builder()
                 .setService(NotificationService.class)
                 .setPeriod(mSettings.getTime().getTimeInMillis())
@@ -279,18 +299,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void saveSettings(SettingsObject mSettings) {
-        if (mSettings.isRemainderOn()) {
-            setNotification();
-        }else {
-            removeNotification();
-        }
-        CommonAsyncTask<Void, Void, Void> saveSettingsTask = new CommonAsyncTask<>();
-        saveSettingsTask.setDoInBackground(param -> {
-            FacadePreferences.setSettingsToPref(SettingsActivity.this, mSettings);
-            return null;
-        });
-        saveSettingsTask.setConsumer(param -> showToast(R.string.settings_saved));
-        saveSettingsTask.execute();
+        FacadePreferences.setSettingsToPref(SettingsActivity.this, mSettings);
     }
 
     boolean doNotTriggerAllAccents = false;
@@ -375,6 +384,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                 updateSingleCheckboxClicked();
                 break;
         }
+        saveSettings(mSettings);
 
     }
 

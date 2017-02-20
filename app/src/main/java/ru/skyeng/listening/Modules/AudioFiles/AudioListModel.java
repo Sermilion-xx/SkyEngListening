@@ -11,16 +11,15 @@ import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import ru.skyeng.listening.CommonComponents.Constants;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioData;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFilesRequestParams;
 import ru.skyeng.listening.Modules.AudioFiles.network.AudioFilesService;
-import ru.skyeng.listening.CommonComponents.ServiceGenerator;
 import ru.skyeng.listening.MVPBase.MVPModel;
 import ru.skyeng.listening.Modules.Settings.model.SettingsObject;
 import ru.skyeng.listening.Utility.FacadePreferences;
 
-import static ru.skyeng.listening.CommonComponents.Constants.CURRENT_PAGE;
 import static ru.skyeng.listening.CommonComponents.Constants.LAST_PAGE;
 
 /**
@@ -36,17 +35,13 @@ import static ru.skyeng.listening.CommonComponents.Constants.LAST_PAGE;
 public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, AudioFilesRequestParams> {
 
 
+    private static final String CURRENT_PAGE = "currentPage";
     private AudioFilesService audioFilesService;
     private AudioData mData;
 
-    AudioData getAudioData(){
-        return mData;
-    }
 
-    @Override
-    public void initRetrofitService() {
-        ServiceGenerator serviceGenerator = new ServiceGenerator();
-        audioFilesService = serviceGenerator.createService(AudioFilesService.class);
+    public void setRetrofitService(AudioFilesService service) {
+        audioFilesService = service;
     }
 
     @Override
@@ -91,6 +86,12 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
     }
 
     @Override
+    public void addData(AudioData data) {
+        mData.getPrimaryData().addAll(data.getPrimaryData());
+        mData.getMetaData().put(CURRENT_PAGE, data.getMetaData().get(CURRENT_PAGE));
+    }
+
+    @Override
     public List<AudioFile> processResult(AudioData data) {
         return data.getPrimaryData();
     }
@@ -106,7 +107,7 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
     @Override
     public Bundle getExtraData() {
         Bundle bundle = new Bundle();
-        bundle.putInt(CURRENT_PAGE, Integer.parseInt(mData.getMetaData().get(CURRENT_PAGE)));
+        bundle.putInt(Constants.CURRENT_PAGE, Integer.parseInt(mData.getMetaData().get(Constants.CURRENT_PAGE)));
         bundle.putInt(LAST_PAGE, Integer.parseInt(mData.getMetaData().get(LAST_PAGE)));
         return bundle;
     }

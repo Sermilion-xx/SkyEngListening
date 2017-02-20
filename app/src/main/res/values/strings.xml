@@ -35,6 +35,17 @@
     <string name="select_duration">Выберите продолжительность</string>
     <string name="select">Выбрать</string>
     <string name="cancel">Отмена</string>
+    <string name="from0to5">От 0 до 5 минут</string>
+    <string name="from5to10">От 5 до 10 минут</string>
+    <string name="from10to20">От 10 до 20 минут</string>
+    <string name="from20andMore">От 20 и больше минут</string>
+    <string name="write_to_developer">Написать разработчикам</string>
+    <string name="elementary">Elementary</string>
+    <string name="preintermediate">Pre-Intermediate</string>
+    <string name="intermediate">Intermediate</string>
+    <string name="upperintermediate">Upper-Intermediate</string>
+    <string name="advanced">Advanced</string>
+    <string name="no_email_client">У вас не установленн ни один почтовы клиент.</string>
 
 
     <string-array name="notification_days">

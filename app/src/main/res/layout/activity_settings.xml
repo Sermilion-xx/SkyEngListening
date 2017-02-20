@@ -284,7 +284,7 @@
                     android:paddingLeft="16dp"
                     android:paddingRight="20dp"
                     android:paddingStart="16dp"
-                    android:text="@string/apply"
+                    android:text="@string/write_to_developer"
                     android:textAlignment="textStart"
                     android:textColor="@color/colorWhite"
                     android:layout_marginBottom="20dp"/>

@@ -53,7 +53,11 @@ public class CategoriesPresenter extends MvpBasePresenter<MVPView<List<AudioTag>
     @Override
     public void setModel(MVPModel<TagsData, List<AudioTag>, BaseRequestParams> model) {
         this.mModel = (CategoriesModel) model;
-        this.mModel.initRetrofitService();
+    }
+
+    @Override
+    public void clear() {
+        getData().clear();
     }
 
     @Override

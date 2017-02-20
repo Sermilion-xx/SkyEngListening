@@ -29,6 +29,7 @@ import ru.skyeng.listening.MVPBase.MVPView;
 import ru.skyeng.listening.Modules.AudioFiles.AudioListActivity;
 import ru.skyeng.listening.Modules.Categories.model.AudioTag;
 import ru.skyeng.listening.Modules.Categories.model.TagsData;
+import ru.skyeng.listening.Modules.Categories.network.TagsService;
 import ru.skyeng.listening.R;
 
 
@@ -80,6 +81,11 @@ public class CategoriesFragment extends MvpLceFragment<
     @Inject
     void setModel(CategoriesModel model) {
         presenter.setModel(model);
+    }
+
+    @Inject
+    void setRetrofitService(TagsService service){
+        ((CategoriesModel)presenter.getModel()).setRetrofitService(service);
     }
 
     @Override

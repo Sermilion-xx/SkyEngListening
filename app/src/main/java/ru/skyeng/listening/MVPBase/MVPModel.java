@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import io.reactivex.Observer;
 import ru.skyeng.listening.CommonComponents.Interfaces.RequestParams;
+import ru.skyeng.listening.Utility.asynctask.Consumer;
 
 /**
  * ---------------------------------------------------
@@ -16,9 +17,9 @@ import ru.skyeng.listening.CommonComponents.Interfaces.RequestParams;
  */
 
 public interface MVPModel<L, P, E extends RequestParams> {
-    void initRetrofitService();
     void loadData(Observer<L> observable, E params);
     void setData(L data);
+    void addData(L data);
     P processResult(L data);
     P getItems();
     Bundle getExtraData();

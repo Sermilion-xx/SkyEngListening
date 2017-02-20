@@ -9,7 +9,6 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import ru.skyeng.listening.CommonComponents.BaseRequestParams;
-import ru.skyeng.listening.CommonComponents.ServiceGenerator;
 import ru.skyeng.listening.MVPBase.MVPModel;
 import ru.skyeng.listening.Modules.Categories.model.AudioTag;
 import ru.skyeng.listening.Modules.Categories.model.TagsData;
@@ -33,10 +32,8 @@ public class CategoriesModel implements MVPModel<TagsData, List<AudioTag>, BaseR
     private TagsService mTagsService;
     private TagsData mData;
 
-    @Override
-    public void initRetrofitService() {
-        ServiceGenerator serviceGenerator = new ServiceGenerator();
-        mTagsService = serviceGenerator.createService(TagsService.class);
+    public void setRetrofitService(TagsService service) {
+        mTagsService = service;
     }
 
     @Override
@@ -54,6 +51,11 @@ public class CategoriesModel implements MVPModel<TagsData, List<AudioTag>, BaseR
     @Override
     public void setData(TagsData data) {
         this.mData = data;
+    }
+
+    @Override
+    public void addData(TagsData data) {
+
     }
 
     @Override

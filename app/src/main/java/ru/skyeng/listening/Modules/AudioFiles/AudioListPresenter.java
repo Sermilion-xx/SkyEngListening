@@ -52,12 +52,15 @@ public class AudioListPresenter
     @Override
     public void setModel(MVPModel<AudioData, List<AudioFile>, AudioFilesRequestParams> model) {
         this.mModel = (AudioListModel) model;
-        this.mModel.initRetrofitService();
+    }
+
+    @Override
+    public void clear() {
+        getData().clear();
     }
 
     public void setSubtitlesModel(MVPModel<List<SubtitleFile>, List<SubtitleFile>, SubtitlesRequestParams> model) {
         this.mSubtitlesModel = (SubtitlesModel) model;
-        this.mSubtitlesModel.initRetrofitService();
     }
 
     @Override

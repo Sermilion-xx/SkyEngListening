@@ -8,7 +8,6 @@ import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import ru.skyeng.listening.CommonComponents.ServiceGenerator;
 import ru.skyeng.listening.MVPBase.MVPModel;
 import ru.skyeng.listening.Modules.AudioFiles.model.SubtitleFile;
 import ru.skyeng.listening.Modules.AudioFiles.model.SubtitlesRequestParams;
@@ -24,17 +23,17 @@ import ru.skyeng.listening.Modules.AudioFiles.network.SubtitlesService;
  * ---------------------------------------------------
  */
 
-public class SubtitlesModel implements MVPModel<List<SubtitleFile>, List<SubtitleFile>, SubtitlesRequestParams> {
+public class SubtitlesModel implements MVPModel<List<SubtitleFile>,
+        List<SubtitleFile>,
+        SubtitlesRequestParams> {
 
     private SubtitlesService mSubtitlesService;
     private List<SubtitleFile> mData;
 
-    @Override
-    public void initRetrofitService() {
-        ServiceGenerator serviceGenerator = new ServiceGenerator();
-        mSubtitlesService = serviceGenerator.createService(SubtitlesService.class);
-    }
 
+    public void setRetrofitService(SubtitlesService service) {
+        mSubtitlesService = service;
+    }
 
     @Override
     public void loadData(Observer<List<SubtitleFile>> observable, SubtitlesRequestParams params) {
@@ -48,6 +47,11 @@ public class SubtitlesModel implements MVPModel<List<SubtitleFile>, List<Subtitl
     @Override
     public void setData(List<SubtitleFile> data) {
         this.mData = data;
+    }
+
+    @Override
+    public void addData(List<SubtitleFile> data) {
+
     }
 
     @Override

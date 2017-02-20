@@ -19,6 +19,7 @@ public interface MVPPresenter<L, P, E extends RequestParams> {
     Context getAppContext();
     Context getActivityContext();
     void setModel(MVPModel<L, P, E> models);
+    void clear();
     MVPModel<L,P,E> getModel();
     P getData();
     void loadData(boolean pullToRefresh, RequestParams params);

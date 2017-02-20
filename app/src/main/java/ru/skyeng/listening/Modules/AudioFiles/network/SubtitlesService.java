@@ -1,16 +1,11 @@
 package ru.skyeng.listening.Modules.AudioFiles.network;
 
-import com.google.android.exoplayer2.text.SubtitleDecoder;
-
 import java.util.List;
 
 import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
-import retrofit2.http.Query;
-import ru.skyeng.listening.Modules.AudioFiles.model.AudioData;
 import ru.skyeng.listening.Modules.AudioFiles.model.SubtitleFile;
-import ru.skyeng.listening.Modules.AudioFiles.model.SubtitlesData;
 
 /**
  * ---------------------------------------------------
@@ -22,7 +17,7 @@ import ru.skyeng.listening.Modules.AudioFiles.model.SubtitlesData;
  * ---------------------------------------------------
  */
 
-public interface SubtitlesService {
+public interface SubtitlesService{
 
     @GET("/audios/{audioId}/subtitles")
     Observable<List<SubtitleFile>> getSubtitles(

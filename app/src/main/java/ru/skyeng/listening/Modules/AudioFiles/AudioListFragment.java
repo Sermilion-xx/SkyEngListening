@@ -23,12 +23,15 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
+import ru.skyeng.listening.CommonComponents.EndlessRecyclerViewScrollListener;
 import ru.skyeng.listening.CommonComponents.SEApplication;
 import ru.skyeng.listening.MVPBase.MVPView;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioData;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFilesRequestParams;
 import ru.skyeng.listening.Modules.AudioFiles.model.SubtitlesRequestParams;
+import ru.skyeng.listening.Modules.AudioFiles.network.AudioFilesService;
+import ru.skyeng.listening.Modules.AudioFiles.network.SubtitlesService;
 import ru.skyeng.listening.R;
 
 /**
@@ -49,14 +52,16 @@ public class AudioListFragment extends MvpLceFragment<
         implements MVPView<List<AudioFile>>,
         SwipeRefreshLayout.OnRefreshListener, Observer<AudioData> {
 
-    @Inject
-    AudioListAdapter mAdapter;
     @BindView(R.id.recyclerView)
     RecyclerView mRecyclerView;
     @BindView(R.id.loadingView)
     ProgressBar mProgress;
     private boolean isRefreshing;
     private AudioFilesRequestParams mRequestParams;
+    private EndlessScrollListener mScrollListener;
+
+    @Inject
+    AudioListAdapter mAdapter;
 
     @Override
     @Inject
@@ -64,9 +69,6 @@ public class AudioListFragment extends MvpLceFragment<
         presenter.setObserver(this);
         super.setPresenter(presenter);
     }
-
-
-
 
     @NonNull
     @Override
@@ -80,12 +82,22 @@ public class AudioListFragment extends MvpLceFragment<
     }
 
     @Inject
+    void setRetrofitService(AudioFilesService audioFilesService) {
+        ((AudioListModel) presenter.getModel()).setRetrofitService(audioFilesService);
+    }
+
+    @Inject
     void setSubtitleModel(SubtitlesModel model) {
         presenter.setSubtitlesModel(model);
     }
 
-    public boolean modelHasData(){
-        if(presenter!=null && presenter.getData()!=null) {
+    @Inject
+    void setSubtitlesService(SubtitlesService service) {
+        ((SubtitlesModel) presenter.getSubtitlesModel()).setRetrofitService(service);
+    }
+
+    public boolean modelHasData() {
+        if (presenter != null && presenter.getData() != null) {
             return presenter.getData().size() > 0;
         }
         return false;
@@ -94,6 +106,11 @@ public class AudioListFragment extends MvpLceFragment<
     public void setRequestParams(AudioFilesRequestParams mRequestParams) {
         this.mRequestParams = mRequestParams;
     }
+
+    public AudioFilesRequestParams getRequestParams() {
+        return mRequestParams;
+    }
+
 
     public AudioListAdapter getAdapter() {
         return mAdapter;
@@ -121,13 +138,30 @@ public class AudioListFragment extends MvpLceFragment<
         contentView.setOnRefreshListener(this);
         mAdapter.setPresenter(presenter);
         mAdapter.setFragment(this);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        mRecyclerView.setLayoutManager(layoutManager);
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
-        DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(this.mRecyclerView.getContext(), layoutManager.getOrientation());
+        mScrollListener = new EndlessScrollListener(mLayoutManager);
+        mRecyclerView.addOnScrollListener(mScrollListener);
+        DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(this.mRecyclerView.getContext(), mLayoutManager.getOrientation());
         this.mRecyclerView.addItemDecoration(mDividerItemDecoration);
         if ((presenter.getModel()).getItems() == null) {
             loadData(false);
+        }
+    }
+
+    class EndlessScrollListener extends EndlessRecyclerViewScrollListener {
+
+        public EndlessScrollListener(LinearLayoutManager layoutManager) {
+            super(layoutManager);
+        }
+
+        @Override
+        public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+            if(totalItemsCount>14){
+                mRequestParams.setPage(mRequestParams.getPage() + 1);
+                loadData(false);
+            }
         }
     }
 
@@ -178,6 +212,11 @@ public class AudioListFragment extends MvpLceFragment<
 
     @Override
     public void loadData(boolean pullToRefresh) {
+        if (pullToRefresh) {
+            mRequestParams.setPage(1);
+            mScrollListener.resetState();
+            presenter.clear();
+        }
         presenter.loadData(pullToRefresh, mRequestParams);
     }
 
@@ -204,12 +243,17 @@ public class AudioListFragment extends MvpLceFragment<
 
     @Override
     public void onNext(AudioData value) {
-        presenter.getModel().setData(value);
-        if (value.getPrimaryData().size() == 0) {
+        if (value.getPrimaryData().size() == 0 && mRequestParams.getPage() == 1) {
             ((AudioListActivity) getActivityContext()).showNoContentView();
         } else {
             ((AudioListActivity) getActivityContext()).hideNoContentView();
             mAdapter.setPlayingPosition(-1);
+        }
+
+        if (presenter.getModel().getItems() == null || presenter.getModel().getItems().size() == 0) {
+            presenter.getModel().setData(value);
+        } else if (presenter.getModel().getItems().size() > 0) {
+            presenter.getModel().addData(value);
         }
         setData(value.getPrimaryData());
     }

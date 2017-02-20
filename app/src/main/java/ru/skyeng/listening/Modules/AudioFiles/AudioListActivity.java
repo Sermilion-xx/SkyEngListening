@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -27,6 +28,10 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.makeramen.roundedimageview.RoundedImageView;
@@ -132,10 +137,6 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
         return mAudioFile;
     }
 
-    public void setAudioFile(AudioFile mAudioFile) {
-        this.mAudioFile = mAudioFile;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -212,10 +213,10 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
             settings = new SettingsObject();
         }
         CharSequence durations[] = new CharSequence[]{
-                "От 0 до 5 минут",
-                "От 5 до 10 минут",
-                "От 10 до 20 минут",
-                "От 20 и больше минут"};
+                getString(R.string.from0to5),
+                getString(R.string.from5to10),
+                getString(R.string.from10to20),
+                getString(R.string.from20andMore)};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(AudioListActivity.this);
         SettingsObject finalSettings = settings;
@@ -258,6 +259,8 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
             AudioFilesRequestParams params = new AudioFilesRequestParams();
             params.setTagIds(mSelectedTags);
             mFragment.setRequestParams(params);
+            mFragment.getPresenter().clear();
+            mFragment.getRequestParams().setPage(1);
             mFragment.loadData(false);
         }
     }
@@ -280,7 +283,6 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
             mSubtitleEngine = savedInstanceState.getParcelable(KEY_SUBTITLE_ENGINE);
             mBound = savedInstanceState.getBoolean(KEY_SERVICE_BOUND);
             mAudioFile = savedInstanceState.getParcelable(KEY_AUDIO_FILE);
-            int visibility = savedInstanceState.getInt(KEY_PROGRESS_VISIBILITY, -1);
             if (!broadcastUpdateFinished) {
                 updatePlayerUI();
             }
@@ -355,6 +357,21 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
     }
 
     public void startBufferingMessage(AudioFile audioFile) {
+        Glide.with(this)
+                .load(audioFile.getImageFileUrl())
+                .asBitmap()
+                .priority(Priority.HIGH).listener(new RequestListener<String, Bitmap>() {
+            @Override
+            public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
+                return false;
+            }
+
+            @Override
+            public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                mAudioFile.setImageBitmap(resource);
+                return false;
+            }
+        }).into(audioCoverImage);
         mSubtitleEngine = new SubtitleEngine();
         audioSubtitles.setText(getString(R.string.dash));
         mAudioFile = audioFile;

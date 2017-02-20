@@ -1,23 +1,12 @@
 package ru.skyeng.listening.Modules.Settings.model;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 import android.util.SparseIntArray;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
-import ru.skyeng.listening.R;
-
-import static android.content.Context.NOTIFICATION_SERVICE;
 
 /**
  * ---------------------------------------------------
@@ -89,15 +78,22 @@ public class SettingsObject {
     }
 
     public boolean[] getDurationsBooleanArray() {
+        boolean allFalse = true;
         SparseIntArray map = new SparseIntArray();
         map.put(0, 300);
         map.put(300, 600);
         map.put(600, 1200);
         map.put(1200, 2400);
         boolean[] values = new boolean[4];
-        for(int i=0; i<duration.size(); i++){
+        for(int i=0; i<duration.size()/2; i++){
             if(map.get(duration.get(i)) == duration.get(i+1)){
                 values[i] = true;
+                allFalse = false;
+            }
+        }
+        if(allFalse){
+            for(int i = 0; i<values.length; i++){
+                values[i]=true;
             }
         }
         return values;

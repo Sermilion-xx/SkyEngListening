@@ -12,10 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.Priority;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.List;
@@ -78,7 +75,6 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         AudioViewHolder holder = (AudioViewHolder) viewHolder;
-//        AudioFile item = new AudioFile();
         AudioFile item = getItems().get(position);
         item.setDurationInMinutes(FacadeCommon.getDateFromMillis(item.getDurationInSeconds() * 1000));
         holder.mDuration.setText(item.getDurationInMinutes());
@@ -101,18 +97,11 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         if (item.getImageFileUrl() != null) {
             if (item.getImageBitmap() == null) {
                 Glide.with(getContext())
-                        .load(item.getImageFileUrl()).listener(new RequestListener<String, GlideDrawable>() {
-                    @Override
-                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                        item.setImageBitmap(((GlideBitmapDrawable) resource).getBitmap());
-                        return false;
-                    }
-                }).into(holder.mCoverImage);
+                        .load(item.getImageFileUrl())
+                        .asBitmap()
+                        .priority(Priority.HIGH)
+                        .centerCrop()
+                        .into(holder.mCoverImage);
             } else {
                 holder.mCoverImage.setImageBitmap(item.getImageBitmap());
             }
@@ -144,7 +133,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         notifyItemChanged(playingPosition);
     }
 
-    public void onSwitchAudio(AudioFile item, int position){
+    public void onSwitchAudio(AudioFile item, int position) {
         if (playingPosition < getItems().size()) {
             getItems().get(playingPosition).setState(0);
         }
@@ -154,7 +143,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         mFragment.startPlaying(item);
     }
 
-    public void onPlayingAudioClicked(AudioFile item, AudioViewHolder viewHolder, int position){
+    public void onPlayingAudioClicked(AudioFile item, AudioViewHolder viewHolder, int position) {
         item.setState(item.getState() == 1 ? 2 : 1);
         notifyItemChanged(position);
         int actionType = setPlayPauseIcon(viewHolder, item);
@@ -165,7 +154,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
     }
 
-    public void onPlayingNewAudio(AudioFile item, int position){
+    public void onPlayingNewAudio(AudioFile item, int position) {
         item.setState(1);
         notifyItemPlaying(position);
         mFragment.startPlaying(item);

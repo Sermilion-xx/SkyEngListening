@@ -4,8 +4,10 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import ru.skyeng.listening.CommonComponents.ServiceGenerator;
 import ru.skyeng.listening.Modules.Categories.CategoriesModel;
 import ru.skyeng.listening.Modules.Categories.CategoriesPresenter;
+import ru.skyeng.listening.Modules.Categories.network.TagsService;
 
 /**
  * ---------------------------------------------------
@@ -31,5 +33,11 @@ class CategoriesModule {
         return new CategoriesModel();
     }
 
+    @Provides
+    @Singleton
+    TagsService getTagsService(){
+        ServiceGenerator serviceGenerator = new ServiceGenerator();
+        return serviceGenerator.createService(TagsService.class);
+    }
 
 }

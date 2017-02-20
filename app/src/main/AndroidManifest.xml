@@ -31,7 +31,7 @@
         <activity android:name=".Modules.Settings.SettingsActivity"
             android:screenOrientation="portrait"/>
 
-        <service android:name=".Utility.NotificationService"
+        <service android:name=".Modules.Settings.NotificationService"
             android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
             android:exported="true">
             <intent-filter>

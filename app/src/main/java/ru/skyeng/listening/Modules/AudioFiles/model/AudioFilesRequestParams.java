@@ -32,6 +32,8 @@ public class AudioFilesRequestParams implements RequestParams {
 
     public AudioFilesRequestParams(){
         this.duration = new HashMap<>();
+        this.page = 1;
+        this.pageSize = 15;
     }
 
     public Map<String, Integer> getDuration() {
