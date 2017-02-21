@@ -3,7 +3,7 @@ package ru.skyeng.listening.Modules.Categories.dagger;
 import javax.inject.Singleton;
 
 import dagger.Component;
-import ru.skyeng.listening.Modules.Categories.CategoriesFragment;
+import ru.skyeng.listening.Modules.Categories.CategoriesActivity;
 
 /**
  * ---------------------------------------------------
@@ -17,5 +17,5 @@ import ru.skyeng.listening.Modules.Categories.CategoriesFragment;
 @Singleton
 @Component(modules = {CategoriesModule.class})
 public interface CategoriesDiComponent {
-    void inject(CategoriesFragment fragment);
+    void inject(CategoriesActivity fragment);
 }

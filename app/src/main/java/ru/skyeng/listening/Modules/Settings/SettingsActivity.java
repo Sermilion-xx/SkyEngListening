@@ -10,7 +10,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -22,6 +25,7 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.PeriodicTask;
@@ -41,7 +45,7 @@ import ru.skyeng.listening.Utility.HelperMethod;
 
 import static ru.skyeng.listening.Modules.Settings.NotificationService.TAG_TASK_PERIODIC_LOG;
 
-public class SettingsActivity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
+public class SettingsActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
 
     private static final int selectedColor = R.color.colorAccent;
     private static final int deselectedColor = R.color.textColorDark;
@@ -92,6 +96,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
     Spinner mDaysSpinner;
     @BindView(R.id.text_remainder_time_value)
     Spinner mTimeSpinner;
+    protected Toolbar mToolbar;
 
     private SettingsObject mSettings;
     private List<ImageView> mLevelViews;
@@ -126,6 +131,19 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         mTimeSpinner.setAdapter(adapter2);
         mTimeSpinner.setSelection(mSettings.getTime().get(Calendar.HOUR));
         mTimeSpinner.setOnItemSelectedListener(this);
+    }
+
+    protected Toolbar setupToolbar(String title, Drawable drawable) {
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbar.setTitle(title);
+        setSupportActionBar(mToolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setHomeAsUpIndicator(drawable);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
+        return mToolbar;
     }
 
     private void applySettings(SettingsObject settings) {
@@ -282,6 +300,10 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         }
     }
 
+    protected void showToast(int message){
+        Toast.makeText(this, getString(message), Toast.LENGTH_LONG).show();
+    }
+
     private void removeNotification() {
         mGcmNetworkManager.cancelAllTasks(NotificationService.class);
     }
@@ -332,8 +354,10 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                 mSettings.setRemainderOn(isChecked);
                 if (isChecked) {
                     showNotificationPanel();
+                    setNotification();
                 } else {
                     hideNotificationPanel();
+                    removeNotification();
                 }
                 break;
             case R.id.checkbox_all_accents:
@@ -419,6 +443,17 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
     public void onNothingSelected(AdapterView<?> parent) {
 
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
 
 }

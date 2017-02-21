@@ -7,11 +7,13 @@ import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 import java.util.List;
 
 import io.reactivex.Observer;
-import ru.skyeng.listening.Modules.Categories.model.CategoriesRequestParams;
+import io.reactivex.disposables.Disposable;
+import ru.skyeng.listening.CommonComponents.Interfaces.ActivityExtensions;
 import ru.skyeng.listening.MVPBase.MVPModel;
 import ru.skyeng.listening.MVPBase.MVPPresenter;
 import ru.skyeng.listening.MVPBase.MVPView;
 import ru.skyeng.listening.Modules.Categories.model.AudioTag;
+import ru.skyeng.listening.Modules.Categories.model.CategoriesRequestParams;
 import ru.skyeng.listening.Modules.Categories.model.TagsData;
 
 /**
@@ -31,7 +33,6 @@ public class CategoriesPresenter extends MvpBasePresenter<MVPView>
         CategoriesRequestParams> {
 
     private CategoriesModel mModel;
-    private Observer<TagsData> mObserver;
 
     @Override
     public Context getAppContext() {
@@ -71,6 +72,30 @@ public class CategoriesPresenter extends MvpBasePresenter<MVPView>
 
     @Override
     public void loadData(boolean pullToRefresh, CategoriesRequestParams params) {
-        mModel.loadData(mObserver,  params);
-    }
+        mModel.loadData(new Observer<TagsData>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(TagsData value) {
+                getModel().setData(value);
+                if(getActivityContext()!=null){
+                    ((CategoriesActivity) getActivityContext()).initTagView(((CategoriesActivity) getActivityContext()).getSelectedTags());
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+                ((ActivityExtensions) getActivityContext()).hideProgress();
+
+            }
+    }, params);
+}
 }

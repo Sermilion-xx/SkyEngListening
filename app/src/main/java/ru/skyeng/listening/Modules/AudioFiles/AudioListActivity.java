@@ -2,19 +2,14 @@ package ru.skyeng.listening.Modules.AudioFiles;
 
 
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
@@ -24,6 +19,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -56,7 +52,6 @@ import ru.skyeng.listening.CommonComponents.SEApplication;
 import ru.skyeng.listening.MVPBase.MVPView;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioData;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
-import ru.skyeng.listening.Modules.AudioFiles.model.AudioFilesRequestParams;
 import ru.skyeng.listening.Modules.AudioFiles.model.SubtitlesRequestParams;
 import ru.skyeng.listening.Modules.AudioFiles.network.AudioFilesService;
 import ru.skyeng.listening.Modules.AudioFiles.network.SubtitlesService;
@@ -74,8 +69,6 @@ import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.ACTION
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.BINDER_MESSENGER;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.EXTRA_AUDIO_URL;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.KEY_PLAYER_STATE;
-import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAGE_PLAYBACK_TIME;
-import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAGE_SUBTITLE_TIME;
 
 public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter> implements SwipeRefreshLayout.OnRefreshListener, MVPView {
 
@@ -84,6 +77,8 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     public static final int TAG_REQUEST_CODE = 0;
     public static final String TAG_REQUEST_DATA = "tagExtra";
     private static final String KEY_SERVICE_BOUND = "serviceBound";
+
+    protected Toolbar mToolbar;
 
     @Override
     @Inject
@@ -205,7 +200,6 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         swipeContainer.setOnRefreshListener(this);
 
         startService(new Intent(this, PlayerService.class));
-
 
         mBottomSheetBehavior = BottomSheetBehavior.from(mLayoutBottomSheet);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);

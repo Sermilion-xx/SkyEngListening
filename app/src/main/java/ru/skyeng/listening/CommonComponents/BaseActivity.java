@@ -66,22 +66,6 @@ public abstract class BaseActivity
         return mToolbar;
     }
 
-    protected Fragment setupRecyclerFragment(Bundle inState, Class<? extends Fragment> fragmentClass, int containerId) {
-        Fragment fragment;
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
-        if (inState != null) {
-            fragment = manager.getFragment(inState, fragmentClass.getName());
-        } else {
-            fragment = FragmentFactory.createFragmentWithName(fragmentClass);
-            transaction.add(containerId, fragment, fragmentClass.getName());
-            transaction.commit();
-        }
-        return fragment;
-    }
-
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -105,4 +89,5 @@ public abstract class BaseActivity
     public void hideProgress() {
         mProgress.setVisibility(View.GONE);
     }
+
 }
