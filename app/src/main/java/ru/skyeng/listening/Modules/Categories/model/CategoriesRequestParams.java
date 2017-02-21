@@ -1,6 +1,4 @@
-package ru.skyeng.listening.CommonComponents;
-
-import ru.skyeng.listening.CommonComponents.Interfaces.RequestParams;
+package ru.skyeng.listening.Modules.Categories.model;
 
 /**
  * ---------------------------------------------------
@@ -12,16 +10,17 @@ import ru.skyeng.listening.CommonComponents.Interfaces.RequestParams;
  * ---------------------------------------------------
  */
 
-public class BaseRequestParams implements RequestParams {
+public class CategoriesRequestParams {
+
     private int page;
     private int pageSize;
 
-    public BaseRequestParams(int page, int pageSize) {
+    public CategoriesRequestParams(int page, int pageSize) {
         this.page = page;
         this.pageSize = pageSize;
     }
 
-    public BaseRequestParams() {
+    public CategoriesRequestParams() {
         page = 1;
         pageSize = 15;
     }

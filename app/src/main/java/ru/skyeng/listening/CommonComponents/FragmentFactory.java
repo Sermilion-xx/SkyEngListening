@@ -3,7 +3,6 @@ package ru.skyeng.listening.CommonComponents;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
-import ru.skyeng.listening.Modules.AudioFiles.AudioListFragment;
 import ru.skyeng.listening.Modules.Categories.CategoriesFragment;
 
 /**
@@ -20,9 +19,7 @@ public class FragmentFactory {
 
     @Nullable
     public static Fragment createFragmentWithName(Class<? extends Fragment> fragmentClass){
-        if(fragmentClass.getName().equals(AudioListFragment.class.getName())){
-            return new AudioListFragment();
-        }else if(fragmentClass.getName().equals(CategoriesFragment.class.getName())){
+        if(fragmentClass.getName().equals(CategoriesFragment.class.getName())){
             return new CategoriesFragment();
         }else {
             return null;

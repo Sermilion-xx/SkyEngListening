@@ -1,7 +1,5 @@
 package ru.skyeng.listening.Modules.AudioFiles.model;
 
-import ru.skyeng.listening.CommonComponents.Interfaces.RequestParams;
-
 /**
  * ---------------------------------------------------
  * Created by Sermilion on 17/02/2017.
@@ -12,9 +10,15 @@ import ru.skyeng.listening.CommonComponents.Interfaces.RequestParams;
  * ---------------------------------------------------
  */
 
-public class SubtitlesRequestParams implements RequestParams {
+public class SubtitlesRequestParams {
 
     private int audioId;
+    private int page;
+    private int pageSize;
+
+    public SubtitlesRequestParams() {
+
+    }
 
     public SubtitlesRequestParams(int audioId) {
         this.audioId = audioId;
@@ -26,5 +30,21 @@ public class SubtitlesRequestParams implements RequestParams {
 
     public void setAudioId(int audioId) {
         this.audioId = audioId;
+    }
+
+    public int getPage() {
+        return page;
+    }
+
+    public void setPage(int page) {
+        this.page = page;
+    }
+
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
     }
 }

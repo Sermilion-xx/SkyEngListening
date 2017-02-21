@@ -3,7 +3,6 @@ package ru.skyeng.listening.MVPBase;
 import android.content.Context;
 
 import io.reactivex.Observer;
-import ru.skyeng.listening.CommonComponents.Interfaces.RequestParams;
 
 /**
  * ---------------------------------------------------
@@ -15,13 +14,12 @@ import ru.skyeng.listening.CommonComponents.Interfaces.RequestParams;
  * ---------------------------------------------------
  */
 
-public interface MVPPresenter<L, P, E extends RequestParams> {
+public interface MVPPresenter<L, P, E> {
     Context getAppContext();
     Context getActivityContext();
     void setModel(MVPModel<L, P, E> models);
     void clear();
     MVPModel<L,P,E> getModel();
     P getData();
-    void loadData(boolean pullToRefresh, RequestParams params);
-    void setObserver(Observer<L> observer);
+    void loadData(boolean pullToRefresh, E params);
 }

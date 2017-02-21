@@ -15,10 +15,15 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -37,18 +42,26 @@ import com.google.gson.reflect.TypeToken;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
 import ru.skyeng.listening.CommonComponents.BaseActivity;
+import ru.skyeng.listening.CommonComponents.EndlessRecyclerViewScrollListener;
 import ru.skyeng.listening.CommonComponents.FacadeCommon;
+import ru.skyeng.listening.CommonComponents.SEApplication;
+import ru.skyeng.listening.MVPBase.MVPView;
+import ru.skyeng.listening.Modules.AudioFiles.model.AudioData;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFilesRequestParams;
-import ru.skyeng.listening.Modules.AudioFiles.model.SubtitleFile;
+import ru.skyeng.listening.Modules.AudioFiles.model.SubtitlesRequestParams;
+import ru.skyeng.listening.Modules.AudioFiles.network.AudioFilesService;
+import ru.skyeng.listening.Modules.AudioFiles.network.SubtitlesService;
 import ru.skyeng.listening.Modules.AudioFiles.player.PlayerService;
+import ru.skyeng.listening.Modules.AudioFiles.player.PlayerState;
 import ru.skyeng.listening.Modules.Categories.CategoriesActivity;
 import ru.skyeng.listening.Modules.Settings.SettingsActivity;
 import ru.skyeng.listening.Modules.Settings.model.SettingsObject;
@@ -64,29 +77,52 @@ import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.KEY_PL
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAGE_PLAYBACK_TIME;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAGE_SUBTITLE_TIME;
 
-public class AudioListActivity extends BaseActivity implements Observer<List<SubtitleFile>> {
+public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter> implements SwipeRefreshLayout.OnRefreshListener, MVPView {
 
-    private static final String TAG_AUDIO_FILES_FRAGMENT = AudioListFragment.class.getName();
     private static final String KEY_AUDIO_FILE = "mAudioFile";
     private static final String KEY_PROGRESS_VISIBILITY = "progressVisibility";
     public static final int TAG_REQUEST_CODE = 0;
     public static final String TAG_REQUEST_DATA = "tagExtra";
     private static final String KEY_SERVICE_BOUND = "serviceBound";
-    private static final String KEY_SUBTITLE_ENGINE = "mSubtitleEngine";
+
+    @Override
+    @Inject
+    public void setPresenter(@NonNull AudioListPresenter presenter) {
+        this.presenter = presenter;
+        super.setPresenter(presenter);
+    }
+
+    @Inject
+    void setModel(AudioListModel model) {
+        presenter.setModel(model);
+    }
+
+    @Inject
+    void setRetrofitService(AudioFilesService audioFilesService) {
+        ((AudioListModel) presenter.getModel()).setRetrofitService(audioFilesService);
+    }
+
+    @Inject
+    void setSubtitleModel(SubtitlesModel model) {
+        presenter.setSubtitlesModel(model);
+    }
+
+    @Inject
+    void setSubtitlesService(SubtitlesService service) {
+        ((SubtitlesModel) presenter.getSubtitlesModel()).setRetrofitService(service);
+    }
 
     public static boolean categoriesSelected = false;
-
-    private AudioListFragment mFragment;
     private BottomSheetBehavior mBottomSheetBehavior;
     private AudioFile mAudioFile;
     private List<Integer> mSelectedTags;
-    private SubtitleEngine mSubtitleEngine;
 
     private boolean broadcastUpdateFinished;
     private AudioReceiver mPlayerBroadcast;
-
     boolean mBound = false;
     private Messenger msgService;
+    private EndlessScrollListener mScrollListener;
+    private AudioListAdapter mAdapter;
 
     @BindView(R.id.appBarLayout)
     AppBarLayout mAppBarLayout;
@@ -120,6 +156,10 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
     TextView mResetCategories;
     @BindView(R.id.action_settings)
     ImageButton mSettingsButton;
+    @BindView(R.id.recyclerView)
+    RecyclerView mRecyclerView;
+    @BindView(R.id.swipeContainer)
+    SwipeRefreshLayout swipeContainer;
 
     public RelativeLayout getNoContentFoundLayout() {
         return mNoContentFoundLayout;
@@ -133,23 +173,40 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
         mNoContentFoundLayout.setVisibility(View.VISIBLE);
     }
 
-    public AudioFile getAudioFile() {
-        return mAudioFile;
+    public boolean modelHasData() {
+        if (presenter != null && presenter.getData() != null) {
+            return presenter.getData().size() > 0;
+        }
+        return false;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ((SEApplication) getApplicationContext()).getAudioListDiComponent().inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-        startService(new Intent(this, PlayerService.class));
         setupToolbar(getString(R.string.Listening));
-        mFragment = (AudioListFragment) setupRecyclerFragment(
-                savedInstanceState,
-                AudioListFragment.class,
-                R.id.fragment_container
-        );
-        mSubtitleEngine = new SubtitleEngine();
+        mProgress = (ProgressBar) findViewById(R.id.loadingView);
+
+        ButterKnife.bind(this);
+        mAdapter = new AudioListAdapter(presenter);
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
+        mScrollListener = new EndlessScrollListener(mLayoutManager);
+        mRecyclerView.addOnScrollListener(mScrollListener);
+        DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(this.mRecyclerView.getContext(), mLayoutManager.getOrientation());
+        this.mRecyclerView.addItemDecoration(mDividerItemDecoration);
+        if ((presenter.getModel()).getItems() == null) {
+            loadData(false);
+        }
+
+        swipeContainer.setColorSchemeResources(R.color.colorAccent);
+        swipeContainer.setOnRefreshListener(this);
+
+        startService(new Intent(this, PlayerService.class));
+
+
         mBottomSheetBehavior = BottomSheetBehavior.from(mLayoutBottomSheet);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         restoreSavedInstanceState(savedInstanceState);
@@ -178,15 +235,14 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
             }
         });
 
-
         mResetCategories.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mFragment.setRequestParams(new AudioFilesRequestParams());
                 mNoContentFoundLayout.setVisibility(View.GONE);
-                mFragment.loadData(false);
+                loadData(false);
             }
         });
+
         audioSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int currentProgress;
 
@@ -202,7 +258,7 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                sendMessage(null, PlayerService.MESSAGE_PLAYBACK_SEARCH, (long) currentProgress * 1000);
+                presenter.sendMessage(null, PlayerService.MESSAGE_PLAYBACK_SEARCH, (long) currentProgress * 1000);
             }
         });
         mSettingsButton.setOnClickListener(v -> startActivity(new Intent(AudioListActivity.this, SettingsActivity.class)));
@@ -237,7 +293,7 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
                             });
                             saveSettingsTask.setConsumer(param -> {
                                 showToast(R.string.settings_saved);
-                                mFragment.loadData(false);
+                                loadData(false);
                             });
                             saveSettingsTask.execute();
                         }
@@ -256,31 +312,23 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
             Type type = new TypeToken<List<Integer>>() {
             }.getType();
             mSelectedTags = gson.fromJson(data.getStringExtra(TAG_REQUEST_DATA), type);
-            AudioFilesRequestParams params = new AudioFilesRequestParams();
-            params.setTagIds(mSelectedTags);
-            mFragment.setRequestParams(params);
-            mFragment.getPresenter().clear();
-            mFragment.getRequestParams().setPage(1);
-            mFragment.loadData(false);
+            presenter.getModel().getRequestParams().setTagIds(mSelectedTags);
+            getPresenter().clear();
+            presenter.getModel().getRequestParams().setPage(1);
+            loadData(false);
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (mFragment != null) {
-            getSupportFragmentManager().putFragment(outState, TAG_AUDIO_FILES_FRAGMENT, mFragment);
-        }
-        outState.putParcelable(KEY_SUBTITLE_ENGINE, mSubtitleEngine);
         outState.putBoolean(KEY_SERVICE_BOUND, mBound);
         outState.putParcelable(KEY_AUDIO_FILE, mAudioFile);
         outState.putInt(KEY_PROGRESS_VISIBILITY, mAudioProgressBar.getVisibility());
         super.onSaveInstanceState(outState);
     }
 
-
     private void restoreSavedInstanceState(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
-            mSubtitleEngine = savedInstanceState.getParcelable(KEY_SUBTITLE_ENGINE);
             mBound = savedInstanceState.getBoolean(KEY_SERVICE_BOUND);
             mAudioFile = savedInstanceState.getParcelable(KEY_AUDIO_FILE);
             if (!broadcastUpdateFinished) {
@@ -289,26 +337,51 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
         }
     }
 
+    @Override
+    public void onRefresh() {
+        loadData(true);
+    }
+
+    public void updateAdapter(List<AudioFile> data) {
+        if (mAudioFile != null) {
+            for (int i = 0; i < data.size(); i++) {
+                if (data.get(i).getId() == mAudioFile.getId()) {
+                    data.get(i).setState(PlayerState.PLAY);
+                }
+            }
+        }
+        mAdapter.notifyDataSetChanged();
+    }
+
+    public void loadData(boolean pullToRefresh) {
+        if (pullToRefresh) {
+            presenter.getModel().getRequestParams().setPage(1);
+            mScrollListener.resetState();
+            presenter.clear();
+        }
+        presenter.loadData(pullToRefresh, presenter.getModel().getRequestParams());
+    }
+    //--------------------------Player UI----------------------------------------//
     private void setupPlayerCoverListener() {
         audioCoverImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mFragment.mAdapter.getPlayingPosition() != -1) {
-                    int audioState = mAudioFile.getState();
+                if (mAdapter.getPlayingPosition() != -1) {
+                    PlayerState audioState = mAudioFile.getState();
                     int icon;
-                    int state;
-                    if (audioState == 1) {
-                        state = 2;
+                    PlayerState state;
+                    if (audioState == PlayerState.PLAY) {
+                        state = PlayerState.PAUSE;
                         icon = R.drawable.ic_play_white;
                         pausePlayerMessage();
                     } else {
-                        state = 1;
+                        state = PlayerState.PLAY;
                         icon = R.drawable.ic_pause_white;
                         continuePlayingMessage();
                     }
-                    mFragment.mAdapter.setPlayerState(state);
+                    mAdapter.setPlayerState(state);
                     audioPlayPause.setImageDrawable(ContextCompat.getDrawable(AudioListActivity.this, icon));
-                    if (audioState == 0) {
+                    if (audioState == PlayerState.STOP) {
                         mDarkLayer.setVisibility(View.GONE);
                         audioPlayPause.setVisibility(View.VISIBLE);
                     } else {
@@ -327,10 +400,10 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
                 audioCoverImage.setImageBitmap(mAudioFile.getImageBitmap());
             }
             int icon = R.drawable.ic_pause_white;
-            if (mAudioFile.getState() == 1 && !mAudioFile.isLoading()) {
+            if (mAudioFile.getState() == PlayerState.PLAY && !mAudioFile.isLoading()) {
                 hideAudioLoading();
                 audioPlayPause.setVisibility(View.VISIBLE);
-            } else if (mAudioFile.getState() == 2 && !mAudioFile.isLoading()) {
+            } else if (mAudioFile.getState() == PlayerState.PAUSE && !mAudioFile.isLoading()) {
                 icon = R.drawable.ic_play_white;
                 hideAudioLoading();
                 audioPlayPause.setVisibility(View.VISIBLE);
@@ -344,6 +417,19 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
         }
     }
 
+    public void startPlaying(AudioFile item) {
+        presenter.loadSubtitles(new SubtitlesRequestParams(item.getId()));
+        startBufferingMessage(item);
+    }
+
+    public void continuePlaying() {
+        continuePlayingMessage();
+    }
+
+    public void pausePlayer() {
+        pausePlayerMessage();
+    }
+
     private void hideAudioLoading() {
         mAudioProgressBar.setVisibility(View.GONE);
     }
@@ -353,7 +439,7 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
     }
 
     public void startPlayerMessage() {
-        sendMessage(null, PlayerService.MESSAGE_PLAY);
+        presenter.sendMessage(null, PlayerService.MESSAGE_PLAY);
     }
 
     public void startBufferingMessage(AudioFile audioFile) {
@@ -369,10 +455,10 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
             @Override
             public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
                 mAudioFile.setImageBitmap(resource);
+                audioCoverImage.setImageBitmap(resource);
                 return false;
             }
         }).into(audioCoverImage);
-        mSubtitleEngine = new SubtitleEngine();
         audioSubtitles.setText(getString(R.string.dash));
         mAudioFile = audioFile;
         mAudioFile.setLoading(true);
@@ -380,21 +466,21 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
         bindPlayerService();
         Bundle bundle = new Bundle();
         bundle.putString(EXTRA_AUDIO_URL, audioFile.getAudioFileUrl());
-        sendMessage(bundle, PlayerService.MESSAGE_START_BUFFERING);
+        presenter.sendMessage(bundle, PlayerService.MESSAGE_START_BUFFERING);
     }
 
     public void continuePlayingMessage() {
         updatePlayerUI();
         if (mAudioFile != null)
-            mAudioFile.setState(1);
-        sendMessage(null, PlayerService.MESSAGE_CONTINUE);
+            mAudioFile.setState(PlayerState.PLAY);
+        presenter.sendMessage(null, PlayerService.MESSAGE_CONTINUE);
     }
 
     public void pausePlayerMessage() {
         if (mAudioFile != null)
-            mAudioFile.setState(2);
+            mAudioFile.setState(PlayerState.PAUSE);
         updatePlayerUI();
-        sendMessage(null, PlayerService.MESSAGE_PAUSE);
+        presenter.sendMessage(null, PlayerService.MESSAGE_PAUSE);
     }
 
     public void updateButtonsVisibility() {
@@ -402,15 +488,18 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
         mCategoryButton.setText(getString(R.string.categories));
     }
 
+//--------------------------Player UI----------------------------------------//
+//-----------------------Lifecycle Methods-----------------------------------//
+
     @Override
     public void onResume() {
-        if(mFragment.modelHasData()){
+        if(modelHasData()){
             updateButtonsVisibility();
         }
         if (mAudioFile != null) {
             if (mAudioFile.isLoading()) {
                 mAudioFile.setLoading(false);
-                mAudioFile.setState(1);
+                mAudioFile.setState(PlayerState.PLAY);
                 updatePlayerUI();
             }
         }
@@ -433,7 +522,7 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
     @Override
     protected void onStop() {
         if (mBound) {
-            unbindService(playerConnection);
+            unbindService(presenter.playerConnection);
             mBound = false;
         }
         super.onStop();
@@ -445,56 +534,33 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
         bindPlayerService();
     }
 
-    //Binding к PlayerService
-    public void sendMessage(Bundle bundle, int type, Object... obj) {
-        if (mBound) {
-            try {
-                Message message = Message.obtain(null, type, 1, 1);
-                if (obj.length != 0) {
-                    message.obj = obj[0];
-                }
-                message.setData(bundle);
-                msgService.send(message); //sending message to service
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
+//--------------------------Lifecycle Methods--------------------------------//
+//---------------------------------------------------------------------------//
+    public void handleSubtitleMessage(Message message) {
+        long time = (long) message.obj * 1000;
+        if (presenter.getSubtitleEngine().size() > 0)
+            audioSubtitles.setText(presenter.getSubtitleEngine().updateSubtitles(time).getTextEn());
     }
 
-    public ServiceConnection playerConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder binder) {
-            mBound = true;
-            msgService = new Messenger(binder);
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
-            mBound = false;
-        }
-    };
-
-    public Handler playbackHandler = new Handler() {
-        public void handleMessage(Message message) {
-            if (message.what == MESSAGE_PLAYBACK_TIME) {
-                long time = (long) message.obj / 1000;
-                audioSeek.setProgress((int) time);
-                audioPlayed.setText(FacadeCommon.getDateFromMillis((Long) message.obj));
-                long duration = mAudioFile.getDurationInSeconds();
-                audioLeft.setText(String.format(getString(R.string.leftTime), FacadeCommon.getDateFromMillis(duration * 1000 - (long) message.obj)));
-            } else if (message.what == MESSAGE_SUBTITLE_TIME) {
-                long time = (long) message.obj * 1000;
-                if (mSubtitleEngine.size() > 0)
-                    audioSubtitles.setText(mSubtitleEngine.updateSubtitles(time).getTextEn());
-            }
-        }
-    };
+    public void handlePlaybackTimeMessage(Message message) {
+        long time = (long) message.obj / 1000;
+        audioSeek.setProgress((int) time);
+        audioPlayed.setText(FacadeCommon.getDateFromMillis((Long) message.obj));
+        long duration = mAudioFile.getDurationInSeconds();
+        audioLeft.setText(String.format(getString(R.string.leftTime), FacadeCommon.getDateFromMillis(duration * 1000 - (long) message.obj)));
+    }
 
     public void bindPlayerService() {
         if (!mBound) {
             Intent intent = new Intent(this, PlayerService.class);
-            Messenger messenger = new Messenger(playbackHandler);
+            Messenger messenger = new Messenger(presenter.playbackHandler);
             intent.putExtra(BINDER_MESSENGER, messenger);
-            bindService(intent, playerConnection, Context.BIND_AUTO_CREATE);
+            bindService(intent, presenter.playerConnection, Context.BIND_AUTO_CREATE);
         }
+    }
+
+    public void setRefreshing(boolean refreshing) {
+        swipeContainer.setRefreshing(refreshing);
     }
 
     //Broadcast получаемый при начале воспроизведения аудио
@@ -516,26 +582,46 @@ public class AudioListActivity extends BaseActivity implements Observer<List<Sub
         super.onDestroy();
     }
 
-    //Callback методы запроса на субтитры
-    @Override
-    public void onSubscribe(Disposable d) {
-        System.out.println();
+    class EndlessScrollListener extends EndlessRecyclerViewScrollListener {
+
+        public EndlessScrollListener(LinearLayoutManager layoutManager) {
+            super(layoutManager);
+        }
+
+        @Override
+        public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+            if(totalItemsCount>14){
+                presenter.getModel().getRequestParams().setPage(presenter.getModel().getRequestParams().getPage() + 1);
+                loadData(false);
+            }
+        }
     }
 
-    @Override
-    public void onNext(List<SubtitleFile> value) {
-        mSubtitleEngine.setSubtitles(value);
-        startPlayerMessage();
+    public void onNext(AudioData value) {
+        if (value.getPrimaryData().size() == 0 && presenter.getModel().getRequestParams().getPage() == 1) {
+            showNoContentView();
+        } else {
+            hideNoContentView();
+            mAdapter.setPlayingPosition(-1);
+        }
+        updateAdapter(value.getPrimaryData());
     }
 
-    @Override
     public void onError(Throwable e) {
-        System.out.println();
+        hideProgress();
+        if (presenter.getModel().getItems() == null)
+            getNoContentFoundLayout().setVisibility(View.VISIBLE);
+        updateAdapter(new ArrayList<>());
+        e.printStackTrace();
     }
 
     @Override
-    public void onComplete() {
-        System.out.println();
+    public Context getAppContext() {
+        return getApplicationContext();
     }
 
+    @Override
+    public Context getActivityContext() {
+        return this;
+    }
 }

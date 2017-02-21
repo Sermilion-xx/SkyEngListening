@@ -56,10 +56,4 @@ public class SEApplication extends Application {
         return new DefaultHttpDataSourceFactory(userAgent, bandwidthMeter);
     }
 
-
-
-    public boolean useExtensionRenderers() {
-        return BuildConfig.FLAVOR.equals("withExtensions");
-    }
-
 }

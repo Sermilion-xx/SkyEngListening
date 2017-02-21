@@ -1,11 +1,14 @@
 package ru.skyeng.listening.Modules.AudioFiles.model;
 
 import android.graphics.Bitmap;
+import android.media.session.PlaybackState;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.List;
 import java.util.Map;
+
+import ru.skyeng.listening.Modules.AudioFiles.player.PlayerState;
 
 /**
  * ---------------------------------------------------
@@ -31,12 +34,12 @@ public class AudioFile implements Parcelable, Comparable<AudioFile>{
     private List<Map<String, String>> tags;
     private int durationInSeconds;
     private String durationInMinutes;
-    //0 - stopped, 1 - playing, 2 - paused
-    private int state;
+    private PlayerState state;
     private boolean loading;
     private List<SubtitleFile> mSubtitles;
 
     public AudioFile() {
+        state = PlayerState.STOP;
     }
 
     public boolean isLoading() {
@@ -65,7 +68,8 @@ public class AudioFile implements Parcelable, Comparable<AudioFile>{
         wordsInMinute = in.readInt();
         durationInSeconds = in.readInt();
         durationInMinutes = in.readString();
-        state = in.readInt();
+        int stateInt = in.readInt();
+        state = PlayerState.values()[stateInt];
     }
 
     public static final Creator<AudioFile> CREATOR = new Creator<AudioFile>() {
@@ -177,11 +181,11 @@ public class AudioFile implements Parcelable, Comparable<AudioFile>{
         this.durationInSeconds = durationInSeconds;
     }
 
-    public int getState() {
+    public PlayerState getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(PlayerState state) {
         this.state = state;
     }
 
@@ -201,7 +205,8 @@ public class AudioFile implements Parcelable, Comparable<AudioFile>{
         dest.writeInt(wordsInMinute);
         dest.writeInt(durationInSeconds);
         dest.writeString(durationInMinutes);
-        dest.writeInt(state);
+        int stateTmp = state == null ? -1 : state.ordinal();
+        dest.writeInt(stateTmp);
     }
 
 

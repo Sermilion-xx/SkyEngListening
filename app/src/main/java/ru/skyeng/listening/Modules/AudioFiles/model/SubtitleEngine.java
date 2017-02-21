@@ -1,4 +1,4 @@
-package ru.skyeng.listening.Modules.AudioFiles;
+package ru.skyeng.listening.Modules.AudioFiles.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.skyeng.listening.CommonComponents.FacadeCommon;
-import ru.skyeng.listening.Modules.AudioFiles.model.SubtitleFile;
 
 /**
  * ---------------------------------------------------
@@ -26,7 +25,7 @@ public class SubtitleEngine implements Comparable<Long>, Parcelable {
     private List<SubtitleFile> subtitleFileList;
     private SubtitleFile current;
 
-    protected SubtitleEngine(Parcel in) {
+    public SubtitleEngine(Parcel in) {
         index = in.readInt();
     }
 
@@ -47,7 +46,7 @@ public class SubtitleEngine implements Comparable<Long>, Parcelable {
         return subtitleFileList.size();
     }
 
-    SubtitleEngine() {
+    public SubtitleEngine() {
         subtitleFileList = new ArrayList<>();
     }
 
@@ -65,7 +64,7 @@ public class SubtitleEngine implements Comparable<Long>, Parcelable {
         return current;
     }
 
-    void setSubtitles(List<SubtitleFile> subtitleFileList) {
+    public void setSubtitles(List<SubtitleFile> subtitleFileList) {
         this.subtitleFileList = subtitleFileList;
         if (subtitleFileList.size() > 0) {
             current = subtitleFileList.get(0);

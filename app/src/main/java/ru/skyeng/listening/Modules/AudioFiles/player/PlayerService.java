@@ -191,7 +191,7 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         if (playbackState == 3) {
-            mPlayer.setState(1);
+            mPlayer.setState(PlayerState.PLAY);
             Intent intent = new Intent(ACTION_AUDIO_STATE);
             intent.putExtra(KEY_PLAYER_STATE, false);
             sendBroadcast(intent);
@@ -276,7 +276,7 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
                 new Runnable() {
                     @Override
                     public void run() {
-                        if(mPlayer.getState()!=1) {
+                        if(mPlayer.getState()!=PlayerState.PLAY) {
                             mPlayer.pause();
                             sendAudioDidNotStartBroadcast();
                         }

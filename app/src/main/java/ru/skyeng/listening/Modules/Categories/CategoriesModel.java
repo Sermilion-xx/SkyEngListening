@@ -8,7 +8,7 @@ import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import ru.skyeng.listening.CommonComponents.BaseRequestParams;
+import ru.skyeng.listening.Modules.Categories.model.CategoriesRequestParams;
 import ru.skyeng.listening.MVPBase.MVPModel;
 import ru.skyeng.listening.Modules.Categories.model.AudioTag;
 import ru.skyeng.listening.Modules.Categories.model.TagsData;
@@ -27,19 +27,21 @@ import static ru.skyeng.listening.CommonComponents.Constants.LAST_PAGE;
  * ---------------------------------------------------
  */
 
-public class CategoriesModel implements MVPModel<TagsData, List<AudioTag>, BaseRequestParams> {
+public class CategoriesModel implements MVPModel<TagsData, List<AudioTag>, CategoriesRequestParams> {
 
     private TagsService mTagsService;
     private TagsData mData;
+    private CategoriesRequestParams mParams;
 
     public void setRetrofitService(TagsService service) {
         mTagsService = service;
+        mParams = new CategoriesRequestParams();
     }
 
     @Override
-    public void loadData(Observer<TagsData> observable, BaseRequestParams params) {
+    public void loadData(Observer<TagsData> observable, CategoriesRequestParams params) {
         if(params==null)
-            params = new BaseRequestParams();
+            params = new CategoriesRequestParams();
         Observable<TagsData> tagsDataObservable = mTagsService.getTags(
                 params.getPage(),
                 params.getPageSize())
@@ -75,5 +77,10 @@ public class CategoriesModel implements MVPModel<TagsData, List<AudioTag>, BaseR
         bundle.putInt(CURRENT_PAGE, Integer.parseInt(mData.getMetaData().get(CURRENT_PAGE)));
         bundle.putInt(LAST_PAGE, Integer.parseInt(mData.getMetaData().get(LAST_PAGE)));
         return bundle;
+    }
+
+    @Override
+    public CategoriesRequestParams getRequestParams() {
+        return mParams;
     }
 }

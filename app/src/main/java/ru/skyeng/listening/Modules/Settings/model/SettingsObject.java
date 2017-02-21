@@ -64,6 +64,9 @@ public class SettingsObject {
             if(index[i]){
                 duration.add(one);
                 duration.add(two);
+            }else {
+                duration.add(-1);
+                duration.add(-1);
             }
             one = two;
             two = one*2;
@@ -80,20 +83,27 @@ public class SettingsObject {
     public boolean[] getDurationsBooleanArray() {
         boolean allFalse = true;
         SparseIntArray map = new SparseIntArray();
+        //durations: 0, 300, 300, 600, 600, 1200, 1200, 2400
         map.put(0, 300);
         map.put(300, 600);
         map.put(600, 1200);
         map.put(1200, 2400);
         boolean[] values = new boolean[4];
-        for(int i=0; i<duration.size()/2; i++){
-            if(map.get(duration.get(i)) == duration.get(i+1)){
-                values[i] = true;
-                allFalse = false;
+        int index1 = 0;
+        for(int i=0; i<duration.size(); i++){
+            if(i+1<duration.size()) {
+                if (map.get(duration.get(index1)) == duration.get(i + 1)) {
+                    if(i<values.length) {
+                        values[i] = true;
+                        allFalse = false;
+                    }
+                }
+                index1++;
             }
         }
         if(allFalse){
             for(int i = 0; i<values.length; i++){
-                values[i]=true;
+                values[i] = false;
             }
         }
         return values;

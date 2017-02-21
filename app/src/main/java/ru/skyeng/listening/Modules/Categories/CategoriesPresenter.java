@@ -7,8 +7,7 @@ import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 import java.util.List;
 
 import io.reactivex.Observer;
-import ru.skyeng.listening.CommonComponents.BaseRequestParams;
-import ru.skyeng.listening.CommonComponents.Interfaces.RequestParams;
+import ru.skyeng.listening.Modules.Categories.model.CategoriesRequestParams;
 import ru.skyeng.listening.MVPBase.MVPModel;
 import ru.skyeng.listening.MVPBase.MVPPresenter;
 import ru.skyeng.listening.MVPBase.MVPView;
@@ -25,11 +24,11 @@ import ru.skyeng.listening.Modules.Categories.model.TagsData;
  * ---------------------------------------------------
  */
 
-public class CategoriesPresenter extends MvpBasePresenter<MVPView<List<AudioTag>>>
+public class CategoriesPresenter extends MvpBasePresenter<MVPView>
         implements MVPPresenter<
         TagsData,
         List<AudioTag>,
-        BaseRequestParams> {
+        CategoriesRequestParams> {
 
     private CategoriesModel mModel;
     private Observer<TagsData> mObserver;
@@ -51,7 +50,7 @@ public class CategoriesPresenter extends MvpBasePresenter<MVPView<List<AudioTag>
     }
 
     @Override
-    public void setModel(MVPModel<TagsData, List<AudioTag>, BaseRequestParams> model) {
+    public void setModel(MVPModel<TagsData, List<AudioTag>, CategoriesRequestParams> model) {
         this.mModel = (CategoriesModel) model;
     }
 
@@ -61,7 +60,7 @@ public class CategoriesPresenter extends MvpBasePresenter<MVPView<List<AudioTag>
     }
 
     @Override
-    public MVPModel<TagsData, List<AudioTag>, BaseRequestParams> getModel() {
+    public MVPModel<TagsData, List<AudioTag>, CategoriesRequestParams> getModel() {
         return mModel;
     }
 
@@ -71,12 +70,7 @@ public class CategoriesPresenter extends MvpBasePresenter<MVPView<List<AudioTag>
     }
 
     @Override
-    public void loadData(boolean pullToRefresh, RequestParams params) {
-        mModel.loadData(mObserver, (BaseRequestParams) params);
-    }
-
-    @Override
-    public void setObserver(Observer<TagsData> observer) {
-        mObserver = observer;
+    public void loadData(boolean pullToRefresh, CategoriesRequestParams params) {
+        mModel.loadData(mObserver,  params);
     }
 }

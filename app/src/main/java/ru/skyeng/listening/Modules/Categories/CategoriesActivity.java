@@ -31,6 +31,7 @@ public class CategoriesActivity extends BaseActivity implements View.OnClickList
     Button mResetTagsButton;
     @BindView(R.id.button_apply)
     Button mApplyTagsButton;
+    protected ProgressBar mProgress;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -53,7 +54,7 @@ public class CategoriesActivity extends BaseActivity implements View.OnClickList
         );
         Gson gson = new Gson();
         Type type = new TypeToken<List<Integer>>(){}.getType();
-        mFragment.setSelectedTags(gson.fromJson(getIntent().getStringExtra(TAG_REQUEST_DATA), type));
+//        mFragment.setSelectedTags(gson.fromJson(getIntent().getStringExtra(TAG_REQUEST_DATA), type));
         mApplyTagsButton.setOnClickListener(this);
         mResetTagsButton.setOnClickListener(this);
     }
@@ -65,7 +66,7 @@ public class CategoriesActivity extends BaseActivity implements View.OnClickList
                 applyCategories();
                 break;
             case R.id.button_reset:
-                mFragment.resetSelectedTags();
+//                mFragment.resetSelectedTags();
                 setResult(Activity.RESULT_OK, new Intent());
                 finish();
                 break;
@@ -73,16 +74,16 @@ public class CategoriesActivity extends BaseActivity implements View.OnClickList
     }
 
     private void applyCategories() {
-        if(mFragment.getSelectedTags().size()>0){
-            Intent returnIntent = new Intent();
-            Gson gson = new Gson();
-            String jsonTags = gson.toJson(mFragment.getSelectedTags());
-            returnIntent.putExtra(TAG_REQUEST_DATA, jsonTags);
-            setResult(Activity.RESULT_OK, returnIntent);
-            finish();
-        } else {
-            Toast.makeText(CategoriesActivity.this, getResources().getString(R.string.select_tags), Toast.LENGTH_LONG).show();
-        }
+//        if(mFragment.getSelectedTags().size()>0){
+//            Intent returnIntent = new Intent();
+//            Gson gson = new Gson();
+//            String jsonTags = gson.toJson(mFragment.getSelectedTags());
+//            returnIntent.putExtra(TAG_REQUEST_DATA, jsonTags);
+//            setResult(Activity.RESULT_OK, returnIntent);
+//            finish();
+//        } else {
+//            Toast.makeText(CategoriesActivity.this, getResources().getString(R.string.select_tags), Toast.LENGTH_LONG).show();
+//        }
     }
 
     @Override
@@ -94,5 +95,6 @@ public class CategoriesActivity extends BaseActivity implements View.OnClickList
         }
         return super.onOptionsItemSelected(item);
     }
+
 
 }

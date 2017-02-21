@@ -24,6 +24,9 @@ import ru.skyeng.listening.Modules.AudioFiles.network.SubtitlesService;
 
 @Module
 class AudioListModule {
+
+    //inject AudioPlayer to Service
+
     @Provides
     @Singleton
     AudioListPresenter getAudioListPresenter(){
@@ -47,12 +50,6 @@ class AudioListModule {
     SubtitlesService getSubtitlesService(){
         ServiceGenerator serviceGenerator = new ServiceGenerator();
         return serviceGenerator.createService(SubtitlesService.class);
-    }
-
-    @Provides
-    @Singleton
-    AudioListAdapter getAudioListAdapter(){
-        return new AudioListAdapter();
     }
 
     @Provides

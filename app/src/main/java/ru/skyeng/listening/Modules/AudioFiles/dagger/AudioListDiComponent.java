@@ -3,7 +3,7 @@ package ru.skyeng.listening.Modules.AudioFiles.dagger;
 import javax.inject.Singleton;
 
 import dagger.Component;
-import ru.skyeng.listening.Modules.AudioFiles.AudioListFragment;
+import ru.skyeng.listening.Modules.AudioFiles.AudioListActivity;
 
 /**
  * ---------------------------------------------------
@@ -17,5 +17,5 @@ import ru.skyeng.listening.Modules.AudioFiles.AudioListFragment;
 @Singleton
 @Component(modules = {AudioListModule.class})
 public interface AudioListDiComponent {
-    void inject(AudioListFragment fragment);
+    void inject(AudioListActivity fragment);
 }

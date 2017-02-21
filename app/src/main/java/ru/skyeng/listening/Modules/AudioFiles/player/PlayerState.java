@@ -1,8 +1,8 @@
-package ru.skyeng.listening.CommonComponents.Interfaces;
+package ru.skyeng.listening.Modules.AudioFiles.player;
 
 /**
  * ---------------------------------------------------
- * Created by Sermilion on 10/02/2017.
+ * Created by Sermilion on 21/02/2017.
  * Project: Listening
  * ---------------------------------------------------
  * <a href="http://www.skyeng.ru">www.skyeng.ru</a>
@@ -10,5 +10,8 @@ package ru.skyeng.listening.CommonComponents.Interfaces;
  * ---------------------------------------------------
  */
 
-public interface RequestParams {
+public enum PlayerState {
+    PLAY,
+    PAUSE,
+    STOP;
 }

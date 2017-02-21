@@ -38,7 +38,7 @@ class AudioPlayer {
     private Context mContext;
     private SimpleExoPlayer mPlayer;
     private String extraData;
-    private int state;
+    private PlayerState state;
     private ExoPlayer.EventListener mEventListener;
     private ExtractorsFactory extractorsFactory;
     private boolean shouldAutoPlay;
@@ -52,7 +52,7 @@ class AudioPlayer {
         shouldAutoPlay = true;
         mEventListener = eventListener;
         mContext = context;
-        state = 0;
+        state = PlayerState.STOP;
         mediaDataSourceFactory = buildDataSourceFactory(true);
         extractorsFactory = new DefaultExtractorsFactory();
         initializePlayer();
@@ -60,7 +60,7 @@ class AudioPlayer {
 
     void setPlaySource(String url){
         extraData = url;
-        state = 0;
+        state = PlayerState.STOP;
         setMediaSource(url);
     }
 
@@ -75,24 +75,24 @@ class AudioPlayer {
     }
 
     boolean isPaused() {
-        return state == 2;
+        return state == PlayerState.PAUSE;
     }
 
-    void setState(int state) {
+    void setState(PlayerState state) {
         this.state = state;
     }
 
-    public int getState() {
+    public PlayerState getState() {
         return state;
     }
 
     void pause() {
-        state = 2;
+        state = PlayerState.PAUSE;
         mPlayer.setPlayWhenReady(false);
     }
 
     void play() {
-        state = 1;
+        state = PlayerState.PLAY;
         mPlayer.setPlayWhenReady(true);
     }
 

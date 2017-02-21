@@ -6,12 +6,9 @@ import android.os.Message;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import ru.skyeng.listening.CommonComponents.FacadeCommon;
-import ru.skyeng.listening.Modules.AudioFiles.SubtitleEngine;
+import ru.skyeng.listening.Modules.AudioFiles.model.SubtitleEngine;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
-import ru.skyeng.listening.Modules.AudioFiles.model.SubtitleFile;
 import ru.skyeng.listening.R;
 
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAGE_PLAYBACK_TIME;

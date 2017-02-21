@@ -2,20 +2,26 @@ package ru.skyeng.listening.CommonComponents;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.hannesdorfmann.mosby.mvp.MvpActivity;
+import com.hannesdorfmann.mosby.mvp.MvpPresenter;
+
 import ru.skyeng.listening.CommonComponents.Interfaces.ActivityExtensions;
+import ru.skyeng.listening.MVPBase.MVPView;
 import ru.skyeng.listening.R;
 
-public class BaseActivity extends AppCompatActivity implements ActivityExtensions {
+public abstract class BaseActivity
+        <V extends MVPView, Presenter extends MvpPresenter<V>>
+        extends MvpActivity<V, Presenter> implements ActivityExtensions {
 
     protected ProgressBar mProgress;
     protected Toolbar mToolbar;
@@ -25,6 +31,13 @@ public class BaseActivity extends AppCompatActivity implements ActivityExtension
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
     }
+
+    @NonNull
+    @Override
+    public Presenter createPresenter() {
+        return presenter;
+    }
+
 
     protected Toolbar setupToolbar(String title, int... homeAsUpIndicator) {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -67,13 +80,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityExtension
         return fragment;
     }
 
-    public void showProgress() {
-        mProgress.setVisibility(View.VISIBLE);
-    }
 
-    public void hideProgress() {
-        mProgress.setVisibility(View.GONE);
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -87,5 +94,15 @@ public class BaseActivity extends AppCompatActivity implements ActivityExtension
 
     protected void showToast(int message){
         Toast.makeText(this, getString(message), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showProgress() {
+        mProgress.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideProgress() {
+        mProgress.setVisibility(View.GONE);
     }
 }

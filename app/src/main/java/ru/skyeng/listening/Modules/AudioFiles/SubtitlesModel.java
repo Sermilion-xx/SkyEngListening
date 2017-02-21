@@ -29,7 +29,11 @@ public class SubtitlesModel implements MVPModel<List<SubtitleFile>,
 
     private SubtitlesService mSubtitlesService;
     private List<SubtitleFile> mData;
+    private SubtitlesRequestParams mParams;
 
+    public SubtitlesModel(){
+        mParams = new SubtitlesRequestParams();
+    }
 
     public void setRetrofitService(SubtitlesService service) {
         mSubtitlesService = service;
@@ -67,6 +71,11 @@ public class SubtitlesModel implements MVPModel<List<SubtitleFile>,
 
     @Override
     public Bundle getExtraData() {
+        return null;
+    }
+
+    @Override
+    public SubtitlesRequestParams getRequestParams() {
         return null;
     }
 }

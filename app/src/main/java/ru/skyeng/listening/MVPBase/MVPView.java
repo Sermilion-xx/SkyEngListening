@@ -2,6 +2,7 @@ package ru.skyeng.listening.MVPBase;
 
 import android.content.Context;
 
+import com.hannesdorfmann.mosby.mvp.MvpView;
 import com.hannesdorfmann.mosby.mvp.lce.MvpLceView;
 
 /**
@@ -14,7 +15,7 @@ import com.hannesdorfmann.mosby.mvp.lce.MvpLceView;
  * ---------------------------------------------------
  */
 
-public interface MVPView<T> extends MvpLceView<T> {
+public interface MVPView extends MvpView {
     Context getAppContext();
     Context getActivityContext();
 }

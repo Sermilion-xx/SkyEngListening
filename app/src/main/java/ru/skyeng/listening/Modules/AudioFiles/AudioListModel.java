@@ -15,6 +15,7 @@ import ru.skyeng.listening.CommonComponents.Constants;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioData;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFilesRequestParams;
+import ru.skyeng.listening.Modules.AudioFiles.model.SubtitlesRequestParams;
 import ru.skyeng.listening.Modules.AudioFiles.network.AudioFilesService;
 import ru.skyeng.listening.MVPBase.MVPModel;
 import ru.skyeng.listening.Modules.Settings.model.SettingsObject;
@@ -34,10 +35,14 @@ import static ru.skyeng.listening.CommonComponents.Constants.LAST_PAGE;
 
 public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, AudioFilesRequestParams> {
 
-
     private static final String CURRENT_PAGE = "currentPage";
     private AudioFilesService audioFilesService;
     private AudioData mData;
+    private AudioFilesRequestParams mRequestParams;
+
+    public AudioListModel(){
+        mRequestParams = new AudioFilesRequestParams();
+    }
 
 
     public void setRetrofitService(AudioFilesService service) {
@@ -46,24 +51,6 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
 
     @Override
     public void loadData(Observer<AudioData> observable, AudioFilesRequestParams params) {
-        if(params==null)
-            params = new AudioFilesRequestParams();
-        SettingsObject settingsObject = FacadePreferences.getSettingsFromPref(((AudioListFragment)observable).getActivityContext());
-        if(settingsObject!=null) {
-            params.setAccentIds(new ArrayList<>(settingsObject.getAccentIds()));
-            params.setLevelId(settingsObject.getLevel());
-            List<Integer> durationValues = settingsObject.getDuration();
-            Map<String, Integer> paramsMap = new HashMap<>();
-            int valueIndex = 0;
-            for(int i = 0; i<durationValues.size()/2; i++){
-                for(int j = 0; j<2; j++){
-                    paramsMap.put("durations["+i+"]["+j+"]", durationValues.get(valueIndex));
-                    valueIndex++;
-                }
-            }
-            params.setDuration(paramsMap);
-        }
-
         Observable<AudioData> audioDataObservable = audioFilesService.getAudioFiles(
                 params.getDuration(),
                 params.getPage(),
@@ -74,8 +61,7 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
                 params.getTagIds(),
                 params.getDurationGT(),
                 params.getDurationLT()
-                )
-                .subscribeOn(Schedulers.io())
+                ).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
         audioDataObservable.subscribe(observable);
     }
@@ -110,6 +96,11 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
         bundle.putInt(Constants.CURRENT_PAGE, Integer.parseInt(mData.getMetaData().get(Constants.CURRENT_PAGE)));
         bundle.putInt(LAST_PAGE, Integer.parseInt(mData.getMetaData().get(LAST_PAGE)));
         return bundle;
+    }
+
+    @Override
+    public AudioFilesRequestParams getRequestParams() {
+        return mRequestParams;
     }
 
 }

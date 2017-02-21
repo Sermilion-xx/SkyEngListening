@@ -1,12 +1,8 @@
 package ru.skyeng.listening.Modules.AudioFiles.model;
 
-import android.support.v4.util.Pair;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import ru.skyeng.listening.CommonComponents.Interfaces.RequestParams;
 
 /**
  * ---------------------------------------------------
@@ -18,11 +14,11 @@ import ru.skyeng.listening.CommonComponents.Interfaces.RequestParams;
  * ---------------------------------------------------
  */
 
-public class AudioFilesRequestParams implements RequestParams {
+public class AudioFilesRequestParams {
 
     private Integer page;
     private Integer pageSize;
-    private String title;
+    private String  title;
     private List<Integer> accentIds;
     private Integer levelId;
     private List<Integer> tagIds;
