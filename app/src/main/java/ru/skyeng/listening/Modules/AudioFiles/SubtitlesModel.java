@@ -4,11 +4,14 @@ import android.os.Bundle;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import ru.skyeng.listening.MVPBase.MVPModel;
+import ru.skyeng.listening.CommonComponents.Interfaces.MVPBase.MVPModel;
+import ru.skyeng.listening.CommonComponents.SEApplication;
 import ru.skyeng.listening.Modules.AudioFiles.model.SubtitleFile;
 import ru.skyeng.listening.Modules.AudioFiles.model.SubtitlesRequestParams;
 import ru.skyeng.listening.Modules.AudioFiles.network.SubtitlesService;
@@ -29,13 +32,14 @@ public class SubtitlesModel implements MVPModel<List<SubtitleFile>,
 
     private SubtitlesService mSubtitlesService;
     private List<SubtitleFile> mData;
-    private SubtitlesRequestParams mParams;
+    private SubtitlesRequestParams mRequestParams;
 
-    public SubtitlesModel(){
-        mParams = new SubtitlesRequestParams();
+    public SubtitlesModel() {
+        mRequestParams = new SubtitlesRequestParams();
     }
 
-    public void setRetrofitService(SubtitlesService service) {
+    @Inject
+    void setSubtitlesService(SubtitlesService service) {
         mSubtitlesService = service;
     }
 
@@ -65,7 +69,7 @@ public class SubtitlesModel implements MVPModel<List<SubtitleFile>,
 
     @Override
     public List<SubtitleFile> getItems() {
-        if(mData==null) return null;
+        if (mData == null) return null;
         return mData;
     }
 
@@ -77,5 +81,10 @@ public class SubtitlesModel implements MVPModel<List<SubtitleFile>,
     @Override
     public SubtitlesRequestParams getRequestParams() {
         return null;
+    }
+
+    @Override
+    public void injectDependencies(SEApplication application) {
+        application.getSubtitlesModelListDiComponent().inject(this);
     }
 }

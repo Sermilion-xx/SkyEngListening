@@ -26,13 +26,12 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.skyeng.listening.CommonComponents.BaseActivity;
-import ru.skyeng.listening.CommonComponents.Interfaces.ActivityExtensions;
 import ru.skyeng.listening.CommonComponents.SEApplication;
-import ru.skyeng.listening.MVPBase.MVPView;
+import ru.skyeng.listening.CommonComponents.Interfaces.MVPBase.MVPView;
 import ru.skyeng.listening.Modules.AudioFiles.AudioListActivity;
 import ru.skyeng.listening.Modules.Categories.model.AudioTag;
 import ru.skyeng.listening.Modules.Categories.model.CategoriesRequestParams;
-import ru.skyeng.listening.Modules.Categories.network.TagsService;
+import ru.skyeng.listening.Modules.Categories.network.CategoriesService;
 import ru.skyeng.listening.R;
 
 import static ru.skyeng.listening.Modules.AudioFiles.AudioListActivity.TAG_REQUEST_DATA;
@@ -52,16 +51,6 @@ public class CategoriesActivity extends BaseActivity<MVPView, CategoriesPresente
         super.setPresenter(presenter);
     }
 
-    @Inject
-    void setModel(CategoriesModel model) {
-        presenter.setModel(model);
-    }
-
-    @Inject
-    void setRetrofitService(TagsService service){
-        ((CategoriesModel)presenter.getModel()).setRetrofitService(service);
-    }
-
     public void setSelectedTags(List<Integer> selectedTags) {
         this.selectedTags = selectedTags;
     }
@@ -75,15 +64,19 @@ public class CategoriesActivity extends BaseActivity<MVPView, CategoriesPresente
         ((SEApplication) getApplicationContext()).getCategoriesDiComponent().inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_categories);
+        presenter.injectDependencies();
         mProgress = (ProgressBar) findViewById(R.id.progressBar);
         ButterKnife.bind(this);
         setupToolbar(getString(R.string.select_categories), R.drawable.ic_x);
         Gson gson = new Gson();
         Type type = new TypeToken<List<Integer>>(){}.getType();
         setSelectedTags(gson.fromJson(getIntent().getStringExtra(TAG_REQUEST_DATA), type));
+        //вызвать метод презентора с этими данными
+        //активити установит вьюсшт
         if (selectedTags != null) {
             initTagView(selectedTags);
         } else {
+
             selectedTags = new ArrayList<>();
         }
         tagGroup.setOnTagClickListener(new TagView.OnTagClickListener() {
@@ -97,6 +90,8 @@ public class CategoriesActivity extends BaseActivity<MVPView, CategoriesPresente
                 initTagView(selectedTags);
             }
         });
+        //отправить колбак на презентер чтобы проверил
+        //повторный вызов возможен при повороте экрана
         if ((presenter.getModel()).getItems() == null) {
             loadData(false);
         } else {
@@ -109,7 +104,7 @@ public class CategoriesActivity extends BaseActivity<MVPView, CategoriesPresente
     public void loadData(boolean pullToRefresh) {
         if (!pullToRefresh)
             showProgress();
-        presenter.loadData(pullToRefresh, new CategoriesRequestParams());
+        presenter.loadData(pullToRefresh);
     }
 
     public void initTagView(List<Integer> selected) {

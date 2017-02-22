@@ -3,9 +3,6 @@ package ru.skyeng.listening.CommonComponents;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,7 +13,7 @@ import com.hannesdorfmann.mosby.mvp.MvpActivity;
 import com.hannesdorfmann.mosby.mvp.MvpPresenter;
 
 import ru.skyeng.listening.CommonComponents.Interfaces.ActivityExtensions;
-import ru.skyeng.listening.MVPBase.MVPView;
+import ru.skyeng.listening.CommonComponents.Interfaces.MVPBase.MVPView;
 import ru.skyeng.listening.R;
 
 public abstract class BaseActivity

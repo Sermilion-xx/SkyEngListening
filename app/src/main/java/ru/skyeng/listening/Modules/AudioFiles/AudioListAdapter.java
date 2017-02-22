@@ -1,6 +1,6 @@
 package ru.skyeng.listening.Modules.AudioFiles;
 
-import android.graphics.BitmapFactory;
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +17,7 @@ import com.makeramen.roundedimageview.RoundedImageView;
 import java.util.List;
 
 import ru.skyeng.listening.CommonComponents.FacadeCommon;
+import ru.skyeng.listening.CommonComponents.PlayerCallback;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
 import ru.skyeng.listening.Modules.AudioFiles.player.PlayerState;
 import ru.skyeng.listening.R;
@@ -35,16 +36,21 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     private static final String KEY_TITLE = "title";
     private int playingPosition = -1;
-    private AudioListPresenter mPresenter;
-    private AudioListActivity mActivity;
+    private List<AudioFile> mItems;
+    private Context mContext;
+    private PlayerCallback mPlayerCallback;
 
-    public AudioListAdapter(AudioListPresenter presenter){
-        this.mPresenter = presenter;
-        this.mActivity = (AudioListActivity) presenter.getView();
+    public AudioListAdapter(Context context, PlayerCallback callback) {
+        this.mContext = context;
+        this.mPlayerCallback = callback;
     }
 
-    private List<AudioFile> getItems() {
-        return mPresenter.getData();
+    public List<AudioFile> getItems() {
+        return mItems;
+    }
+
+    public void setItems(List<AudioFile> mItems) {
+        this.mItems = mItems;
     }
 
     public void setPlayingPosition(int playingPosition) {
@@ -79,33 +85,26 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         } else if (item.getState() == PlayerState.STOP) {
             setupAudioCover(holder, -1, View.GONE);
         }
-        String category = mPresenter.getActivityContext().getString(R.string.no_category);
+        String category = mContext.getString(R.string.no_category);
         if (item.getTags().size() > 0) {
             category = item.getTags().get(0).get(KEY_TITLE);
         }
         holder.mCategory.setText(category);
-        if (item.getImageFileUrl() != null) {
-            if (item.getImageBitmap() == null) {
-                Glide.with(mPresenter.getActivityContext())
-                        .load(item.getImageFileUrl())
-                        .asBitmap()
-                        .priority(Priority.HIGH)
-                        .centerCrop()
-                        .into(holder.mCoverImage);
-            } else {
-                holder.mCoverImage.setImageBitmap(item.getImageBitmap());
-            }
-        } else {
-            holder.mCoverImage.setImageDrawable(ContextCompat.getDrawable(mPresenter.getActivityContext(), R.drawable.ic_player_cover));
-            item.setImageBitmap(BitmapFactory.decodeResource(mPresenter.getActivityContext().getResources(),
-                    R.drawable.ic_player_cover));
-        }
+        Glide.with(mContext)
+                .load(item.getImageFileUrl())
+                .asBitmap()
+                .priority(Priority.HIGH)
+                .centerCrop()
+                .into(holder.mCoverImage);
+        //плейсхолдер поставть
+        //не делать getDrawable (потому что происходит этов новом треде - тормоз)
+
         holder.mCoverImage.setOnClickListener(getOnClickListener(position, holder, item));
     }
 
     private void setupAudioCover(AudioViewHolder viewHolder, int drawableId, int visibility) {
         if (drawableId > -1) {
-            viewHolder.mPlayPause.setImageDrawable(ContextCompat.getDrawable(mPresenter.getActivityContext(), drawableId));
+            viewHolder.mPlayPause.setImageDrawable(ContextCompat.getDrawable(mContext, drawableId));
         }
         viewHolder.mPlayPause.setVisibility(visibility);
         viewHolder.mDarkLayer.setVisibility(visibility);
@@ -127,7 +126,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         notifyItemChanged(playingPosition);
         item.setState(PlayerState.PLAY);
         notifyItemPlaying(position);
-        mActivity.startPlaying(item);
+        mPlayerCallback.startPlaying(item);
     }
 
     public void onPlayingAudioClicked(AudioFile item, AudioViewHolder viewHolder, int position) {
@@ -135,16 +134,16 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         notifyItemChanged(position);
         int actionType = setPlayPauseIcon(viewHolder, item);
         if (actionType == 1) {
-            mActivity.pausePlayer();
+            mPlayerCallback.pausePlayer();
         } else if (actionType == 2) {
-            mActivity.continuePlaying();
+            mPlayerCallback.continuePlaying();
         }
     }
 
     public void onPlayingNewAudio(AudioFile item, int position) {
         item.setState(PlayerState.PLAY);
         notifyItemPlaying(position);
-        mActivity.startPlaying(item);
+        mPlayerCallback.startPlaying(item);
     }
 
     @NonNull
@@ -177,7 +176,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             icon = R.drawable.ic_pause_blue;
             actionType = 2;
         }
-        viewHolder.mPlayPause.setImageDrawable(ContextCompat.getDrawable(mPresenter.getActivityContext(), icon));
+        viewHolder.mPlayPause.setImageDrawable(ContextCompat.getDrawable(mContext, icon));
         return actionType;
     }
 
@@ -185,8 +184,6 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public int getItemCount() {
         return getItems() != null ? getItems().size() : 0;
     }
-
-
 
     private class AudioViewHolder extends RecyclerView.ViewHolder {
 

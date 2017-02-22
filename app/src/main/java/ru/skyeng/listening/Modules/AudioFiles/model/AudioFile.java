@@ -27,7 +27,6 @@ public class AudioFile implements Parcelable, Comparable<AudioFile>{
     private String description;
     private String audioFileUrl;
     private String imageFileUrl;
-    private Bitmap imageBitmap;
     private int wordsInMinute;
     private Map<String, String> accent;
     private Map<String, String> level;
@@ -64,7 +63,6 @@ public class AudioFile implements Parcelable, Comparable<AudioFile>{
         description = in.readString();
         audioFileUrl = in.readString();
         imageFileUrl = in.readString();
-        imageBitmap = in.readParcelable(Bitmap.class.getClassLoader());
         wordsInMinute = in.readInt();
         durationInSeconds = in.readInt();
         durationInMinutes = in.readString();
@@ -91,15 +89,6 @@ public class AudioFile implements Parcelable, Comparable<AudioFile>{
     public void setDurationInMinutes(String durationInMinutes) {
         this.durationInMinutes = durationInMinutes;
     }
-
-    public Bitmap getImageBitmap() {
-        return imageBitmap;
-    }
-
-    public void setImageBitmap(Bitmap imageBitmap) {
-        this.imageBitmap = imageBitmap;
-    }
-
 
     public int getId() {
         return id;
@@ -201,7 +190,6 @@ public class AudioFile implements Parcelable, Comparable<AudioFile>{
         dest.writeString(description);
         dest.writeString(audioFileUrl);
         dest.writeString(imageFileUrl);
-        dest.writeParcelable(imageBitmap, flags);
         dest.writeInt(wordsInMinute);
         dest.writeInt(durationInSeconds);
         dest.writeString(durationInMinutes);

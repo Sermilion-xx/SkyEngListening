@@ -19,6 +19,7 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 
 import ru.skyeng.listening.CommonComponents.SEApplication;
+import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
 
 /**
  * ---------------------------------------------------
@@ -43,24 +44,33 @@ class AudioPlayer {
     private ExtractorsFactory extractorsFactory;
     private boolean shouldAutoPlay;
     private DataSource.Factory mediaDataSourceFactory;
+    private AudioFile mAudioFile;
 
-    public SimpleExoPlayer getPlayer() {
-        return mPlayer;
-    }
-
-    AudioPlayer(Context context, ExoPlayer.EventListener eventListener){
+    AudioPlayer(Context context, ExoPlayer.EventListener eventListener) {
         shouldAutoPlay = true;
         mEventListener = eventListener;
         mContext = context;
-        state = PlayerState.STOP;
+        setState(PlayerState.STOP);
         mediaDataSourceFactory = buildDataSourceFactory(true);
         extractorsFactory = new DefaultExtractorsFactory();
         initializePlayer();
     }
 
-    void setPlaySource(String url){
+    public void setAudioFile(AudioFile mAudioFile) {
+        this.mAudioFile = mAudioFile;
+    }
+
+    public AudioFile getAudioFile() {
+        return mAudioFile;
+    }
+
+    public SimpleExoPlayer getPlayer() {
+        return mPlayer;
+    }
+
+    void setPlaySource(String url) {
         extraData = url;
-        state = PlayerState.STOP;
+        setState(PlayerState.STOP);
         setMediaSource(url);
     }
 
@@ -70,7 +80,7 @@ class AudioPlayer {
         mPlayer.prepare(mediaSource, true, true);
     }
 
-    public long getCurrentPosition(){
+    public long getCurrentPosition() {
         return mPlayer.getCurrentPosition();
     }
 
@@ -80,6 +90,9 @@ class AudioPlayer {
 
     void setState(PlayerState state) {
         this.state = state;
+        if (mAudioFile != null) {
+            mAudioFile.setState(state);
+        }
     }
 
     public PlayerState getState() {
@@ -87,16 +100,17 @@ class AudioPlayer {
     }
 
     void pause() {
-        state = PlayerState.PAUSE;
+        mAudioFile.setLoading(false);
+        setState(PlayerState.PAUSE);
         mPlayer.setPlayWhenReady(false);
     }
 
     void play() {
-        state = PlayerState.PLAY;
+        setState(PlayerState.PLAY);
         mPlayer.setPlayWhenReady(true);
     }
 
-    void release(){
+    void release() {
         mPlayer.release();
     }
 

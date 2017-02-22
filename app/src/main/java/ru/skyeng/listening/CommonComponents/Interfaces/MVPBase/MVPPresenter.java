@@ -1,8 +1,6 @@
-package ru.skyeng.listening.MVPBase;
+package ru.skyeng.listening.CommonComponents.Interfaces.MVPBase;
 
 import android.content.Context;
-
-import io.reactivex.Observer;
 
 /**
  * ---------------------------------------------------
@@ -14,12 +12,13 @@ import io.reactivex.Observer;
  * ---------------------------------------------------
  */
 
-public interface MVPPresenter<L, P, E> {
+public interface MVPPresenter<M, P, E> {
     Context getAppContext();
     Context getActivityContext();
-    void setModel(MVPModel<L, P, E> models);
+    void setModel(M models);
     void clear();
-    MVPModel<L,P,E> getModel();
+    M getModel();
     P getData();
-    void loadData(boolean pullToRefresh, E params);
+    void loadData(boolean pullToRefresh);
+    void injectDependencies();
 }

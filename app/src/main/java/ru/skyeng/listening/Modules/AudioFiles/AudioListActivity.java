@@ -6,9 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Message;
 import android.os.Messenger;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
@@ -19,7 +17,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -31,8 +28,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.makeramen.roundedimageview.RoundedImageView;
@@ -48,13 +43,11 @@ import butterknife.ButterKnife;
 import ru.skyeng.listening.CommonComponents.BaseActivity;
 import ru.skyeng.listening.CommonComponents.EndlessRecyclerViewScrollListener;
 import ru.skyeng.listening.CommonComponents.FacadeCommon;
+import ru.skyeng.listening.CommonComponents.PlayerCallback;
 import ru.skyeng.listening.CommonComponents.SEApplication;
-import ru.skyeng.listening.MVPBase.MVPView;
-import ru.skyeng.listening.Modules.AudioFiles.model.AudioData;
+import ru.skyeng.listening.CommonComponents.Interfaces.MVPBase.MVPView;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
 import ru.skyeng.listening.Modules.AudioFiles.model.SubtitlesRequestParams;
-import ru.skyeng.listening.Modules.AudioFiles.network.AudioFilesService;
-import ru.skyeng.listening.Modules.AudioFiles.network.SubtitlesService;
 import ru.skyeng.listening.Modules.AudioFiles.player.PlayerService;
 import ru.skyeng.listening.Modules.AudioFiles.player.PlayerState;
 import ru.skyeng.listening.Modules.Categories.CategoriesActivity;
@@ -68,7 +61,7 @@ import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.ACTION
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.ACTION_DID_NOT_STAR;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.BINDER_MESSENGER;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.EXTRA_AUDIO_URL;
-import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.KEY_PLAYER_STATE;
+import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.KEY_CURRENT_AUDIO;
 
 public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter> implements SwipeRefreshLayout.OnRefreshListener, MVPView {
 
@@ -77,45 +70,22 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     public static final int TAG_REQUEST_CODE = 0;
     public static final String TAG_REQUEST_DATA = "tagExtra";
     private static final String KEY_SERVICE_BOUND = "serviceBound";
-
-    protected Toolbar mToolbar;
+    public static final String ACTION_UPDATE_ADAPTER = "updateAdapter";
 
     @Override
     @Inject
     public void setPresenter(@NonNull AudioListPresenter presenter) {
         this.presenter = presenter;
-        super.setPresenter(presenter);
-    }
-
-    @Inject
-    void setModel(AudioListModel model) {
-        presenter.setModel(model);
-    }
-
-    @Inject
-    void setRetrofitService(AudioFilesService audioFilesService) {
-        ((AudioListModel) presenter.getModel()).setRetrofitService(audioFilesService);
-    }
-
-    @Inject
-    void setSubtitleModel(SubtitlesModel model) {
-        presenter.setSubtitlesModel(model);
-    }
-
-    @Inject
-    void setSubtitlesService(SubtitlesService service) {
-        ((SubtitlesModel) presenter.getSubtitlesModel()).setRetrofitService(service);
     }
 
     public static boolean categoriesSelected = false;
     private BottomSheetBehavior mBottomSheetBehavior;
-    private AudioFile mAudioFile;
+
     private List<Integer> mSelectedTags;
 
     private boolean broadcastUpdateFinished;
     private AudioReceiver mPlayerBroadcast;
     boolean mBound = false;
-    private Messenger msgService;
     private EndlessScrollListener mScrollListener;
     private AudioListAdapter mAdapter;
 
@@ -156,10 +126,6 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     @BindView(R.id.swipeContainer)
     SwipeRefreshLayout swipeContainer;
 
-    public RelativeLayout getNoContentFoundLayout() {
-        return mNoContentFoundLayout;
-    }
-
     public void hideNoContentView(){
         mNoContentFoundLayout.setVisibility(View.GONE);
     }
@@ -180,11 +146,28 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         ((SEApplication) getApplicationContext()).getAudioListDiComponent().inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        this.presenter.injectDependencies();
         setupToolbar(getString(R.string.Listening));
         mProgress = (ProgressBar) findViewById(R.id.loadingView);
 
         ButterKnife.bind(this);
-        mAdapter = new AudioListAdapter(presenter);
+        mAdapter = new AudioListAdapter(this, new PlayerCallback() {
+            @Override
+            public void startPlaying(AudioFile audioFile) {
+                presenter.loadSubtitles(new SubtitlesRequestParams(audioFile.getId()));
+                startBufferingMessage(audioFile);
+            }
+
+            @Override
+            public void pausePlayer() {
+                pausePlayerMessage();
+            }
+
+            @Override
+            public void continuePlaying() {
+                continuePlayingMessage();
+            }
+        });
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
@@ -204,11 +187,13 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         mBottomSheetBehavior = BottomSheetBehavior.from(mLayoutBottomSheet);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         restoreSavedInstanceState(savedInstanceState);
-        setupPlayerCoverListener();
+        //TriggersMethod("setupPlayerCoverListener")
+        presenter.sendMessage(null, PlayerService.MESSAGE_PLAYING_FILE_STATE_FOR_COVER);
         mProgress = (ProgressBar) findViewById(R.id.loadingView);
         mAudioProgressBar.setIndeterminate(true);
         mAudioProgressBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(this, R.color.colorWhite), android.graphics.PorterDuff.Mode.MULTIPLY);
         setupListeners();
+        setupPlayerCoverListener();
     }
 
     private void setupListeners() {
@@ -309,6 +294,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
             presenter.getModel().getRequestParams().setTagIds(mSelectedTags);
             getPresenter().clear();
             presenter.getModel().getRequestParams().setPage(1);
+            presenter.clear();
             loadData(false);
         }
     }
@@ -316,7 +302,6 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(KEY_SERVICE_BOUND, mBound);
-        outState.putParcelable(KEY_AUDIO_FILE, mAudioFile);
         outState.putInt(KEY_PROGRESS_VISIBILITY, mAudioProgressBar.getVisibility());
         super.onSaveInstanceState(outState);
     }
@@ -324,9 +309,8 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     private void restoreSavedInstanceState(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             mBound = savedInstanceState.getBoolean(KEY_SERVICE_BOUND);
-            mAudioFile = savedInstanceState.getParcelable(KEY_AUDIO_FILE);
             if (!broadcastUpdateFinished) {
-                updatePlayerUI();
+//                updatePlayerUI();
             }
         }
     }
@@ -336,10 +320,10 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         loadData(true);
     }
 
-    public void updateAdapter(List<AudioFile> data) {
-        if (mAudioFile != null) {
+    public void updateAdapter(List<AudioFile> data, AudioFile currentFile) {
+        if (currentFile != null) {
             for (int i = 0; i < data.size(); i++) {
-                if (data.get(i).getId() == mAudioFile.getId()) {
+                if (data.get(i).getId() == currentFile.getId()) {
                     data.get(i).setState(PlayerState.PLAY);
                 }
             }
@@ -353,46 +337,46 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
             mScrollListener.resetState();
             presenter.clear();
         }
-        presenter.loadData(pullToRefresh, presenter.getModel().getRequestParams());
+        presenter.loadData(pullToRefresh);
     }
     //--------------------------Player UI----------------------------------------//
-    private void setupPlayerCoverListener() {
+    public void setupPlayerCoverListener() {
         audioCoverImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mAdapter.getPlayingPosition() != -1) {
-                    PlayerState audioState = mAudioFile.getState();
-                    int icon;
-                    PlayerState state;
-                    if (audioState == PlayerState.PLAY) {
-                        state = PlayerState.PAUSE;
-                        icon = R.drawable.ic_play_white;
-                        pausePlayerMessage();
-                    } else {
-                        state = PlayerState.PLAY;
-                        icon = R.drawable.ic_pause_white;
-                        continuePlayingMessage();
-                    }
-                    mAdapter.setPlayerState(state);
-                    audioPlayPause.setImageDrawable(ContextCompat.getDrawable(AudioListActivity.this, icon));
-                    if (audioState == PlayerState.STOP) {
-                        mDarkLayer.setVisibility(View.GONE);
-                        audioPlayPause.setVisibility(View.VISIBLE);
-                    } else {
-                        mDarkLayer.setVisibility(View.VISIBLE);
-                    }
-                }
+                presenter.sendMessage(null, PlayerService.MESSAGE_PLAYING_FILE_STATE_FOR_COVER);
             }
         });
     }
 
-    private void updatePlayerUI() {
+    public void onPlayerCoverClick(PlayerState audioState) {
+        if (mAdapter.getPlayingPosition() != -1) {
+            int icon;
+            PlayerState state;
+            if (audioState == PlayerState.PLAY) {
+                state = PlayerState.PAUSE;
+                icon = R.drawable.ic_play_white;
+                pausePlayerMessage();
+            } else {
+                state = PlayerState.PLAY;
+                icon = R.drawable.ic_pause_white;
+                continuePlayingMessage();
+            }
+            mAdapter.setPlayerState(state);
+            audioPlayPause.setImageDrawable(ContextCompat.getDrawable(AudioListActivity.this, icon));
+            if (audioState == PlayerState.STOP) {
+                mDarkLayer.setVisibility(View.GONE);
+                audioPlayPause.setVisibility(View.VISIBLE);
+            } else {
+                mDarkLayer.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    public void updatePlayerUI(AudioFile mAudioFile) {
         if (mAudioFile != null) {
             audioTitle.setText(mAudioFile.getTitle());
             audioSeek.setMax(mAudioFile.getDurationInSeconds());
-            if (mAudioFile.getImageBitmap() != null) {
-                audioCoverImage.setImageBitmap(mAudioFile.getImageBitmap());
-            }
             int icon = R.drawable.ic_pause_white;
             if (mAudioFile.getState() == PlayerState.PLAY && !mAudioFile.isLoading()) {
                 hideAudioLoading();
@@ -411,19 +395,6 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         }
     }
 
-    public void startPlaying(AudioFile item) {
-        presenter.loadSubtitles(new SubtitlesRequestParams(item.getId()));
-        startBufferingMessage(item);
-    }
-
-    public void continuePlaying() {
-        continuePlayingMessage();
-    }
-
-    public void pausePlayer() {
-        pausePlayerMessage();
-    }
-
     private void hideAudioLoading() {
         mAudioProgressBar.setVisibility(View.GONE);
     }
@@ -440,40 +411,24 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         Glide.with(this)
                 .load(audioFile.getImageFileUrl())
                 .asBitmap()
-                .priority(Priority.HIGH).listener(new RequestListener<String, Bitmap>() {
-            @Override
-            public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
-                return false;
-            }
-
-            @Override
-            public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                mAudioFile.setImageBitmap(resource);
-                audioCoverImage.setImageBitmap(resource);
-                return false;
-            }
-        }).into(audioCoverImage);
+                .priority(Priority.HIGH)
+                .placeholder(R.drawable.ic_player_cover)
+                .into(audioCoverImage);
         audioSubtitles.setText(getString(R.string.dash));
-        mAudioFile = audioFile;
-        mAudioFile.setLoading(true);
-        updatePlayerUI();
+
+        audioFile.setLoading(true);
+        updatePlayerUI(audioFile);
         bindPlayerService();
         Bundle bundle = new Bundle();
         bundle.putString(EXTRA_AUDIO_URL, audioFile.getAudioFileUrl());
-        presenter.sendMessage(bundle, PlayerService.MESSAGE_START_BUFFERING);
+        presenter.sendMessage(bundle, PlayerService.MESSAGE_START_BUFFERING, audioFile);
     }
 
     public void continuePlayingMessage() {
-        updatePlayerUI();
-        if (mAudioFile != null)
-            mAudioFile.setState(PlayerState.PLAY);
         presenter.sendMessage(null, PlayerService.MESSAGE_CONTINUE);
     }
 
     public void pausePlayerMessage() {
-        if (mAudioFile != null)
-            mAudioFile.setState(PlayerState.PAUSE);
-        updatePlayerUI();
         presenter.sendMessage(null, PlayerService.MESSAGE_PAUSE);
     }
 
@@ -484,19 +439,12 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
 
 //--------------------------Player UI----------------------------------------//
 //-----------------------Lifecycle Methods-----------------------------------//
-
     @Override
     public void onResume() {
         if(modelHasData()){
             updateButtonsVisibility();
         }
-        if (mAudioFile != null) {
-            if (mAudioFile.isLoading()) {
-                mAudioFile.setLoading(false);
-                mAudioFile.setState(PlayerState.PLAY);
-                updatePlayerUI();
-            }
-        }
+        presenter.sendMessage(null, PlayerService.MESSAGE_UPDATE_PLAYER_UI);
         mPlayerBroadcast = new AudioReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ACTION_DID_NOT_STAR);
@@ -530,18 +478,15 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
 
 //--------------------------Lifecycle Methods--------------------------------//
 //---------------------------------------------------------------------------//
-    public void handleSubtitleMessage(Message message) {
-        long time = (long) message.obj * 1000;
+    public void handleSubtitleMessage(long time) {
         if (presenter.getSubtitleEngine().size() > 0)
             audioSubtitles.setText(presenter.getSubtitleEngine().updateSubtitles(time).getTextEn());
     }
 
-    public void handlePlaybackTimeMessage(Message message) {
-        long time = (long) message.obj / 1000;
-        audioSeek.setProgress((int) time);
-        audioPlayed.setText(FacadeCommon.getDateFromMillis((Long) message.obj));
-        long duration = mAudioFile.getDurationInSeconds();
-        audioLeft.setText(String.format(getString(R.string.leftTime), FacadeCommon.getDateFromMillis(duration * 1000 - (long) message.obj)));
+    public void handlePlaybackTimeMessage(long elapsedTime, long duration) {
+        audioSeek.setProgress((int) elapsedTime/1000);
+        audioPlayed.setText(FacadeCommon.getDateFromMillis(elapsedTime));
+        audioLeft.setText(String.format(getString(R.string.leftTime), FacadeCommon.getDateFromMillis(duration * 1000 - elapsedTime)));
     }
 
     public void bindPlayerService() {
@@ -562,8 +507,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(ACTION_AUDIO_STATE)) {
-                mAudioFile.setLoading(intent.getBooleanExtra(KEY_PLAYER_STATE, false));
-                updatePlayerUI();
+                updatePlayerUI(intent.getParcelableExtra(KEY_CURRENT_AUDIO));
                 broadcastUpdateFinished = true;
             } else if (intent.getAction().equals(ACTION_DID_NOT_STAR)) {
                 hideAudioLoading();
@@ -584,6 +528,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
 
         @Override
         public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+            //эта логика должна быть в презентере
             if(totalItemsCount>14){
                 presenter.getModel().getRequestParams().setPage(presenter.getModel().getRequestParams().getPage() + 1);
                 loadData(false);
@@ -591,21 +536,21 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         }
     }
 
-    public void onNext(AudioData value) {
-        if (value.getPrimaryData().size() == 0 && presenter.getModel().getRequestParams().getPage() == 1) {
+    public void updatePlayList(List<AudioFile> value) {
+        if (value.size() == 0 && presenter.getModel().getRequestParams().getPage() == 1) {
             showNoContentView();
         } else {
             hideNoContentView();
             mAdapter.setPlayingPosition(-1);
         }
-        updateAdapter(value.getPrimaryData());
+        mAdapter.setItems(value);
+        presenter.sendMessage(null, PlayerService.MESSAGE_UPDATE_ADAPTER);
     }
 
     public void onError(Throwable e) {
         hideProgress();
         if (presenter.getModel().getItems() == null)
-            getNoContentFoundLayout().setVisibility(View.VISIBLE);
-        updateAdapter(new ArrayList<>());
+            mNoContentFoundLayout.setVisibility(View.VISIBLE);
         e.printStackTrace();
     }
 
@@ -618,4 +563,9 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     public Context getActivityContext() {
         return this;
     }
+
+    public void handleUpdateAdapterMessage(AudioFile currentFile){
+        updateAdapter(mAdapter.getItems(), currentFile);
+    }
+
 }

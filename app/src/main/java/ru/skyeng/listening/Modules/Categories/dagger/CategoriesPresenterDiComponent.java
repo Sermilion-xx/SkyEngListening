@@ -2,12 +2,8 @@ package ru.skyeng.listening.Modules.Categories.dagger;
 
 import javax.inject.Singleton;
 
-import dagger.Module;
-import dagger.Provides;
-import ru.skyeng.listening.CommonComponents.ServiceGenerator;
-import ru.skyeng.listening.Modules.Categories.CategoriesModel;
+import dagger.Component;
 import ru.skyeng.listening.Modules.Categories.CategoriesPresenter;
-import ru.skyeng.listening.Modules.Categories.network.CategoriesService;
 
 /**
  * ---------------------------------------------------
@@ -18,14 +14,8 @@ import ru.skyeng.listening.Modules.Categories.network.CategoriesService;
  * <a href="http://www.github.com/sermilion>github</a>
  * ---------------------------------------------------
  */
-
-@Module
-class CategoriesModule {
-
-    @Provides
-    @Singleton
-    CategoriesPresenter getCategoriesPresenter(){
-        return new CategoriesPresenter();
-    }
-
+@Singleton
+@Component(modules = {CategoriesPresenterModule.class})
+public interface CategoriesPresenterDiComponent {
+    void inject(CategoriesPresenter presenter);
 }

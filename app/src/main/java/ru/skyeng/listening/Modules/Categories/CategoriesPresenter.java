@@ -6,12 +6,14 @@ import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import ru.skyeng.listening.CommonComponents.Interfaces.ActivityExtensions;
-import ru.skyeng.listening.MVPBase.MVPModel;
-import ru.skyeng.listening.MVPBase.MVPPresenter;
-import ru.skyeng.listening.MVPBase.MVPView;
+import ru.skyeng.listening.CommonComponents.Interfaces.MVPBase.MVPPresenter;
+import ru.skyeng.listening.CommonComponents.Interfaces.MVPBase.MVPView;
+import ru.skyeng.listening.CommonComponents.SEApplication;
 import ru.skyeng.listening.Modules.Categories.model.AudioTag;
 import ru.skyeng.listening.Modules.Categories.model.CategoriesRequestParams;
 import ru.skyeng.listening.Modules.Categories.model.TagsData;
@@ -28,11 +30,70 @@ import ru.skyeng.listening.Modules.Categories.model.TagsData;
 
 public class CategoriesPresenter extends MvpBasePresenter<MVPView>
         implements MVPPresenter<
-        TagsData,
+        CategoriesModel,
         List<AudioTag>,
         CategoriesRequestParams> {
 
     private CategoriesModel mModel;
+    private CategoriesRequestParams mRequestParams;
+
+    public CategoriesPresenter(){
+        this.mRequestParams = new CategoriesRequestParams();
+    }
+
+    @Override
+    @Inject
+    public void setModel(CategoriesModel model) {
+        this.mModel = model;
+        this.mModel.injectDependencies((SEApplication) getAppContext());
+    }
+
+    @Override
+    public CategoriesModel getModel() {
+        return mModel;
+    }
+
+    @Override
+    public void clear() {
+        getData().clear();
+    }
+
+
+    @Override
+    public List<AudioTag> getData() {
+        return getModel().getItems();
+    }
+
+    @Override
+    public void loadData(boolean pullToRefresh) {
+        mModel.loadData(new Observer<TagsData>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(TagsData value) {
+                getModel().setData(value);
+                if (getActivityContext() != null) {
+                    ((CategoriesActivity) getActivityContext()).initTagView(((CategoriesActivity) getActivityContext()).getSelectedTags());
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+                if (getView() != null) {
+                    ((ActivityExtensions) getActivityContext()).hideProgress();
+                }
+
+            }
+        }, mRequestParams);
+    }
 
     @Override
     public Context getAppContext() {
@@ -51,51 +112,7 @@ public class CategoriesPresenter extends MvpBasePresenter<MVPView>
     }
 
     @Override
-    public void setModel(MVPModel<TagsData, List<AudioTag>, CategoriesRequestParams> model) {
-        this.mModel = (CategoriesModel) model;
+    public void injectDependencies() {
+        ((SEApplication) getAppContext()).getCategoriesPresenterDiComponent().inject(this);
     }
-
-    @Override
-    public void clear() {
-        getData().clear();
-    }
-
-    @Override
-    public MVPModel<TagsData, List<AudioTag>, CategoriesRequestParams> getModel() {
-        return mModel;
-    }
-
-    @Override
-    public List<AudioTag> getData() {
-        return getModel().getItems();
-    }
-
-    @Override
-    public void loadData(boolean pullToRefresh, CategoriesRequestParams params) {
-        mModel.loadData(new Observer<TagsData>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
-
-            @Override
-            public void onNext(TagsData value) {
-                getModel().setData(value);
-                if(getActivityContext()!=null){
-                    ((CategoriesActivity) getActivityContext()).initTagView(((CategoriesActivity) getActivityContext()).getSelectedTags());
-                }
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onComplete() {
-                ((ActivityExtensions) getActivityContext()).hideProgress();
-
-            }
-    }, params);
-}
 }

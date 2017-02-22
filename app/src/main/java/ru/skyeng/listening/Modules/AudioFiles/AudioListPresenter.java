@@ -12,27 +12,33 @@ import android.os.RemoteException;
 
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import javax.inject.Inject;
 
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
+import ru.skyeng.listening.CommonComponents.Interfaces.MVPBase.MVPModel;
+import ru.skyeng.listening.CommonComponents.Interfaces.MVPBase.MVPPresenter;
+import ru.skyeng.listening.CommonComponents.Interfaces.MVPBase.MVPView;
+import ru.skyeng.listening.CommonComponents.SEApplication;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioData;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFilesRequestParams;
-import ru.skyeng.listening.MVPBase.MVPModel;
-import ru.skyeng.listening.MVPBase.MVPPresenter;
-import ru.skyeng.listening.MVPBase.MVPView;
 import ru.skyeng.listening.Modules.AudioFiles.model.SubtitleEngine;
 import ru.skyeng.listening.Modules.AudioFiles.model.SubtitleFile;
 import ru.skyeng.listening.Modules.AudioFiles.model.SubtitlesRequestParams;
+import ru.skyeng.listening.Modules.AudioFiles.player.PlayerService;
+import ru.skyeng.listening.Modules.AudioFiles.player.PlayerState;
 import ru.skyeng.listening.Modules.Settings.model.SettingsObject;
 import ru.skyeng.listening.Utility.FacadePreferences;
 
+import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.AUDIO_DURATION;
+import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.AUDIO_ELAPSED_TIME;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAGE_PLAYBACK_TIME;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAGE_SUBTITLE_TIME;
+import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAGE_UPDATE_ADAPTER;
+import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAGE_UPDATE_PLAYER_UI;
 
 /**
  * ---------------------------------------------------
@@ -47,7 +53,7 @@ import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAG
 public class AudioListPresenter
         extends MvpBasePresenter<MVPView>
         implements MVPPresenter<
-        AudioData,
+        AudioListModel,
         List<AudioFile>,
         AudioFilesRequestParams> {
 
@@ -57,12 +63,33 @@ public class AudioListPresenter
     private Messenger msgService;
     private SubtitleEngine mSubtitleEngine;
     private AudioListActivity mActivity;
+    private AudioFilesRequestParams mRequestParams;
 
+    @Inject
+    public void setModel(AudioListModel model) {
+        mModel = model;
+        mModel.injectDependencies((SEApplication) getAppContext());
+    }
+
+    @Inject
+    void setSubtitleModel(SubtitlesModel model) {
+        mSubtitlesModel = model;
+        mSubtitlesModel.injectDependencies((SEApplication) getAppContext());
+    }
+
+    @Inject
+    void setSubtitleEngine(SubtitleEngine engine) {
+        mSubtitleEngine = engine;
+    }
+
+    @Inject
+    public void setSubtitlesModel(SubtitlesModel model) {
+        this.mSubtitlesModel = model;
+    }
 
 
     public AudioListPresenter() {
-        mSubtitleEngine = new SubtitleEngine();
-
+        mRequestParams = new AudioFilesRequestParams();
     }
 
     public SubtitleEngine getSubtitleEngine() {
@@ -70,23 +97,12 @@ public class AudioListPresenter
     }
 
     @Override
-    public void setModel(MVPModel<AudioData, List<AudioFile>, AudioFilesRequestParams> model) {
-        this.mModel = (AudioListModel) model;
-    }
-
-    @Override
     public void clear() {
         getData().clear();
     }
 
-    public void setSubtitlesModel(MVPModel<List<SubtitleFile>, List<SubtitleFile>, SubtitlesRequestParams> model) {
-        this.mSubtitlesModel = (SubtitlesModel) model;
-    }
-
     @Override
-    public MVPModel<AudioData,
-            List<AudioFile>,
-            AudioFilesRequestParams> getModel() {
+    public AudioListModel getModel() {
         return mModel;
     }
 
@@ -106,34 +122,18 @@ public class AudioListPresenter
     }
 
     @Override
-    public void loadData(final boolean pullToRefresh, AudioFilesRequestParams params) {
-        if(mActivity== null) {
+    public void loadData(final boolean pullToRefresh) {
+        if (mActivity == null) {
             mActivity = (AudioListActivity) getActivityContext();
         }
-        if(params==null) {
-            params = new AudioFilesRequestParams();
-        }
         SettingsObject settingsObject = FacadePreferences.getSettingsFromPref(getActivityContext());
-        if(settingsObject!=null) {
-            params.setAccentIds(new ArrayList<>(settingsObject.getAccentIds()));
-            params.setLevelId(settingsObject.getLevel());
-            List<Integer> durationValues = settingsObject.getDuration();
-            Map<String, Integer> paramsMap = new HashMap<>();
-            int valueIndex = 0;
-            for(int i = 0; i<durationValues.size()/2; i++) {
-                for(int j = 0; j < 2; j ++) {
-                    paramsMap.put("durations["+i+"]["+j+"]", durationValues.get(valueIndex));
-                    valueIndex ++;
-                }
-            }
-            params.setDuration(paramsMap);
-        }
-
+        mRequestParams.prepareDurations(settingsObject);
         mModel.loadData(new Observer<AudioData>() {
-
             @Override
             public void onSubscribe(Disposable d) {
-                mActivity.showProgress();
+                if (!pullToRefresh) {
+                    mActivity.showProgress();
+                }
             }
 
             @Override
@@ -143,7 +143,7 @@ public class AudioListPresenter
                 } else if (mModel.getItems().size() > 0) {
                     mModel.addData(value);
                 }
-                mActivity.onNext(value);
+                mActivity.updatePlayList(mModel.getItems());
             }
 
             @Override
@@ -153,17 +153,17 @@ public class AudioListPresenter
 
             @Override
             public void onComplete() {
-                if (getActivityContext() != null) {
+                if (getActivityContext() != null && !pullToRefresh) {
                     mActivity.hideProgress();
                     mActivity.updateButtonsVisibility();
                 }
                 if (pullToRefresh)
                     mActivity.setRefreshing(false);
             }
-        }, params);
+        }, mRequestParams);
     }
 
-    public void loadSubtitles(SubtitlesRequestParams params){
+    public void loadSubtitles(SubtitlesRequestParams params) {
         mSubtitlesModel.loadData(new Observer<List<SubtitleFile>>() {
 
             @Override
@@ -210,6 +210,7 @@ public class AudioListPresenter
             mBound = true;
             msgService = new Messenger(binder);
         }
+
         public void onServiceDisconnected(ComponentName className) {
             mBound = false;
         }
@@ -224,7 +225,7 @@ public class AudioListPresenter
                     message.obj = obj[0];
                 }
                 message.setData(bundle);
-                msgService.send(message); //sending message to service
+                msgService.send(message);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -234,13 +235,23 @@ public class AudioListPresenter
     public Handler playbackHandler = new Handler() {
         public void handleMessage(Message message) {
             if (message.what == MESSAGE_PLAYBACK_TIME) {
-                mActivity.handlePlaybackTimeMessage(message);
+                Bundle bundle = (Bundle) message.obj;
+                mActivity.handlePlaybackTimeMessage(bundle.getLong(AUDIO_ELAPSED_TIME), bundle.getLong(AUDIO_DURATION));
             } else if (message.what == MESSAGE_SUBTITLE_TIME) {
-                mActivity.handleSubtitleMessage(message);
+                long time = (long) message.obj;
+                mActivity.handleSubtitleMessage(time);
+            } else if (message.what == PlayerService.MESSAGE_PLAYING_FILE_STATE_FOR_COVER) {
+                mActivity.onPlayerCoverClick((PlayerState) message.obj);
+            } else if (message.what == MESSAGE_UPDATE_PLAYER_UI) {
+                mActivity.updatePlayerUI((AudioFile) message.obj);
+            } else if(message.what == MESSAGE_UPDATE_ADAPTER) {
+                mActivity.handleUpdateAdapterMessage((AudioFile) message.obj);
             }
         }
     };
 
-
-
+    @Override
+    public void injectDependencies() {
+        ((SEApplication) getAppContext()).getAudioListPresenterDiComponent().inject(this);
+    }
 }

@@ -46,6 +46,7 @@
     <string name="upperintermediate">Upper-Intermediate</string>
     <string name="advanced">Advanced</string>
     <string name="no_email_client">У вас не установленн ни один почтовы клиент.</string>
+    <string name="skyeng_listening">SkyEng Listening</string>
 
 
     <string-array name="notification_days">

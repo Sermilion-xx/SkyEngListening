@@ -4,15 +4,18 @@ import android.os.Bundle;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import ru.skyeng.listening.CommonComponents.SEApplication;
 import ru.skyeng.listening.Modules.Categories.model.CategoriesRequestParams;
-import ru.skyeng.listening.MVPBase.MVPModel;
+import ru.skyeng.listening.CommonComponents.Interfaces.MVPBase.MVPModel;
 import ru.skyeng.listening.Modules.Categories.model.AudioTag;
 import ru.skyeng.listening.Modules.Categories.model.TagsData;
-import ru.skyeng.listening.Modules.Categories.network.TagsService;
+import ru.skyeng.listening.Modules.Categories.network.CategoriesService;
 
 import static ru.skyeng.listening.CommonComponents.Constants.CURRENT_PAGE;
 import static ru.skyeng.listening.CommonComponents.Constants.LAST_PAGE;
@@ -29,20 +32,24 @@ import static ru.skyeng.listening.CommonComponents.Constants.LAST_PAGE;
 
 public class CategoriesModel implements MVPModel<TagsData, List<AudioTag>, CategoriesRequestParams> {
 
-    private TagsService mTagsService;
+    private CategoriesService mCategoriesService;
     private TagsData mData;
-    private CategoriesRequestParams mParams;
+    private CategoriesRequestParams mRequestParams;
 
-    public void setRetrofitService(TagsService service) {
-        mTagsService = service;
-        mParams = new CategoriesRequestParams();
+    public CategoriesModel(){
+        mRequestParams = new CategoriesRequestParams();
+    }
+
+    @Inject
+    void setCategoriesService(CategoriesService service){
+        mCategoriesService = service;
     }
 
     @Override
     public void loadData(Observer<TagsData> observable, CategoriesRequestParams params) {
         if(params==null)
             params = new CategoriesRequestParams();
-        Observable<TagsData> tagsDataObservable = mTagsService.getTags(
+        Observable<TagsData> tagsDataObservable = mCategoriesService.getTags(
                 params.getPage(),
                 params.getPageSize())
                 .subscribeOn(Schedulers.io())
@@ -81,6 +88,11 @@ public class CategoriesModel implements MVPModel<TagsData, List<AudioTag>, Categ
 
     @Override
     public CategoriesRequestParams getRequestParams() {
-        return mParams;
+        return mRequestParams;
+    }
+
+    @Override
+    public void injectDependencies(SEApplication application) {
+        application.getCategoriesModelDiComponent().inject(this);
     }
 }

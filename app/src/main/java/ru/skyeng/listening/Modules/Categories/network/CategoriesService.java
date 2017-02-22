@@ -15,7 +15,7 @@ import ru.skyeng.listening.Modules.Categories.model.TagsData;
  * ---------------------------------------------------
  */
 
-public interface TagsService {
+public interface CategoriesService {
 
     @GET("/tags")
     Observable<TagsData> getTags(

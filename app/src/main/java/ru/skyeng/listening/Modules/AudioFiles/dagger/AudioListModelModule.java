@@ -1,13 +1,13 @@
-package ru.skyeng.listening.Modules.Categories.dagger;
+package ru.skyeng.listening.Modules.AudioFiles.dagger;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
 import ru.skyeng.listening.CommonComponents.ServiceGenerator;
-import ru.skyeng.listening.Modules.Categories.CategoriesModel;
-import ru.skyeng.listening.Modules.Categories.CategoriesPresenter;
-import ru.skyeng.listening.Modules.Categories.network.CategoriesService;
+import ru.skyeng.listening.Modules.AudioFiles.AudioListPresenter;
+import ru.skyeng.listening.Modules.AudioFiles.network.AudioFilesService;
+import ru.skyeng.listening.Modules.AudioFiles.network.SubtitlesService;
 
 /**
  * ---------------------------------------------------
@@ -20,12 +20,12 @@ import ru.skyeng.listening.Modules.Categories.network.CategoriesService;
  */
 
 @Module
-class CategoriesModule {
+class AudioListModelModule {
 
     @Provides
-    @Singleton
-    CategoriesPresenter getCategoriesPresenter(){
-        return new CategoriesPresenter();
+    AudioFilesService getAudioFilesService(){
+        ServiceGenerator serviceGenerator = new ServiceGenerator();
+        return serviceGenerator.createService(AudioFilesService.class);
     }
 
 }

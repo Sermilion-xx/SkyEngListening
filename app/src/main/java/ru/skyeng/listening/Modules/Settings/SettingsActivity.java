@@ -453,7 +453,4 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         }
         return super.onOptionsItemSelected(item);
     }
-
-
-
 }

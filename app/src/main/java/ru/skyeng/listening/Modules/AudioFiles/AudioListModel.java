@@ -2,24 +2,21 @@ package ru.skyeng.listening.Modules.AudioFiles;
 
 import android.os.Bundle;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import ru.skyeng.listening.CommonComponents.Constants;
+import ru.skyeng.listening.CommonComponents.SEApplication;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioData;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFilesRequestParams;
-import ru.skyeng.listening.Modules.AudioFiles.model.SubtitlesRequestParams;
 import ru.skyeng.listening.Modules.AudioFiles.network.AudioFilesService;
-import ru.skyeng.listening.MVPBase.MVPModel;
-import ru.skyeng.listening.Modules.Settings.model.SettingsObject;
-import ru.skyeng.listening.Utility.FacadePreferences;
+import ru.skyeng.listening.CommonComponents.Interfaces.MVPBase.MVPModel;
 
 import static ru.skyeng.listening.CommonComponents.Constants.LAST_PAGE;
 
@@ -42,6 +39,11 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
 
     public AudioListModel(){
         mRequestParams = new AudioFilesRequestParams();
+    }
+
+    @Inject
+    void setAudioFilesService(AudioFilesService audioFilesService) {
+        this.audioFilesService = audioFilesService;
     }
 
 
@@ -101,6 +103,11 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
     @Override
     public AudioFilesRequestParams getRequestParams() {
         return mRequestParams;
+    }
+
+    @Override
+    public void injectDependencies(SEApplication application) {
+        application.getAudioListModelDiComponent().inject(this);
     }
 
 }

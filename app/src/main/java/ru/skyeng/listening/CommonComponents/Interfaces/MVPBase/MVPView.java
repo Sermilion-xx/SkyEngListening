@@ -1,9 +1,8 @@
-package ru.skyeng.listening.MVPBase;
+package ru.skyeng.listening.CommonComponents.Interfaces.MVPBase;
 
 import android.content.Context;
 
 import com.hannesdorfmann.mosby.mvp.MvpView;
-import com.hannesdorfmann.mosby.mvp.lce.MvpLceView;
 
 /**
  * ---------------------------------------------------

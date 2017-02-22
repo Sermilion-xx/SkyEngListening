@@ -1,8 +1,9 @@
-package ru.skyeng.listening.MVPBase;
+package ru.skyeng.listening.CommonComponents.Interfaces.MVPBase;
 
 import android.os.Bundle;
 
 import io.reactivex.Observer;
+import ru.skyeng.listening.CommonComponents.SEApplication;
 
 /**
  * ---------------------------------------------------
@@ -22,4 +23,5 @@ public interface MVPModel<L, P, E> {
     P getItems();
     Bundle getExtraData();
     E getRequestParams();
+    void injectDependencies(SEApplication application);
 }

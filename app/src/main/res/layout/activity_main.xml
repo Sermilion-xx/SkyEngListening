@@ -152,7 +152,6 @@
         android:background="@color/almostWhite"
         app:behavior_hideable="true"
         app:elevation="16dp"
-
         app:layout_behavior="@string/bottom_sheet_behavior">
 
         <FrameLayout

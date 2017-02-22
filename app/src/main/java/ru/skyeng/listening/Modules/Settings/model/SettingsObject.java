@@ -1,5 +1,6 @@
 package ru.skyeng.listening.Modules.Settings.model;
 
+import android.support.v4.util.Pair;
 import android.util.SparseIntArray;
 
 import java.util.ArrayList;
@@ -20,6 +21,14 @@ import java.util.Set;
 
 public class SettingsObject {
 
+    private static final int START_1 = 0;
+    private static final int END_1 = 300;
+    private static final int START_2 = 300;
+    private static final int END_2 = 600;
+    private static final int START_3 = 600;
+    private static final int END_3 = 1200;
+    private static final int START_4 = 1200;
+    private static final int END_4 = 2400;
     private int level;
     private Set<Integer> accentIds;
     private boolean intAccent;
@@ -30,7 +39,8 @@ public class SettingsObject {
     //0 - weekends, 1 - weekdays, 2 - everyday
     //3,4,5,6,7,8,9 - mon - sun
     private int remindEvery;
-    private List<Integer> duration;
+    //    private List<Integer> duration;
+    private List<Pair<Integer, Integer>> duration;
     private Calendar time;
 
 
@@ -57,26 +67,30 @@ public class SettingsObject {
     }
 
     public void setDuration(boolean[] index) {
+        boolean allZeros = true;
         duration.clear();
         int one = 0;
-        int two = 5*60;
-        for(int i=0; i<index.length; i++){
-            if(index[i]){
-                duration.add(one);
-                duration.add(two);
-            }else {
-                duration.add(-1);
-                duration.add(-1);
+        int two = 5 * 60;
+        for (int i = 0; i < index.length; i++) {
+            if (index[i]) {
+                duration.add(new Pair<>(one, two));
+                allZeros = false;
+            } else {
+                duration.add(new Pair<>(0, 0));
             }
             one = two;
-            two = one*2;
-            if(i==3){
+            two = one * 2;
+            if (i == 3) {
                 two = 360;
             }
         }
+        if(allZeros){
+            duration.clear();
+            duration.add(new Pair<>(START_1,END_4));
+        }
     }
 
-    public List<Integer> getDuration() {
+    public List<Pair<Integer, Integer>> getDuration() {
         return duration;
     }
 
@@ -84,25 +98,21 @@ public class SettingsObject {
         boolean allFalse = true;
         SparseIntArray map = new SparseIntArray();
         //durations: 0, 300, 300, 600, 600, 1200, 1200, 2400
-        map.put(0, 300);
-        map.put(300, 600);
-        map.put(600, 1200);
-        map.put(1200, 2400);
+        map.put(START_1, END_1);
+        map.put(START_2, END_2);
+        map.put(START_3, END_3);
+        map.put(START_4, END_4);
         boolean[] values = new boolean[4];
-        int index1 = 0;
-        for(int i=0; i<duration.size(); i++){
-            if(i+1<duration.size()) {
-                if (map.get(duration.get(index1)) == duration.get(i + 1)) {
-                    if(i<values.length) {
-                        values[i] = true;
-                        allFalse = false;
-                    }
+        for (int i = 0; i < duration.size(); i++) {
+            if (map.get(duration.get(i).first) == duration.get(i).second) {
+                if (i < values.length) {
+                    values[i] = true;
+                    allFalse = false;
                 }
-                index1++;
             }
         }
-        if(allFalse){
-            for(int i = 0; i<values.length; i++){
+        if (allFalse) {
+            for (int i = 0; i < values.length; i++) {
                 values[i] = false;
             }
         }
@@ -121,7 +131,7 @@ public class SettingsObject {
         this.remindEvery = remindEvery;
     }
 
-    public void setDuration(List<Integer> duration) {
+    public void setDuration(List<Pair<Integer, Integer>> duration) {
         this.duration = duration;
     }
 
@@ -154,10 +164,11 @@ public class SettingsObject {
     }
 
     public boolean isAllAccents() {
-        return accentIds.size()==3;
+        return accentIds.size() == 3;
     }
 
-    public void setAllAccents(boolean allAccents) {;
+    public void setAllAccents(boolean allAccents) {
+        ;
         if (allAccents) {
             intAccent = true;
             britishAccent = true;
@@ -182,7 +193,7 @@ public class SettingsObject {
         this.intAccent = intAccent;
         if (!intAccent) {
             accentIds.remove(Integer.valueOf(5));
-        }else {
+        } else {
             accentIds.add(5);
         }
     }
@@ -195,7 +206,7 @@ public class SettingsObject {
         this.britishAccent = britishAccent;
         if (britishAccent) {
             accentIds.add(4);
-        }else {
+        } else {
             accentIds.remove(Integer.valueOf(4));
         }
     }
@@ -206,13 +217,12 @@ public class SettingsObject {
 
     public void setAmericanAccent(boolean americanAccent) {
         this.americanAccent = americanAccent;
-        if(americanAccent){
+        if (americanAccent) {
             accentIds.add(3);
-        }else {
+        } else {
             accentIds.remove(Integer.valueOf(3));
         }
     }
-
 
 
 }
