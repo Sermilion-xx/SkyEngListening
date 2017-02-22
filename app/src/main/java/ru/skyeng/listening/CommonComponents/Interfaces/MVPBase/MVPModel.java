@@ -22,6 +22,5 @@ public interface MVPModel<L, P, E> {
     P processResult(L data);
     P getItems();
     Bundle getExtraData();
-    E getRequestParams();
     void injectDependencies(SEApplication application);
 }

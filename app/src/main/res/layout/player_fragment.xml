@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:clickable="true"
+    android:id="@+id/player_dialog"
+    android:background="@color/almostWhite"
+    app:layout_behavior="@string/bottom_sheet_behavior"
+    app:behavior_hideable="true"
+    app:elevation="16dp">
+
+    <FrameLayout
+        android:id="@+id/audio_cover_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <com.makeramen.roundedimageview.RoundedImageView
+                android:clickable="true"
+                android:id="@+id/audio_cover"
+                android:layout_width="50dp"
+                app:riv_corner_radius="3dp"
+                app:riv_mutate_background="true"
+                android:layout_height="50dp"
+                android:background="@drawable/round_image_background"
+                android:src="@drawable/ic_player_cover"
+                android:contentDescription="@string/settings" />
+
+            <View
+                android:id="@+id/cover_dark_layer"
+                android:layout_width="86dp"
+                android:layout_height="86dp"
+                android:background="@drawable/dark_image_layer"
+                android:layout_alignBottom="@+id/audio_cover"
+                android:layout_alignRight="@+id/audio_cover"
+                android:layout_alignEnd="@+id/audio_cover"
+                android:visibility="gone"/>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="23dp"
+                android:layout_height="23dp"
+                style="?android:attr/progressBarStyle"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:visibility="gone"
+                />
+
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_pause_white"
+            android:id="@+id/audio_play_pause"
+            android:visibility="gone"
+            android:layout_gravity="center" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/audio_title"
+        style="@style/textStylePrimary"
+        android:layout_alignTop="@+id/audio_cover_layout"
+        android:layout_marginLeft="12dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="4dp"
+        android:layout_toEndOf="@+id/audio_cover_layout"
+        android:layout_toRightOf="@+id/audio_cover_layout"
+        android:text="@string/no_audio" />
+
+    <TextView
+        android:id="@+id/audio_left"
+        style="@style/textStyleSecondary"
+        android:layout_alignLeft="@+id/audio_title"
+        android:layout_alignStart="@+id/audio_title"
+        android:layout_below="@+id/audio_title"
+        android:text="@string/negative_default_time" />
+
+    <SeekBar
+        android:id="@+id/audio_seek"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/audio_cover_layout"
+        android:layout_centerInParent="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="13dp"
+        android:maxHeight="8dp"
+        android:minHeight="8dp"
+        android:thumb="@drawable/seek_thumb"
+        android:progressDrawable="@drawable/seek_style"/>
+
+    <TextView
+        android:id="@+id/audio_played"
+        style="@style/textStyleDarkBlue"
+        android:layout_below="@+id/audio_seek"
+        android:layout_marginLeft="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="50dp"
+        android:text="@string/audio_default_time" />
+
+    <TextView
+        android:id="@+id/audio_subtitles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/audio_seek"
+        android:layout_marginLeft="21dp"
+        android:layout_marginStart="21dp"
+        android:layout_marginRight="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="12dp"
+        android:layout_toRightOf="@+id/audio_played"
+        android:layout_toEndOf="@+id/audio_played"
+        android:text="@string/dash"
+        android:ellipsize="end"
+        android:textColor="@color/colorAccent"
+        android:layout_marginBottom="10dp"/>
+</RelativeLayout>

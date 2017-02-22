@@ -35,11 +35,6 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
     private static final String CURRENT_PAGE = "currentPage";
     private AudioFilesService audioFilesService;
     private AudioData mData;
-    private AudioFilesRequestParams mRequestParams;
-
-    public AudioListModel(){
-        mRequestParams = new AudioFilesRequestParams();
-    }
 
     @Inject
     void setAudioFilesService(AudioFilesService audioFilesService) {
@@ -98,11 +93,6 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
         bundle.putInt(Constants.CURRENT_PAGE, Integer.parseInt(mData.getMetaData().get(Constants.CURRENT_PAGE)));
         bundle.putInt(LAST_PAGE, Integer.parseInt(mData.getMetaData().get(LAST_PAGE)));
         return bundle;
-    }
-
-    @Override
-    public AudioFilesRequestParams getRequestParams() {
-        return mRequestParams;
     }
 
     @Override

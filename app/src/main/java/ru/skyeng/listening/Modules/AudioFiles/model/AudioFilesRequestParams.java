@@ -2,12 +2,9 @@ package ru.skyeng.listening.Modules.AudioFiles.model;
 
 import android.support.v4.util.Pair;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import ru.skyeng.listening.Modules.Settings.model.SettingsObject;
 
 /**
  * ---------------------------------------------------
@@ -109,19 +106,14 @@ public class AudioFilesRequestParams {
         this.durationLT = durationLT;
     }
 
-    public void prepareDurations(SettingsObject settingsObject) {
-        if (settingsObject != null) {
-            setAccentIds(new ArrayList<>(settingsObject.getAccentIds()));
-            setLevelId(settingsObject.getLevel());
-            List<Pair<Integer, Integer>> durationValues = settingsObject.getDuration();
-            Map<String, Integer> paramsMap = new HashMap<>();
-            for (int i = 0; i < durationValues.size(); i++) {
-                if(durationValues.get(i).first >0 && durationValues.get(i).second>0){
-                    paramsMap.put("durations[" + i + "][0]", durationValues.get(i).first);
-                    paramsMap.put("durations[" + i + "][1]", durationValues.get(i).second);
-                }
+    public void prepareDurations(List<Pair<Integer, Integer>> durationValues) {
+        Map<String, Integer> paramsMap = new HashMap<>();
+        for (int i = 0; i < durationValues.size(); i++) {
+            if (durationValues.get(i).first > 0 && durationValues.get(i).second > 0) {
+                paramsMap.put("durations[" + i + "][0]", durationValues.get(i).first);
+                paramsMap.put("durations[" + i + "][1]", durationValues.get(i).second);
             }
-            setDuration(paramsMap);
         }
+        setDuration(paramsMap);
     }
 }

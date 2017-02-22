@@ -87,11 +87,6 @@ public class CategoriesModel implements MVPModel<TagsData, List<AudioTag>, Categ
     }
 
     @Override
-    public CategoriesRequestParams getRequestParams() {
-        return mRequestParams;
-    }
-
-    @Override
     public void injectDependencies(SEApplication application) {
         application.getCategoriesModelDiComponent().inject(this);
     }

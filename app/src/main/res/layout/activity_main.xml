@@ -9,9 +9,6 @@
     tools:context=".Modules.AudioFiles.AudioListActivity">
 
 
-
-
-
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
@@ -46,35 +43,52 @@
             </android.support.v7.widget.Toolbar>
 
 
-            <Button
-                android:id="@+id/button_category"
+            <LinearLayout
+                android:id="@+id/layout_button_category"
                 android:layout_width="158dp"
                 android:layout_height="36dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/toolbar"
                 android:layout_margin="16dp"
-                android:background="@drawable/selector_button_category"
-                android:textColor="@color/colorAccent" />
+                android:background="@color/colorBlue0">
 
-            <Button
-                android:id="@+id/button_length"
+                <Button
+                    android:id="@+id/button_category"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:background="?attr/selectableItemBackground"
+                    android:textColor="@color/colorAccent" />
+            </LinearLayout>
+
+
+            <LinearLayout
                 android:layout_width="158dp"
                 android:layout_height="36dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/toolbar"
                 android:layout_margin="16dp"
-                android:background="@drawable/selector_button_length"
-                android:textColor="@color/colorAccent" />
+                android:background="@color/colorBlue1">
 
-            <include layout="@layout/layout_shadow"/>
+            <Button
+                android:id="@+id/button_length"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textColor="@color/colorAccent"
+                android:background="?attr/selectableItemBackground"/>
+            </LinearLayout>
+
+            <include layout="@layout/layout_shadow"
+                android:layout_below="@+id/layout_button_category"
+                android:layout_width="match_parent"
+                android:layout_height="24dp"/>
         </RelativeLayout>
     </android.support.design.widget.AppBarLayout>
 
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/swipeContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -82,58 +96,54 @@
         android:layout_marginTop="1dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <android.support.v7.widget.RecyclerView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <RelativeLayout
-        android:layout_marginTop="147dp"
         android:id="@+id/no_content_found"
-        android:visibility="gone"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="147dp"
         android:background="@color/almostWhite"
-        android:layout_height="match_parent">
+        android:visibility="gone">
 
         <ImageView
-            android:layout_marginTop="100dp"
             android:id="@+id/icon"
             android:layout_width="72dp"
             android:layout_height="72dp"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="30dp"
-            android:src="@drawable/ic_no_content"
-            />
+            android:layout_marginTop="100dp"
+            android:src="@drawable/ic_no_content" />
 
         <TextView
             android:id="@+id/text_nothing_found"
-            android:layout_below="@+id/icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:text="@string/nothing_found"
+            android:layout_below="@+id/icon"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp"
+            android:text="@string/nothing_found"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/text_try"
-            android:layout_below="@+id/text_nothing_found"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:layout_marginLeft="56dp"
-            android:layout_marginStart="56dp"
+            android:layout_below="@+id/text_nothing_found"
             android:layout_marginEnd="56dp"
+            android:layout_marginLeft="56dp"
             android:layout_marginRight="56dp"
-            android:textAlignment="center"
+            android:layout_marginStart="56dp"
             android:layout_marginTop="8dp"
-            android:textColor="@color/colorGrey3"
             android:text="@string/try_to_refresh"
-            />
+            android:textAlignment="center"
+            android:textColor="@color/colorGrey3"
+            android:textSize="14sp" />
 
     </RelativeLayout>
 
@@ -143,140 +153,16 @@
         android:background="@drawable/shape_gradient_top_shadow"
         app:layout_anchor="@+id/player_dialog" />
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:clickable="true"
-        android:id="@+id/player_dialog"
-        android:background="@color/almostWhite"
+    <include
+        layout="@layout/player_fragment"
         app:behavior_hideable="true"
-        app:elevation="16dp"
-        app:layout_behavior="@string/bottom_sheet_behavior">
+        app:elevation="16dp" />
 
-        <FrameLayout
-            android:id="@+id/audio_cover_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="12dp">
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <com.makeramen.roundedimageview.RoundedImageView
-                    android:clickable="true"
-                    android:id="@+id/audio_cover"
-                    android:layout_width="50dp"
-                    app:riv_corner_radius="3dp"
-                    app:riv_mutate_background="true"
-                    android:layout_height="50dp"
-                    android:background="@drawable/round_image_background"
-                    android:src="@drawable/ic_player_cover"
-                    android:contentDescription="@string/settings" />
-
-                <View
-                    android:id="@+id/cover_dark_layer"
-                    android:layout_width="86dp"
-                    android:layout_height="86dp"
-                    android:background="@drawable/dark_image_layer"
-                    android:layout_alignBottom="@+id/audio_cover"
-                    android:layout_alignRight="@+id/audio_cover"
-                    android:layout_alignEnd="@+id/audio_cover"
-                    android:visibility="gone"/>
-
-                <ProgressBar
-                    android:id="@+id/progressBar"
-                    android:layout_width="23dp"
-                    android:layout_height="23dp"
-                    style="?android:attr/progressBarStyle"
-                    android:layout_centerVertical="true"
-                    android:layout_centerHorizontal="true"
-                    android:visibility="gone"
-                    />
-
-            </RelativeLayout>
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_pause_white"
-                android:id="@+id/audio_play_pause"
-                android:visibility="gone"
-                android:layout_gravity="center" />
-        </FrameLayout>
-
-        <TextView
-            android:id="@+id/audio_title"
-            style="@style/textStylePrimary"
-            android:layout_alignTop="@+id/audio_cover_layout"
-            android:layout_marginLeft="12dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="4dp"
-            android:layout_toEndOf="@+id/audio_cover_layout"
-            android:layout_toRightOf="@+id/audio_cover_layout"
-            android:text="@string/no_audio" />
-
-        <TextView
-            android:id="@+id/audio_left"
-            style="@style/textStyleSecondary"
-            android:layout_alignLeft="@+id/audio_title"
-            android:layout_alignStart="@+id/audio_title"
-            android:layout_below="@+id/audio_title"
-            android:text="@string/negative_default_time" />
-
-        <SeekBar
-            android:id="@+id/audio_seek"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/audio_cover_layout"
-            android:layout_centerInParent="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="13dp"
-            android:maxHeight="8dp"
-            android:minHeight="8dp"
-            android:thumb="@drawable/seek_thumb"
-            android:progressDrawable="@drawable/seek_style"/>
-
-        <TextView
-            android:id="@+id/audio_played"
-            style="@style/textStyleDarkBlue"
-            android:layout_below="@+id/audio_seek"
-            android:layout_marginLeft="24dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="14dp"
-            android:layout_marginBottom="50dp"
-            android:text="@string/audio_default_time" />
-
-        <TextView
-            android:id="@+id/audio_subtitles"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/audio_seek"
-            android:layout_marginLeft="21dp"
-            android:layout_marginStart="21dp"
-            android:layout_marginRight="32dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginTop="12dp"
-            android:layout_toRightOf="@+id/audio_played"
-            android:layout_toEndOf="@+id/audio_played"
-            android:text="@string/dash"
-            android:ellipsize="end"
-            android:textColor="@color/colorAccent"
-            android:layout_marginBottom="10dp"/>
-    </RelativeLayout>
-
-    <ProgressBar android:id="@+id/loadingView"
+    <ProgressBar xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/loadingView"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        xmlns:android="http://schemas.android.com/apk/res/android"/>
+        android:layout_gravity="center" />
 
 </android.support.design.widget.CoordinatorLayout>

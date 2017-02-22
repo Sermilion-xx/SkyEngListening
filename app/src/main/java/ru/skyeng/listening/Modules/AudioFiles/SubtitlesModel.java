@@ -79,11 +79,6 @@ public class SubtitlesModel implements MVPModel<List<SubtitleFile>,
     }
 
     @Override
-    public SubtitlesRequestParams getRequestParams() {
-        return null;
-    }
-
-    @Override
     public void injectDependencies(SEApplication application) {
         application.getSubtitlesModelListDiComponent().inject(this);
     }

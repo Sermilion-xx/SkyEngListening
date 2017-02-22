@@ -2,6 +2,7 @@ package ru.skyeng.listening.Modules.AudioFiles.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,10 @@ public class AudioData implements ModelData<AudioFile>{
     public AudioData(List<AudioFile> audioFiles, Map<String, String> meta) {
         this.audioFiles = audioFiles;
         this.meta = meta;
+    }
+
+    public AudioData(){
+        this.audioFiles = new ArrayList<>();
     }
 
     @Override
