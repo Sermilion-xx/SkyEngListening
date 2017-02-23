@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.skyeng.listening.CommonComponents.BaseActivity;
+import ru.skyeng.listening.CommonComponents.FilterSingleton;
 import ru.skyeng.listening.CommonComponents.SEApplication;
 import ru.skyeng.listening.CommonComponents.Interfaces.MVPBase.MVPView;
 import ru.skyeng.listening.Modules.AudioFiles.AudioListActivity;
@@ -71,14 +72,9 @@ public class CategoriesActivity extends BaseActivity<MVPView, CategoriesPresente
         Gson gson = new Gson();
         Type type = new TypeToken<List<Integer>>(){}.getType();
         setSelectedTags(gson.fromJson(getIntent().getStringExtra(TAG_REQUEST_DATA), type));
-        //вызвать метод презентора с этими данными
-        //активити установит вьюсшт
-        if (selectedTags != null) {
-            initTagView(selectedTags);
-        } else {
-
-            selectedTags = new ArrayList<>();
-        }
+        FilterSingleton mFilter = FilterSingleton.getInstance();
+        selectedTags = mFilter.getSelectedTags();
+        initTagView(selectedTags);
         tagGroup.setOnTagClickListener(new TagView.OnTagClickListener() {
             @Override
             public void onTagClick(Tag tag, int position) {

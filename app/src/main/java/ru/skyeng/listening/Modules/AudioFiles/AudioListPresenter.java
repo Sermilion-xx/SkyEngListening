@@ -136,8 +136,10 @@ public class AudioListPresenter
         SettingsObject settingsObject = FacadePreferences.getSettingsFromPref(getActivityContext());
         FilterSingleton mFilter = FilterSingleton.getInstance();
         mRequestParams.prepareDurations(mFilter.getDuration());
-        mRequestParams.setAccentIds(new ArrayList<>(settingsObject.getAccentIds()));
-        mRequestParams.setLevelId(settingsObject.getLevel());
+        if(settingsObject!=null) {
+            mRequestParams.setAccentIds(new ArrayList<>(settingsObject.getAccentIds()));
+            mRequestParams.setLevelId(settingsObject.getLevel());
+        }
         mModel.loadData(new Observer<AudioData>() {
             @Override
             public void onSubscribe(Disposable d) {

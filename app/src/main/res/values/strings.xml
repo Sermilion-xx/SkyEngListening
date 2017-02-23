@@ -47,6 +47,8 @@
     <string name="advanced">Advanced</string>
     <string name="no_email_client">У вас не установленн ни один почтовы клиент.</string>
     <string name="skyeng_listening">SkyEng Listening</string>
+    <string name="selected_categories">%d Категории</string>
+    <string name="selected_time">%1$d - %2$d минут</string>
 
 
     <string-array name="notification_days">

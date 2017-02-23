@@ -13,5 +13,5 @@ package ru.skyeng.listening.Modules.AudioFiles.player;
 public enum PlayerState {
     PLAY,
     PAUSE,
-    STOP;
+    STOP
 }

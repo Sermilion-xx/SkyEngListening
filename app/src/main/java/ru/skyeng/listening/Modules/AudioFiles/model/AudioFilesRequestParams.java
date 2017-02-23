@@ -109,7 +109,7 @@ public class AudioFilesRequestParams {
     public void prepareDurations(List<Pair<Integer, Integer>> durationValues) {
         Map<String, Integer> paramsMap = new HashMap<>();
         for (int i = 0; i < durationValues.size(); i++) {
-            if (durationValues.get(i).first > 0 && durationValues.get(i).second > 0) {
+            if (durationValues.get(i).first > -1 && durationValues.get(i).second > -1) {
                 paramsMap.put("durations[" + i + "][0]", durationValues.get(i).first);
                 paramsMap.put("durations[" + i + "][1]", durationValues.get(i).second);
             }

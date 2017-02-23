@@ -38,6 +38,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.skyeng.listening.CommonComponents.BaseActivity;
+import ru.skyeng.listening.Modules.Settings.model.RemindTime;
 import ru.skyeng.listening.Modules.Settings.model.SettingsObject;
 import ru.skyeng.listening.R;
 import ru.skyeng.listening.Utility.FacadePreferences;
@@ -50,6 +51,11 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     private static final int selectedColor = R.color.colorAccent;
     private static final int deselectedColor = R.color.textColorDark;
     private static final String NOTIFICATION_RECEIVER = "ru.skyeng.listening.NotificationReceiver";
+    private static final String DEVELOPERS_EMAIL = "ibragim.gapuraev@skyeng.ru";
+    private static final String ACTION = "mailto";
+    private static final String MAIL_SUBJECT = "Проблема: ";
+    private static final String MAIL_BODY = "";
+    private static final String SEND_EMAIL = "Send email...";
 
     @BindView(R.id.notification_switch)
     Switch mNotificationSwitch;
@@ -123,13 +129,14 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 R.array.notification_days, android.R.layout.simple_spinner_item);
         adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mDaysSpinner.setAdapter(adapter1);
-        mDaysSpinner.setSelection(mSettings.getRemindEvery());
+        int remindDay = mSettings.getRemindEvery().getValue();
+        mDaysSpinner.setSelection(remindDay);
         mDaysSpinner.setOnItemSelectedListener(this);
         ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this,
                 R.array.notification_time, android.R.layout.simple_spinner_item);
         adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mTimeSpinner.setAdapter(adapter2);
-        mTimeSpinner.setSelection(mSettings.getTime().get(Calendar.HOUR));
+        mTimeSpinner.setSelection(mSettings.getTime().get(Calendar.HOUR_OF_DAY));
         mTimeSpinner.setOnItemSelectedListener(this);
     }
 
@@ -160,10 +167,12 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             if (settings.isIntAccent()) {
                 mIntAccentsCheckBox.setChecked(true);
                 setTextColor(mAccentsInternational, selectedColor, true);
-            } else if (settings.isBritishAccent()) {
+            }
+            if (settings.isBritishAccent()) {
                 mBritishAccentsCheckBox.setChecked(true);
                 setTextColor(mAccentBritish, selectedColor, true);
-            } else if (settings.isAmericanAccent()) {
+            }
+            if (settings.isAmericanAccent()) {
                 mAmericanAccentsCheckBox.setChecked(true);
                 setTextColor(mAccentAmerican, selectedColor, true);
             }
@@ -287,14 +296,14 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
     private void writeToDevs() {
         Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                "mailto","ibragim.gapuraev@skyeng.ru", null));
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Проблема: ");
-        emailIntent.putExtra(Intent.EXTRA_TEXT, "");
+                ACTION, DEVELOPERS_EMAIL, null));
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, MAIL_SUBJECT);
+        emailIntent.putExtra(Intent.EXTRA_TEXT, MAIL_BODY);
 
         PackageManager manager = getPackageManager();
         List<ResolveInfo> infos = manager.queryIntentActivities(emailIntent, 0);
         if (infos.size() > 0) {
-            startActivity(Intent.createChooser(emailIntent, "Send email..."));
+            startActivity(Intent.createChooser(emailIntent, SEND_EMAIL));
         } else {
             showToast(R.string.no_email_client);
         }
@@ -419,10 +428,11 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         textView.setTypeface(Typeface.DEFAULT_BOLD);
         textView.setGravity(Gravity.END);
         if (parent.getId() == R.id.text_remainder_days_value) {
-            mSettings.setRemindEvery(position);
+            mSettings.setRemindEvery(RemindTime.values()[position]);
         } else if (parent.getId() == R.id.text_remainder_time_value) {
             createNotificationTime(textView.getText().toString());
         }
+        saveSettings(mSettings);
     }
 
     private void createNotificationTime(String time) {

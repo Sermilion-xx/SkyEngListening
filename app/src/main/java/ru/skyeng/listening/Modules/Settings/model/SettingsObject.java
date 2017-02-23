@@ -1,12 +1,7 @@
 package ru.skyeng.listening.Modules.Settings.model;
 
-import android.support.v4.util.Pair;
-import android.util.SparseIntArray;
-
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -28,9 +23,7 @@ public class SettingsObject {
     private boolean americanAccent;
 
     private boolean remainderOn;
-    //0 - weekends, 1 - weekdays, 2 - everyday
-    //3,4,5,6,7,8,9 - mon - sun
-    private int remindEvery;
+    private RemindTime remindEvery;
     private Calendar time;
 
 
@@ -45,12 +38,13 @@ public class SettingsObject {
         accentIds.add(4);
         accentIds.add(3);
         time = setNotificationTime(12, 0);
+        remindEvery = RemindTime.EVERYDAY;
 
     }
 
     public static Calendar setNotificationTime(int hours, int minutes) {
         Calendar currentDate = Calendar.getInstance();
-        currentDate.set(Calendar.HOUR, hours);
+        currentDate.set(Calendar.HOUR_OF_DAY, hours);
         currentDate.set(Calendar.MINUTE, minutes);
         return currentDate;
     }
@@ -59,11 +53,11 @@ public class SettingsObject {
         this.accentIds = accentIds;
     }
 
-    public int getRemindEvery() {
+    public RemindTime getRemindEvery() {
         return remindEvery;
     }
 
-    public void setRemindEvery(int remindEvery) {
+    public void setRemindEvery(RemindTime remindEvery) {
         this.remindEvery = remindEvery;
     }
 

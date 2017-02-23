@@ -26,6 +26,8 @@ public class FilterSingleton {
     private static final int END_3 = 1200;
     private static final int START_4 = 1200;
     private static final int END_4 = 2400;
+    private static final int START_5 = 2400;
+    private static final int END_5 = 60000;
 
     private static FilterSingleton INSTANCE;
 
@@ -33,7 +35,7 @@ public class FilterSingleton {
     private List<Pair<Integer, Integer>> duration;
 
     public static FilterSingleton getInstance() {
-        if(INSTANCE == null){
+        if (INSTANCE == null) {
             INSTANCE = new FilterSingleton();
         }
         return INSTANCE;
@@ -49,7 +51,7 @@ public class FilterSingleton {
                 duration.add(new Pair<>(one, two));
                 allZeros = false;
             } else {
-                duration.add(new Pair<>(0, 0));
+                duration.add(new Pair<>(-1, -1));
             }
             one = two;
             two = one * 2;
@@ -57,10 +59,30 @@ public class FilterSingleton {
                 two = 360;
             }
         }
-        if(allZeros){
+        if (allZeros) {
             duration.clear();
-            duration.add(new Pair<>(START_1,END_4));
+            duration.add(new Pair<>(START_1, END_5));
         }
+    }
+
+    public Pair<Integer, Integer> getDurationRange() {
+        int duration1 = 0;
+        boolean firstSelected = false;
+        int duration2 = 0;
+        for (int i = 0; i < duration.size(); i++) {
+            if (duration.get(i).second > 0) {
+                if(!firstSelected) {
+                    duration1 = duration.get(i).first;
+                    firstSelected = true;
+                }
+            }
+            if (duration1>-1) {
+                if (duration.get(i).second > 0) {
+                    duration2 = duration.get(i).second;
+                }
+            }
+        }
+        return new Pair<>(duration1, duration2);
     }
 
     public boolean[] getDurationsBooleanArray() {
@@ -71,6 +93,7 @@ public class FilterSingleton {
         map.put(START_2, END_2);
         map.put(START_3, END_3);
         map.put(START_4, END_4);
+        map.put(START_5, END_5);
         boolean[] values = new boolean[4];
         for (int i = 0; i < duration.size(); i++) {
             if (map.get(duration.get(i).first) == duration.get(i).second) {
@@ -88,7 +111,7 @@ public class FilterSingleton {
         return values;
     }
 
-    private FilterSingleton(){
+    private FilterSingleton() {
         duration = new ArrayList<>();
         selectedTags = new ArrayList<>();
     }
