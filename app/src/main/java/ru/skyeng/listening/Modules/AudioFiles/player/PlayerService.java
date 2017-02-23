@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.NotificationCompat;
 
@@ -28,6 +29,9 @@ import com.google.android.exoplayer2.upstream.DataSpec;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+
+import ru.skyeng.listening.CommonComponents.SEApplication;
 import ru.skyeng.listening.Modules.AudioFiles.AudioListActivity;
 import ru.skyeng.listening.R;
 
@@ -82,14 +86,22 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
         return mPlayer;
     }
 
+    @Inject
+    public void setPlayer(@NonNull AudioPlayer player) {
+        this.mPlayer = player;
+        mPlayer.setContext(this);
+        mPlayer.setEventListener(this);
+    }
+
+
     @Override
     public void onCreate() {
         super.onCreate();
+        ((SEApplication) getApplicationContext()).getPlayerServiceDiComponent().inject(this);
         final IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_PAUSE);
         filter.addAction(ACTION_PLAY);
         filter.addAction(ACTION_CONTINUE);
-        mPlayer = new AudioPlayer(this, this);
         mPlaybackHandler = new Handler();
         messenger = new Messenger(new IncomingHandler(this));
     }

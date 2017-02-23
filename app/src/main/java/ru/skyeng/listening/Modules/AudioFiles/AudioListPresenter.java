@@ -270,16 +270,16 @@ public class AudioListPresenter
         public void handleMessage(Message message) {
             if (message.what == MESSAGE_PLAYBACK_TIME) {
                 Bundle bundle = (Bundle) message.obj;
-                mActivity.handlePlaybackTimeMessage(bundle.getLong(AUDIO_ELAPSED_TIME), bundle.getLong(AUDIO_DURATION));
+                mActivity.updatePlaybacktime(bundle.getLong(AUDIO_ELAPSED_TIME), bundle.getLong(AUDIO_DURATION));
             } else if (message.what == MESSAGE_SUBTITLE_TIME) {
                 long time = (long) message.obj;
-                mActivity.handleSubtitleMessage(time);
+                mActivity.updateSubtitles(time);
             } else if (message.what == PlayerService.MESSAGE_PLAYING_FILE_STATE_FOR_COVER) {
                 mActivity.onPlayerCoverClick((PlayerState) message.obj);
             } else if (message.what == MESSAGE_UPDATE_PLAYER_UI) {
                 mActivity.updatePlayerUI((AudioFile) message.obj);
             } else if (message.what == MESSAGE_UPDATE_ADAPTER) {
-                mActivity.handleUpdateAdapterMessage((AudioFile) message.obj);
+                mActivity.updateAdapter((AudioFile) message.obj);
             }
         }
     };

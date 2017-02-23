@@ -15,7 +15,9 @@ import ru.skyeng.listening.Modules.AudioFiles.dagger.AudioListPresenterDiCompone
 import ru.skyeng.listening.Modules.AudioFiles.dagger.DaggerAudioListDiComponent;
 import ru.skyeng.listening.Modules.AudioFiles.dagger.DaggerAudioListModelDiComponent;
 import ru.skyeng.listening.Modules.AudioFiles.dagger.DaggerAudioListPresenterDiComponent;
+import ru.skyeng.listening.Modules.AudioFiles.dagger.DaggerPlayerServiceDiComponent;
 import ru.skyeng.listening.Modules.AudioFiles.dagger.DaggerSubtitlesModelDiComponent;
+import ru.skyeng.listening.Modules.AudioFiles.dagger.PlayerServiceDiComponent;
 import ru.skyeng.listening.Modules.AudioFiles.dagger.SubtitlesModelDiComponent;
 import ru.skyeng.listening.Modules.Categories.dagger.CategoriesDiComponent;
 import ru.skyeng.listening.Modules.Categories.dagger.CategoriesModelDiComponent;
@@ -45,6 +47,7 @@ public class SEApplication extends Application {
     protected String userAgent;
     private AudioListModelDiComponent audioListModelDiComponent;
     private SubtitlesModelDiComponent subtitlesModelListDiComponent;
+    private PlayerServiceDiComponent playerServiceDiComponent;
 
     @Override
     public void onCreate() {
@@ -56,6 +59,7 @@ public class SEApplication extends Application {
         categoriesModelDiComponent = DaggerCategoriesModelDiComponent.builder().build();
         audioListModelDiComponent = DaggerAudioListModelDiComponent.builder().build();
         subtitlesModelListDiComponent = DaggerSubtitlesModelDiComponent.builder().build();
+        playerServiceDiComponent = DaggerPlayerServiceDiComponent.builder().build();
         userAgent = Util.getUserAgent(this, getString(R.string.skyeng_listening));
     }
 
@@ -85,6 +89,10 @@ public class SEApplication extends Application {
 
     public SubtitlesModelDiComponent getSubtitlesModelListDiComponent() {
         return subtitlesModelListDiComponent;
+    }
+
+    public PlayerServiceDiComponent getPlayerServiceDiComponent() {
+        return playerServiceDiComponent;
     }
 
     public DataSource.Factory buildDataSourceFactory(DefaultBandwidthMeter bandwidthMeter) {

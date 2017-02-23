@@ -31,7 +31,7 @@ import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
  * ---------------------------------------------------
  */
 
-class AudioPlayer {
+public class AudioPlayer {
 
     private static final int BUFFER_SEGMENT_SIZE = 1024;
     private static final int MAIN_BUFFER_SEGMENTS = 254;
@@ -46,10 +46,17 @@ class AudioPlayer {
     private DataSource.Factory mediaDataSourceFactory;
     private AudioFile mAudioFile;
 
-    AudioPlayer(Context context, ExoPlayer.EventListener eventListener) {
+    public AudioPlayer() {
+
+    }
+
+    public void setContext(Context mContext) {
+        this.mContext = mContext;
+    }
+
+    public void setEventListener(ExoPlayer.EventListener mEventListener) {
+        this.mEventListener = mEventListener;
         shouldAutoPlay = true;
-        mEventListener = eventListener;
-        mContext = context;
         setState(PlayerState.STOP);
         mediaDataSourceFactory = buildDataSourceFactory(true);
         extractorsFactory = new DefaultExtractorsFactory();

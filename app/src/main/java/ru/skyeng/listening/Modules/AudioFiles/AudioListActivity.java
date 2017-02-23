@@ -69,6 +69,18 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     public static final String ACTION_UPDATE_ADAPTER = "updateAdapter";
     private static final String CATEGORY_BUTTON_TEXT = "categoryButtonText";
 
+    class EndlessScrollListener extends EndlessRecyclerViewScrollListener {
+
+        public EndlessScrollListener(LinearLayoutManager layoutManager) {
+            super(layoutManager);
+        }
+
+        @Override
+        public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+            presenter.loadMore(totalItemsCount);
+        }
+    }
+
     @Override
     @Inject
     public void setPresenter(@NonNull AudioListPresenter presenter) {
@@ -255,8 +267,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                         selected[which] = isChecked;
                     }
-                })
-                .setPositiveButton(R.string.select, new DialogInterface.OnClickListener() {
+                }).setPositiveButton(R.string.select, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 mFilter.setDuration(selected);
@@ -476,7 +487,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     }
 
     //--------------------------Player UI----------------------------------------//
-//-----------------------Lifecycle Methods-----------------------------------//
+    //-----------------------Lifecycle Methods-----------------------------------//
     @Override
     public void onResume() {
         if (modelHasData()) {
@@ -509,19 +520,19 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     }
 
     //--------------------------Lifecycle Methods--------------------------------//
-//---------------------------------------------------------------------------//
-    public void handleSubtitleMessage(long time) {
+    //---------------------------------------------------------------------------//
+    public void updateSubtitles(long time) {
         if (presenter.getSubtitleEngine().size() > 0)
             audioSubtitles.setText(presenter.getSubtitleEngine().updateSubtitles(time * 1000).getTextEn());
     }
 
-    public void handlePlaybackTimeMessage(long elapsedTime, long duration) {
+    public void updatePlaybacktime(long elapsedTime, long duration) {
         audioSeek.setProgress((int) elapsedTime / 1000);
         audioPlayed.setText(FacadeCommon.getDateFromMillis(elapsedTime));
         audioLeft.setText(String.format(getString(R.string.leftTime), FacadeCommon.getDateFromMillis(duration * 1000 - elapsedTime)));
     }
 
-    public void handleUpdateAdapterMessage(AudioFile currentFile) {
+    public void updateAdapter(AudioFile currentFile) {
         updateAdapter(mAdapter.getItems(), currentFile);
     }
 
@@ -547,17 +558,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         super.onDestroy();
     }
 
-    class EndlessScrollListener extends EndlessRecyclerViewScrollListener {
 
-        public EndlessScrollListener(LinearLayoutManager layoutManager) {
-            super(layoutManager);
-        }
-
-        @Override
-        public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-            presenter.loadMore(totalItemsCount);
-        }
-    }
 
     public void updatePlayList(List<AudioFile> value, boolean fresh) {
         if (value.size() == 0 && presenter.getRequestParams().getPage() == 1) {
