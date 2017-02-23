@@ -22,7 +22,6 @@
             android:id="@+id/toolbar_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/view_shadow"
             android:orientation="horizontal"
             app:layout_scrollFlags="scroll|enterAlways">
 
@@ -64,6 +63,7 @@
 
 
             <LinearLayout
+                android:id="@+id/layout_length"
                 android:layout_width="158dp"
                 android:layout_height="36dp"
                 android:layout_alignParentEnd="true"
@@ -72,19 +72,30 @@
                 android:layout_margin="16dp"
                 android:background="@color/colorBlue1">
 
-            <Button
-                android:id="@+id/button_length"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:textColor="@color/colorAccent"
-                android:background="?attr/selectableItemBackground"/>
+                <Button
+                    android:id="@+id/button_length"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="?attr/selectableItemBackground"
+                    android:textColor="@color/colorAccent" />
             </LinearLayout>
 
-            <include layout="@layout/layout_shadow"
-                android:layout_below="@+id/layout_button_category"
+            <View
+                android:id="@+id/separator"
                 android:layout_width="match_parent"
-                android:layout_height="24dp"/>
+                android:layout_height="1dp"
+                android:background="@color/colorGrey2"
+                android:layout_below="@+id/layout_length"/>
+
+            <View
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/shadow"
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:layout_below="@+id/separator"
+                android:background="@drawable/shadow" />
         </RelativeLayout>
+
     </android.support.design.widget.AppBarLayout>
 
 
