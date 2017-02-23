@@ -512,7 +512,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
 //---------------------------------------------------------------------------//
     public void handleSubtitleMessage(long time) {
         if (presenter.getSubtitleEngine().size() > 0)
-            audioSubtitles.setText(presenter.getSubtitleEngine().updateSubtitles(time).getTextEn());
+            audioSubtitles.setText(presenter.getSubtitleEngine().updateSubtitles(time * 1000).getTextEn());
     }
 
     public void handlePlaybackTimeMessage(long elapsedTime, long duration) {
