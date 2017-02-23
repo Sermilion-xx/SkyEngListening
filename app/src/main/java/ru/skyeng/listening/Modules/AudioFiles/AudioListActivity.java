@@ -192,9 +192,6 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         mCategoryButton.setOnClickListener(
                 v -> {
                     Intent intent = new Intent(AudioListActivity.this, CategoriesActivity.class);
-//                    Gson gson = new Gson();
-//                    String jsonTags = gson.toJson(mFilter.getSelectedTags());
-//                    intent.putExtra(TAG_REQUEST_DATA, jsonTags);
                     startActivityForResult(intent, TAG_REQUEST_CODE);
                 });
 
@@ -209,7 +206,10 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
             @Override
             public void onClick(View v) {
                 mNoContentFoundLayout.setVisibility(View.GONE);
+                resetLengthButton();
+                resetCategoriesButton();
                 mFilter.setDuration(new boolean[4]);
+                mFilter.getSelectedTags().clear();
                 setNewDurations();
                 loadData(false);
             }
@@ -262,14 +262,22 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
                                 mFilter.setDuration(selected);
                                 Pair<Integer, Integer> durationRange = mFilter.getDurationRange();
                                 if (mFilter.getDuration().size() > 0) {
-                                    if(durationRange.first>-1 && durationRange.second<2400){
+                                    if (durationRange.first > -1 && durationRange.second <= 2400) {
+                                        if (durationRange.first == 0 && durationRange.second == 2400) {
+                                            mLengthButton.setText(R.string.from_0_and_greater);
+                                        } else {
+                                            if (durationRange.first == 0 && durationRange.second < 2400) {
+                                                mLengthButton.setText(String.format(getString(R.string.from_0_to), durationRange.second / 60));
+                                            } else if(durationRange.first > 0 && durationRange.second == 2400) {
+                                                mLengthButton.setText(String.format(getString(R.string.from_n_and_greater), durationRange.first / 60));
+                                            } if (durationRange.first > 0 && durationRange.second < 2400) {
+                                                mLengthButton.setText(String.format(getString(R.string.selected_time), durationRange.first / 60, durationRange.second / 60));
+                                            }
+                                        }
                                         mLengthButton.setBackgroundColor(ContextCompat.getColor(AudioListActivity.this, R.color.colorBlue3));
-                                        mLengthButton.setText(String.format(getString(R.string.selected_time), durationRange.first/60, durationRange.second/60));
                                         mLengthButton.setTextColor(ContextCompat.getColor(AudioListActivity.this, R.color.colorWhite));
-                                    }else {
-                                        mLengthButton.setBackgroundColor(ContextCompat.getColor(AudioListActivity.this, R.color.colorBlue1));
-                                        mLengthButton.setText(getString(R.string.length));
-                                        mLengthButton.setTextColor(ContextCompat.getColor(AudioListActivity.this, R.color.colorBlue3));
+                                    } else {
+                                        resetLengthButton();
                                     }
                                 }
                                 mFilter.setDuration(selected);
@@ -282,6 +290,12 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
                 .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.cancel());
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    private void resetLengthButton() {
+        mLengthButton.setBackgroundColor(ContextCompat.getColor(AudioListActivity.this, R.color.colorBlue1));
+        mLengthButton.setText(getString(R.string.length));
+        mLengthButton.setTextColor(ContextCompat.getColor(AudioListActivity.this, R.color.colorBlue3));
     }
 
     @Override
@@ -308,12 +322,16 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
                 mCategoryButton.setBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
                 mCategoryButton.setTextColor(ContextCompat.getColor(this, R.color.colorWhite));
             } else {
-                updateButtonsVisibility();
-                mCategoryButton.setBackgroundColor(ContextCompat.getColor(this, R.color.colorBlue0));
-                mCategoryButton.setTextColor(ContextCompat.getColor(this, R.color.colorAccent));
+                resetCategoriesButton();
             }
             loadData(false);
         }
+    }
+
+    private void resetCategoriesButton() {
+        mCategoryButton.setText(getString(R.string.categories));
+        mCategoryButton.setBackgroundColor(ContextCompat.getColor(this, R.color.colorBlue0));
+        mCategoryButton.setTextColor(ContextCompat.getColor(this, R.color.colorAccent));
     }
 
     @Override
@@ -452,7 +470,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         if (mFilter.getSelectedTags().size() == 0) {
             mCategoryButton.setText(getString(R.string.categories));
         }
-        if(mFilter.getDuration().size() == 0){
+        if (mFilter.getDuration().size() == 0) {
             mLengthButton.setText(getString(R.string.length));
         }
     }

@@ -49,6 +49,9 @@
     <string name="skyeng_listening">SkyEng Listening</string>
     <string name="selected_categories">%d Категории</string>
     <string name="selected_time">%1$d - %2$d минут</string>
+    <string name="from_0_and_greater">От 0 и больше</string>
+    <string name="from_0_to">От 0 до %d</string>
+    <string name="from_n_and_greater">От %d и больше</string>
 
 
     <string-array name="notification_days">
