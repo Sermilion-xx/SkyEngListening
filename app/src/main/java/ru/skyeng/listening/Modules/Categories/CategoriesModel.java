@@ -34,11 +34,6 @@ public class CategoriesModel implements MVPModel<TagsData, List<AudioTag>, Categ
 
     private CategoriesService mCategoriesService;
     private TagsData mData;
-    private CategoriesRequestParams mRequestParams;
-
-    public CategoriesModel(){
-        mRequestParams = new CategoriesRequestParams();
-    }
 
     @Inject
     void setCategoriesService(CategoriesService service){

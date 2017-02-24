@@ -3,6 +3,7 @@ package ru.skyeng.listening.Modules.Categories;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -12,8 +13,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.cunoraz.tagview.Tag;
-import com.cunoraz.tagview.TagView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -31,9 +30,9 @@ import ru.skyeng.listening.CommonComponents.SEApplication;
 import ru.skyeng.listening.CommonComponents.Interfaces.MVPBase.MVPView;
 import ru.skyeng.listening.Modules.AudioFiles.AudioListActivity;
 import ru.skyeng.listening.Modules.Categories.model.AudioTag;
-import ru.skyeng.listening.Modules.Categories.model.CategoriesRequestParams;
-import ru.skyeng.listening.Modules.Categories.network.CategoriesService;
 import ru.skyeng.listening.R;
+import ru.skyeng.listening.Utility.TagView.Tag;
+import ru.skyeng.listening.Utility.TagView.TagView;
 
 import static ru.skyeng.listening.Modules.AudioFiles.AudioListActivity.TAG_REQUEST_DATA;
 
@@ -74,7 +73,6 @@ public class CategoriesActivity extends BaseActivity<MVPView, CategoriesPresente
         setSelectedTags(gson.fromJson(getIntent().getStringExtra(TAG_REQUEST_DATA), type));
         FilterSingleton mFilter = FilterSingleton.getInstance();
         selectedTags = mFilter.getSelectedTags();
-        initTagView(selectedTags);
         tagGroup.setOnTagClickListener(new TagView.OnTagClickListener() {
             @Override
             public void onTagClick(Tag tag, int position) {
@@ -83,31 +81,18 @@ public class CategoriesActivity extends BaseActivity<MVPView, CategoriesPresente
                 } else {
                     selectedTags.add(position);
                 }
-                initTagView(selectedTags);
+
+                initTagView();
             }
         });
-        //отправить колбак на презентер чтобы проверил
-        //повторный вызов возможен при повороте экрана
-        if ((presenter.getModel()).getItems() == null) {
-            loadData(false);
-        } else {
-            initTagView(selectedTags);
-        }
         mApplyTagsButton.setOnClickListener(this);
         mResetTagsButton.setOnClickListener(this);
     }
 
-    public void loadData(boolean pullToRefresh) {
-        if (!pullToRefresh)
-            showProgress();
-        presenter.loadData(pullToRefresh);
-    }
-
-    public void initTagView(List<Integer> selected) {
-
-        if (selected == null) {
-            selected = new ArrayList<>();
-        } else if (selected.size() > 0) {
+    public void initTagView() {
+        if (selectedTags == null) {
+            selectedTags = new ArrayList<>();
+        } else if (selectedTags.size() > 0) {
             AudioListActivity.categoriesSelected = true;
         }
         if (presenter.getData() == null || tagGroup == null) return;
@@ -116,7 +101,8 @@ public class CategoriesActivity extends BaseActivity<MVPView, CategoriesPresente
             AudioTag aTag = presenter.getData().get(i);
             Tag tag = new Tag(aTag.getTitle());
             tag.radius = 6;
-            if (selected.contains(i)) {
+
+            if (selectedTags.contains(i)) {
                 tag.background = ContextCompat.getDrawable(this, R.drawable.blue2_with_shadow);
                 tag.tagTextColor = ContextCompat.getColor(this, R.color.colorWhite);
             } else {
@@ -124,6 +110,7 @@ public class CategoriesActivity extends BaseActivity<MVPView, CategoriesPresente
                 tag.tagTextColor = ContextCompat.getColor(this, R.color.colorAccent);
             }
             tag.tagTextSize = 16;
+            tag.typeface = Typeface.DEFAULT_BOLD;
             tagGroup.addTag(tag);
         }
     }
@@ -167,7 +154,7 @@ public class CategoriesActivity extends BaseActivity<MVPView, CategoriesPresente
 
     public void resetSelectedTags() {
         selectedTags.clear();
-        initTagView(selectedTags);
+        initTagView();
         AudioListActivity.categoriesSelected = false;
     }
 

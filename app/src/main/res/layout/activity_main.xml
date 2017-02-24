@@ -84,11 +84,10 @@
                 android:id="@+id/separator"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/colorGrey2"
-                android:layout_below="@+id/layout_length"/>
+                android:layout_below="@+id/layout_length"
+                android:background="@color/colorGrey2" />
 
-            <View
-                xmlns:android="http://schemas.android.com/apk/res/android"
+            <View xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/shadow"
                 android:layout_width="match_parent"
                 android:layout_height="24dp"
@@ -113,50 +112,10 @@
             android:layout_height="match_parent" />
     </android.support.v4.widget.SwipeRefreshLayout>
 
-    <RelativeLayout
+    <include
         android:id="@+id/no_content_found"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="147dp"
-        android:background="@color/almostWhite"
-        android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/icon"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="30dp"
-            android:layout_marginTop="100dp"
-            android:src="@drawable/ic_no_content" />
-
-        <TextView
-            android:id="@+id/text_nothing_found"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/icon"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
-            android:text="@string/nothing_found"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/text_try"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/text_nothing_found"
-            android:layout_marginEnd="56dp"
-            android:layout_marginLeft="56dp"
-            android:layout_marginRight="56dp"
-            android:layout_marginStart="56dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/try_to_refresh"
-            android:textAlignment="center"
-            android:textColor="@color/colorGrey3"
-            android:textSize="14sp" />
-
-    </RelativeLayout>
+        layout="@layout/no_content_layout"
+        android:visibility="gone" />
 
     <View
         android:layout_width="match_parent"

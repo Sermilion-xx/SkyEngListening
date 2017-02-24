@@ -53,7 +53,8 @@
                 android:layout_below="@+id/separator"
                 android:layout_margin="16dp">
 
-                <com.cunoraz.tagview.TagView xmlns:tagview="http://schemas.android.com/apk/res-auto"
+                <ru.skyeng.listening.Utility.TagView.TagView
+                    xmlns:tagview="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/tag_group"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

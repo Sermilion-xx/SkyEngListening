@@ -15,7 +15,7 @@
     <string name="select_categories">Выберите категории</string>
     <string name="apply">Применить</string>
     <string name="select_tags">Выберите категорию</string>
-    <string name="try_to_refresh">Попробуйте <font fgcolor="#3f89ff">сбросить</font> фильтры или поменять настройки.</string>
+    <string name="try_to_refresh"><![CDATA[<p>Попробуйте <b><font color=#3f89ff>сбросить </b> фильтры или поменять настройки.</p>]]></string>
     <string name="nothing_found">Ничего не найдено</string>
     <string name="remainders">Напоминания</string>
     <string name="level">Уровень</string>

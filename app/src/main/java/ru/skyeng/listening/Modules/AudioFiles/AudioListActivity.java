@@ -17,6 +17,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -159,6 +160,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         setupToolbar(getString(R.string.Listening));
         mFilter = FilterSingleton.getInstance();
         ButterKnife.bind(this);
+        mResetCategories.setText(Html.fromHtml(getResources().getString(R.string.try_to_refresh)));
         mAdapter = new AudioListAdapter(this, new PlayerCallback() {
             @Override
             public void startPlaying(AudioFile audioFile) {

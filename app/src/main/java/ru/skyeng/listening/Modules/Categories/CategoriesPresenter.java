@@ -46,6 +46,8 @@ public class CategoriesPresenter extends MvpBasePresenter<MVPView>
     public void setModel(CategoriesModel model) {
         this.mModel = model;
         this.mModel.injectDependencies((SEApplication) getAppContext());
+        loadData(false);
+
     }
 
     @Override
@@ -76,7 +78,7 @@ public class CategoriesPresenter extends MvpBasePresenter<MVPView>
             public void onNext(TagsData value) {
                 getModel().setData(value);
                 if (getActivityContext() != null) {
-                    ((CategoriesActivity) getActivityContext()).initTagView(((CategoriesActivity) getActivityContext()).getSelectedTags());
+                    ((CategoriesActivity) getActivityContext()).initTagView();
                 }
             }
 
