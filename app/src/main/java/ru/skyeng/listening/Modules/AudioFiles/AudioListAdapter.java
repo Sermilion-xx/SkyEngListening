@@ -35,6 +35,30 @@ import ru.skyeng.listening.R;
 public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final String KEY_TITLE = "title";
+
+    private class AudioViewHolder extends RecyclerView.ViewHolder {
+
+        RoundedImageView mCoverImage;
+        TextView mCategory;
+        TextView mName;
+        TextView mDescription;
+        TextView mDuration;
+        ImageView mPlayPause;
+        View mDarkLayer;
+
+
+        AudioViewHolder(View itemView) {
+            super(itemView);
+            mCoverImage = (RoundedImageView) itemView.findViewById(R.id.image_cover);
+            mCategory = (TextView) itemView.findViewById(R.id.text_category);
+            mName = (TextView) itemView.findViewById(R.id.text_name);
+            mDescription = (TextView) itemView.findViewById(R.id.text_description);
+            mDuration = (TextView) itemView.findViewById(R.id.text_length);
+            mPlayPause = (ImageView) itemView.findViewById(R.id.audio_play_pause);
+            mDarkLayer = itemView.findViewById(R.id.cover_dark_layer);
+        }
+    }
+
     private int playingPosition = -1;
     private List<AudioFile> mItems;
     private Context mContext;
@@ -94,11 +118,9 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 .load(item.getImageFileUrl())
                 .asBitmap()
                 .priority(Priority.HIGH)
-                .centerCrop()
+                .centerCrop().placeholder(R.drawable.ic_player_cover)
                 .into(holder.mCoverImage);
-        //плейсхолдер поставть
         //не делать getDrawable (потому что происходит этов новом треде - тормоз)
-
         holder.mCoverImage.setOnClickListener(getOnClickListener(position, holder, item));
     }
 
@@ -115,8 +137,10 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
      * @param state: 0 - остановленно, 1 - проигрование, 2 - пауза
      */
     void setPlayerState(PlayerState state) {
-        getItems().get(playingPosition).setState(state);
-        notifyItemChanged(playingPosition);
+        if(playingPosition<getItems().size()) {
+            getItems().get(playingPosition).setState(state);
+            notifyItemChanged(playingPosition);
+        }
     }
 
     public void onSwitchAudio(AudioFile item, int position) {
@@ -185,26 +209,4 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         return getItems() != null ? getItems().size() : 0;
     }
 
-    private class AudioViewHolder extends RecyclerView.ViewHolder {
-
-        RoundedImageView mCoverImage;
-        TextView mCategory;
-        TextView mName;
-        TextView mDescription;
-        TextView mDuration;
-        ImageView mPlayPause;
-        View mDarkLayer;
-
-
-        AudioViewHolder(View itemView) {
-            super(itemView);
-            mCoverImage = (RoundedImageView) itemView.findViewById(R.id.image_cover);
-            mCategory = (TextView) itemView.findViewById(R.id.text_category);
-            mName = (TextView) itemView.findViewById(R.id.text_name);
-            mDescription = (TextView) itemView.findViewById(R.id.text_description);
-            mDuration = (TextView) itemView.findViewById(R.id.text_length);
-            mPlayPause = (ImageView) itemView.findViewById(R.id.audio_play_pause);
-            mDarkLayer = itemView.findViewById(R.id.cover_dark_layer);
-        }
-    }
 }

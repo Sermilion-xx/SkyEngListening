@@ -134,6 +134,8 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     RecyclerView mRecyclerView;
     @BindView(R.id.swipeContainer)
     SwipeRefreshLayout swipeContainer;
+    @BindView(R.id.player_expand_button)
+    ImageView mExpandPlayerButton;
 
     public void hideNoContentView() {
         mNoContentFoundLayout.setVisibility(View.GONE);
@@ -191,7 +193,31 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         startService(new Intent(this, PlayerService.class));
 
         mBottomSheetBehavior = BottomSheetBehavior.from(mLayoutBottomSheet);
-        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        mBottomSheetBehavior.setPeekHeight(225);
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        mLayoutBottomSheet.setBackground(ContextCompat.getDrawable(this, R.drawable.left_right_gradient_blue));
+        audioCoverImage.setBackgroundColor(ContextCompat.getColor(this, R.color.colorWhite));
+        audioCoverImage.setImageResource(R.drawable.ic_player_cover);
+        mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                if(newState == 3){
+                    audioTitle.setTextColor(ContextCompat.getColor(AudioListActivity.this, R.color.textColorDark));
+                    mExpandPlayerButton.setVisibility(View.GONE);
+                    mLayoutBottomSheet.setBackgroundColor(ContextCompat.getColor(AudioListActivity.this, R.color.almostWhite));
+                } else if(newState == 4){
+                    audioTitle.setTextColor(ContextCompat.getColor(AudioListActivity.this, R.color.colorWhite));
+                    mExpandPlayerButton.setVisibility(View.VISIBLE);
+                    mLayoutBottomSheet.setBackground(ContextCompat.getDrawable(AudioListActivity.this, R.drawable.left_right_gradient_blue));
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
+
         restoreSavedInstanceState(savedInstanceState);
         //TriggersMethod("setupPlayerCoverListener")
         presenter.sendMessage(null, PlayerService.MESSAGE_PLAYING_FILE_STATE_FOR_COVER);
@@ -203,6 +229,12 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     }
 
     private void setupListeners() {
+        mExpandPlayerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
+        });
         mCategoryButton.setOnClickListener(
                 v -> {
                     Intent intent = new Intent(AudioListActivity.this, CategoriesActivity.class);
@@ -439,7 +471,8 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
             }
             mDarkLayer.setVisibility(View.VISIBLE);
             audioPlayPause.setImageDrawable(ContextCompat.getDrawable(this, icon));
-            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            mLayoutBottomSheet.setBackground(ContextCompat.getDrawable(this, R.drawable.left_right_gradient_blue));
         }
     }
 
@@ -495,6 +528,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         if (modelHasData()) {
             updateButtonsVisibility();
         }
+        presenter.sendMessage(null, PlayerService.MESSAGE_PLAYING_FILE_STATE_FOR_COVER);
         presenter.sendMessage(null, PlayerService.MESSAGE_UPDATE_PLAYER_UI);
         mPlayerBroadcast = new AudioReceiver();
         IntentFilter intentFilter = new IntentFilter();

@@ -68,6 +68,7 @@
     <TextView
         android:id="@+id/audio_title"
         style="@style/textStylePrimary"
+        android:textColor="@color/colorWhite"
         android:layout_alignTop="@+id/audio_cover_layout"
         android:layout_marginLeft="12dp"
         android:layout_marginStart="12dp"
@@ -127,4 +128,17 @@
         android:ellipsize="end"
         android:textColor="@color/colorAccent"
         android:layout_marginBottom="10dp"/>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_arrow_up"
+        android:background="@null"
+        android:layout_marginTop="25dp"
+        android:layout_marginBottom="25dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/player_expand_button" />
 </RelativeLayout>
