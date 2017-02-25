@@ -8,6 +8,14 @@
         <item name="subtitleTextColor">@color/textColorDark</item>
     </style>
 
+    <style name="ParentThemeBlue" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary2</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark2</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="titleTextColor">@color/textColorDark</item>
+        <item name="subtitleTextColor">@color/textColorDark</item>
+    </style>
+
     <style name="AppTheme" parent="ParentTheme">
         <item name="actionBarStyle">@style/MyActionBarTheme</item>
         <item name="colorControlActivated">@color/colorAccent</item>

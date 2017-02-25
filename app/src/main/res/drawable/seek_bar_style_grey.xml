@@ -2,9 +2,9 @@
 
     <item
         android:id="@android:id/background"
-        android:drawable="@drawable/seek_background"/>
+        android:drawable="@drawable/seek_background_grey"/>
     <item android:id="@android:id/progress">
-        <clip android:drawable="@drawable/seek_progress" />
+        <clip android:drawable="@drawable/seek_progress_color_accent" />
     </item>
 
 </layer-list>

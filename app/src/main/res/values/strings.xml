@@ -52,6 +52,8 @@
     <string name="from_0_and_greater">От 0 и больше</string>
     <string name="from_0_to">От 0 до %d</string>
     <string name="from_n_and_greater">От %d и больше</string>
+    <string name="hide_subtitles">Скрыть субтитры</string>
+    <string name="go_to_exercise">Перейти к упражнению</string>
 
 
     <string-array name="notification_days">

@@ -528,8 +528,8 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         if (modelHasData()) {
             updateButtonsVisibility();
         }
-        presenter.sendMessage(null, PlayerService.MESSAGE_PLAYING_FILE_STATE_FOR_COVER);
-        presenter.sendMessage(null, PlayerService.MESSAGE_UPDATE_PLAYER_UI);
+//        presenter.sendMessage(null, PlayerService.MESSAGE_PLAYING_FILE_STATE_FOR_COVER);
+//        presenter.sendMessage(null, PlayerService.MESSAGE_UPDATE_PLAYER_UI);
         mPlayerBroadcast = new AudioReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ACTION_DID_NOT_STAR);

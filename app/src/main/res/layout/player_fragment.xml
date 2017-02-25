@@ -100,7 +100,7 @@
         android:maxHeight="8dp"
         android:minHeight="8dp"
         android:thumb="@drawable/seek_thumb"
-        android:progressDrawable="@drawable/seek_style"/>
+        android:progressDrawable="@drawable/seek_bar_style_grey"/>
 
     <TextView
         android:id="@+id/audio_played"
