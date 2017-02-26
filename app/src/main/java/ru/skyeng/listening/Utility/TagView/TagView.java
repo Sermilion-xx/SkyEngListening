@@ -3,7 +3,6 @@ package ru.skyeng.listening.Utility.TagView;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
@@ -26,9 +25,9 @@ import java.util.List;
 import ru.skyeng.listening.R;
 
 public class TagView extends RelativeLayout {
-    protected List<Tag> mTags = new ArrayList();
+    protected List<Tag> mTags = new ArrayList<>();
     protected LayoutInflater mInflater;
-    protected ViewTreeObserver mViewTreeObserber;
+    protected ViewTreeObserver mViewTreeObserver;
     protected TagView.OnTagClickListener mClickListener;
     protected TagView.OnTagDeleteListener mDeleteListener;
     protected TagView.OnTagLongClickListener mTagLongClickListener;
@@ -58,8 +57,8 @@ public class TagView extends RelativeLayout {
 
     protected void initialize(Context ctx, AttributeSet attrs, int defStyle) {
         this.mInflater = (LayoutInflater)ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        this.mViewTreeObserber = this.getViewTreeObserver();
-        this.mViewTreeObserber.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+        this.mViewTreeObserver = this.getViewTreeObserver();
+        this.mViewTreeObserver.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
             public void onGlobalLayout() {
                 if(!TagView.this.mInitialized) {
                     TagView.this.mInitialized = true;
@@ -108,10 +107,10 @@ public class TagView extends RelativeLayout {
             for(Iterator var6 = this.mTags.iterator(); var6.hasNext(); ++listIndex) {
                 final Tag item = (Tag)var6.next();
                 final int position = listIndex - 1;
-                View tagLayout = this.mInflater.inflate(R.layout.tagview_item, (ViewGroup)null);
+                View tagLayout = this.mInflater.inflate(R.layout.tagview_item, null);
                 tagLayout.setId(listIndex);
                 if(VERSION.SDK_INT < 16) {
-                    tagLayout.setBackgroundDrawable(this.getSelector(item));
+                    tagLayout.setBackground(this.getSelector(item));
                 } else {
                     tagLayout.setBackground(this.getSelector(item));
                 }
@@ -124,22 +123,18 @@ public class TagView extends RelativeLayout {
                 tagView.setTextColor(item.tagTextColor);
                 tagView.setTextSize(2, item.tagTextSize);
                 tagView.setTypeface(item.typeface);
-                tagLayout.setOnClickListener(new OnClickListener() {
-                    public void onClick(View v) {
-                        if(TagView.this.mClickListener != null) {
-                            TagView.this.mClickListener.onTagClick(item, position);
-                        }
-
+                tagLayout.setOnClickListener(v -> {
+                    if(TagView.this.mClickListener != null) {
+                        TagView.this.mClickListener.onTagClick(item, position);
                     }
+
                 });
-                tagLayout.setOnLongClickListener(new OnLongClickListener() {
-                    public boolean onLongClick(View v) {
-                        if(TagView.this.mTagLongClickListener != null) {
-                            TagView.this.mTagLongClickListener.onTagLongClick(item, position);
-                        }
-
-                        return true;
+                tagLayout.setOnLongClickListener(v -> {
+                    if(TagView.this.mTagLongClickListener != null) {
+                        TagView.this.mTagLongClickListener.onTagLongClick(item, position);
                     }
+
+                    return true;
                 });
                 float tagWidth = tagView.getPaint().measureText(item.text) + (float)this.textPaddingLeft + (float)this.textPaddingRight;
                 TextView deletableView = (TextView)tagLayout.findViewById(R.id.tv_tag_item_delete);
@@ -150,12 +145,9 @@ public class TagView extends RelativeLayout {
                     deletableView.setPadding(tagParams, this.textPaddingTop, this.textPaddingRight + tagParams, this.textPaddingBottom);
                     deletableView.setTextColor(item.deleteIndicatorColor);
                     deletableView.setTextSize(2, item.deleteIndicatorSize);
-                    deletableView.setOnClickListener(new OnClickListener() {
-                        public void onClick(View v) {
-                            if(TagView.this.mDeleteListener != null) {
-                                TagView.this.mDeleteListener.onTagDeleted(TagView.this, item, position);
-                            }
-
+                    deletableView.setOnClickListener(v -> {
+                        if(TagView.this.mDeleteListener != null) {
+                            TagView.this.mDeleteListener.onTagDeleted(TagView.this, item, position);
                         }
                     });
                     tagWidth += deletableView.getPaint().measureText(item.deleteIcon) + (float)this.textPaddingLeft + (float)this.textPaddingRight;
@@ -218,32 +210,22 @@ public class TagView extends RelativeLayout {
 
     public void addTags(List<Tag> tags) {
         if(tags != null) {
-            this.mTags = new ArrayList();
+            this.mTags = new ArrayList<>();
             if(tags.isEmpty()) {
                 this.drawTags();
             }
-
-            Iterator var2 = tags.iterator();
-
-            while(var2.hasNext()) {
-                Tag item = (Tag)var2.next();
+            for (Tag item : tags) {
                 this.addTag(item);
             }
-
         }
     }
 
     public void addTags(String[] tags) {
         if(tags != null) {
-            String[] var2 = tags;
-            int var3 = tags.length;
-
-            for(int var4 = 0; var4 < var3; ++var4) {
-                String item = var2[var4];
+            for (String item : tags) {
                 Tag tag = new Tag(item);
                 this.addTag(tag);
             }
-
         }
     }
 
@@ -256,7 +238,6 @@ public class TagView extends RelativeLayout {
             this.mTags.remove(position);
             this.drawTags();
         }
-
     }
 
     public void removeAll() {

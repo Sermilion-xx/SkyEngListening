@@ -50,7 +50,6 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
     private static final int selectedColor = R.color.colorAccent;
     private static final int deselectedColor = R.color.textColorDark;
-    private static final String NOTIFICATION_RECEIVER = "ru.skyeng.listening.NotificationReceiver";
     private static final String DEVELOPERS_EMAIL = "ibragim.gapuraev@skyeng.ru";
     private static final String ACTION = "mailto";
     private static final String MAIL_SUBJECT = "Проблема: ";

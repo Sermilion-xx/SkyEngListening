@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
@@ -18,6 +19,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.Spanned;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -72,7 +74,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
 
     class EndlessScrollListener extends EndlessRecyclerViewScrollListener {
 
-        public EndlessScrollListener(LinearLayoutManager layoutManager) {
+        EndlessScrollListener(LinearLayoutManager layoutManager) {
             super(layoutManager);
         }
 
@@ -91,15 +93,12 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     public static boolean categoriesSelected = false;
     private BottomSheetBehavior mBottomSheetBehavior;
 
-    private boolean broadcastUpdateFinished;
     private AudioReceiver mPlayerBroadcast;
     boolean mBound = false;
     private EndlessScrollListener mScrollListener;
     private AudioListAdapter mAdapter;
     private FilterSingleton mFilter;
 
-    @BindView(R.id.appBarLayout)
-    AppBarLayout mAppBarLayout;
     @BindView(R.id.player_dialog)
     RelativeLayout mLayoutBottomSheet;
     @BindView(R.id.audio_cover)
@@ -146,10 +145,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     }
 
     public boolean modelHasData() {
-        if (presenter != null && presenter.getData() != null) {
-            return presenter.getData().size() > 0;
-        }
-        return false;
+        return presenter != null && presenter.getData() != null && presenter.getData().size() > 0;
     }
 
     @Override
@@ -162,7 +158,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         setupToolbar(getString(R.string.Listening));
         mFilter = FilterSingleton.getInstance();
         ButterKnife.bind(this);
-        mResetCategories.setText(Html.fromHtml(getResources().getString(R.string.try_to_refresh)));
+        mResetCategories.setText(fromHtml(getResources().getString(R.string.try_to_refresh)));
         mAdapter = new AudioListAdapter(this, new PlayerCallback() {
             @Override
             public void startPlaying(AudioFile audioFile) {
@@ -226,6 +222,15 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         mAudioProgressBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(this, R.color.colorWhite), android.graphics.PorterDuff.Mode.MULTIPLY);
         setupListeners();
         setupPlayerCoverListener();
+    }
+
+    @SuppressWarnings("deprecation")
+    public static Spanned fromHtml(String source) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            return Html.fromHtml(source);
+        }
     }
 
     private void setupListeners() {
@@ -582,7 +587,6 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(ACTION_AUDIO_STATE)) {
                 updatePlayerUI(intent.getParcelableExtra(KEY_CURRENT_AUDIO));
-                broadcastUpdateFinished = true;
             } else if (intent.getAction().equals(ACTION_DID_NOT_STAR)) {
                 hideAudioLoading();
             }
@@ -594,9 +598,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         super.onDestroy();
     }
 
-
-
-    public void updatePlayList(List<AudioFile> value, boolean fresh) {
+    public void updatePlayList(List<AudioFile> value) {
         if (value.size() == 0 && presenter.getRequestParams().getPage() == 1) {
             showNoContentView();
         } else {

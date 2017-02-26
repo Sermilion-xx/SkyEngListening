@@ -41,11 +41,6 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
         this.audioFilesService = audioFilesService;
     }
 
-
-    public void setRetrofitService(AudioFilesService service) {
-        audioFilesService = service;
-    }
-
     @Override
     public void loadData(Observer<AudioData> observable, AudioFilesRequestParams params) {
         Observable<AudioData> audioDataObservable = audioFilesService.getAudioFiles(

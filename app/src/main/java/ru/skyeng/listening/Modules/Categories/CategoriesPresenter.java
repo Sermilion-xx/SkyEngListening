@@ -97,10 +97,6 @@ public class CategoriesPresenter extends MvpBasePresenter<MVPView>
         }, mRequestParams);
     }
 
-    public CategoriesRequestParams getRequestParams() {
-        return mRequestParams;
-    }
-
     @Override
     public Context getAppContext() {
         if (getView() != null) {

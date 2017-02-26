@@ -32,11 +32,6 @@ public class SubtitlesModel implements MVPModel<List<SubtitleFile>,
 
     private SubtitlesService mSubtitlesService;
     private List<SubtitleFile> mData;
-    private SubtitlesRequestParams mRequestParams;
-
-    public SubtitlesModel() {
-        mRequestParams = new SubtitlesRequestParams();
-    }
 
     @Inject
     void setSubtitlesService(SubtitlesService service) {

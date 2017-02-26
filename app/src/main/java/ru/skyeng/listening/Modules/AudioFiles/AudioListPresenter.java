@@ -63,7 +63,7 @@ public class AudioListPresenter
 
     private AudioListModel mModel;
     private SubtitlesModel mSubtitlesModel;
-    boolean mBound = false;
+    private boolean mBound = false;
     private Messenger msgService;
     private SubtitleEngine mSubtitleEngine;
     private AudioListActivity mActivity;
@@ -99,7 +99,7 @@ public class AudioListPresenter
 
     }
 
-    public SubtitleEngine getSubtitleEngine() {
+    SubtitleEngine getSubtitleEngine() {
         return mSubtitleEngine;
     }
 
@@ -113,19 +113,9 @@ public class AudioListPresenter
         return mModel;
     }
 
-    public MVPModel<List<SubtitleFile>,
-            List<SubtitleFile>,
-            SubtitlesRequestParams> getSubtitlesModel() {
-        return mSubtitlesModel;
-    }
-
     @Override
     public List<AudioFile> getData() {
         return getModel().getItems();
-    }
-
-    public List<SubtitleFile> getSubtitlesData() {
-        return getSubtitlesModel().getItems();
     }
 
     @Override
@@ -159,7 +149,7 @@ public class AudioListPresenter
                         mModel.addData(value);
                     }
                 }
-                mActivity.updatePlayList(mModel.getItems(), pullToRefresh);
+                mActivity.updatePlayList(mModel.getItems());
             }
 
             @Override
@@ -179,7 +169,7 @@ public class AudioListPresenter
         }, mRequestParams);
     }
 
-    public void loadSubtitles(SubtitlesRequestParams params) {
+    void loadSubtitles(SubtitlesRequestParams params) {
         mSubtitlesModel.loadData(new Observer<List<SubtitleFile>>() {
 
             @Override
@@ -205,7 +195,7 @@ public class AudioListPresenter
         }, params);
     }
 
-    public void loadMore(int totalItemsCount) {
+    void loadMore(int totalItemsCount) {
         if (totalItemsCount > 14) {
             mRequestParams.setPage(mRequestParams.getPage() + 1);
             loadData(true);
@@ -228,7 +218,7 @@ public class AudioListPresenter
         return null;
     }
 
-    public ServiceConnection playerConnection = new ServiceConnection() {
+    ServiceConnection playerConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder binder) {
             mBound = true;
             msgService = new Messenger(binder);
@@ -240,7 +230,7 @@ public class AudioListPresenter
     };
 
     //Binding к PlayerService
-    public void sendMessage(Bundle bundle, int type, Object... obj) {
+    void sendMessage(Bundle bundle, int type, Object... obj) {
         if (mBound) {
             try {
                 Message message = Message.obtain(null, type, 1, 1);
@@ -255,8 +245,7 @@ public class AudioListPresenter
         }
     }
 
-
-    public void bindPlayerService() {
+    private void bindPlayerService() {
         if (!mBound) {
             Intent intent = new Intent(getActivityContext(), PlayerService.class);
             Messenger messenger = new Messenger(playbackHandler);
@@ -265,8 +254,7 @@ public class AudioListPresenter
         }
     }
 
-
-    public Handler playbackHandler = new Handler() {
+    private Handler playbackHandler = new Handler() {
         public void handleMessage(Message message) {
             if (message.what == MESSAGE_PLAYBACK_TIME) {
                 Bundle bundle = (Bundle) message.obj;
@@ -289,7 +277,7 @@ public class AudioListPresenter
         ((SEApplication) getAppContext()).getAudioListPresenterDiComponent().inject(this);
     }
 
-    public AudioFilesRequestParams getRequestParams() {
+    AudioFilesRequestParams getRequestParams() {
         return mRequestParams;
     }
 }

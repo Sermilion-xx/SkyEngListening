@@ -22,7 +22,14 @@ public class Tag {
     public Typeface typeface;
 
     public Tag(String text) {
-        this.init(0, text, TagViewConstants.DEFAULT_TAG_TEXT_COLOR, 14.0F, TagViewConstants.DEFAULT_TAG_LAYOUT_COLOR, TagViewConstants.DEFAULT_TAG_LAYOUT_COLOR_PRESS, false, TagViewConstants.DEFAULT_TAG_DELETE_INDICATOR_COLOR, 14.0F, 100.0F, "×", 0.0F, TagViewConstants.DEFAULT_TAG_LAYOUT_BORDER_COLOR, Typeface.DEFAULT);
+        this.init(0, text, TagViewConstants.DEFAULT_TAG_TEXT_COLOR,
+                14.0F, TagViewConstants.DEFAULT_TAG_LAYOUT_COLOR,
+                TagViewConstants.DEFAULT_TAG_LAYOUT_COLOR_PRESS,
+                false,
+                TagViewConstants.DEFAULT_TAG_DELETE_INDICATOR_COLOR,
+                14.0F, 100.0F, "×", 0.0F,
+                TagViewConstants.DEFAULT_TAG_LAYOUT_BORDER_COLOR,
+                Typeface.DEFAULT);
     }
 
     private void init(int id, String text, int tagTextColor, float tagTextSize, int layoutColor, int layoutColorPress, boolean isDeletable, int deleteIndicatorColor, float deleteIndicatorSize, float radius, String deleteIcon, float layoutBorderSize, int layoutBorderColor, Typeface typeface) {
