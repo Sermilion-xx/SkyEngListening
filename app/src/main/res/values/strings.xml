@@ -54,6 +54,9 @@
     <string name="from_n_and_greater">От %d и больше</string>
     <string name="hide_subtitles">Скрыть субтитры</string>
     <string name="go_to_exercise">Перейти к упражнению</string>
+    <string name="all_correct">Все верно!</string>
+    <string name="dont_stop_further_difficult">Но не останавливайтесь. \nДальше — сложнее!</string>
+    <string name="did_u_like_everything">Вам всё понравилось?</string>
 
 
     <string-array name="notification_days">

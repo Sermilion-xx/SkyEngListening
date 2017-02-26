@@ -15,12 +15,13 @@
     <color name="colorBlack12">#12000000</color>
     <color name="colorWhite">#ffffff</color>
     <color name="colorWhite40">#40ffffff</color>
+    <color name="colorWhite70">#70ffffff</color>
     <color name="almostWhite">#fafafa</color>
 
     <color name="colorPrimary2">#3f63b8</color>
     <color name="colorPrimaryDark2">#325293</color>
     <color name="colorGreenLight">#1dcea6</color>
-    <color name="colorBlueDark">#353c8f</color>
+    <color name="colorBlueDark">#4061b5</color>
     <color name="colorBluePlayer">#3d40b1</color>
 
 

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:layout_below="@+id/toolbar"
+        layout="@layout/player_blue_cover_part"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/audio_seek"/>
+
+    <include
+        android:id="@+id/player_layout"
+        layout="@layout/player_blue_player_part"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button_exercise" />
+
+    <SeekBar
+
+        android:id="@+id/audio_seek"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
+        android:minHeight="2dp"
+        android:progressDrawable="@drawable/seek_bar_style_green_light"
+        android:thumb="@drawable/circle"
+        android:layout_alignTop="@+id/player_layout"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        />
+
+    <Button
+        android:id="@+id/button_exercise"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorBlueDark"
+        android:minHeight="44dp"
+        android:layout_alignParentBottom="true"
+        android:text="@string/go_to_exercise"/>
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:background="@color/colorPrimary2"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Информация"
+            android:background="@null"
+            android:textStyle="bold"
+            android:layout_marginRight="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_gravity="center_horizontal"
+            android:textAllCaps="true"
+            android:textSize="14sp"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Вопросы"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:background="@null"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:textSize="14sp"/>
+
+    </android.support.v7.widget.Toolbar>
+
+
+</RelativeLayout>
