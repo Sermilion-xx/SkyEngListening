@@ -20,5 +20,4 @@ public interface MVPPresenter<M, P, E> {
     M getModel();
     P getData();
     void loadData(boolean pullToRefresh);
-    void injectDependencies();
 }

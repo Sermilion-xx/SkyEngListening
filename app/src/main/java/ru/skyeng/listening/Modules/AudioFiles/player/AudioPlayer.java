@@ -46,8 +46,10 @@ public class AudioPlayer {
     private DataSource.Factory mediaDataSourceFactory;
     private AudioFile mAudioFile;
 
-    public AudioPlayer() {
-
+    public AudioPlayer(Context context, ExoPlayer.EventListener mEventListener) {
+        mContext = context;
+        setEventListener(mEventListener);
+       initializePlayer();
     }
 
     public void setContext(Context mContext) {
@@ -97,9 +99,6 @@ public class AudioPlayer {
 
     void setState(PlayerState state) {
         this.state = state;
-        if (mAudioFile != null) {
-            mAudioFile.setState(state);
-        }
     }
 
     public PlayerState getState() {
@@ -107,7 +106,6 @@ public class AudioPlayer {
     }
 
     void pause() {
-        mAudioFile.setLoading(false);
         setState(PlayerState.PAUSE);
         mPlayer.setPlayWhenReady(false);
     }

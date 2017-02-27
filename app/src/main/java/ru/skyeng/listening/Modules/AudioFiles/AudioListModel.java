@@ -36,14 +36,18 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
     private AudioFilesService audioFilesService;
     private AudioData mData;
 
+    public AudioListModel(){
+        SEApplication.getINSTANCE().getAudioListDiComponent().inject(this);
+    }
+
     @Inject
     void setAudioFilesService(AudioFilesService audioFilesService) {
         this.audioFilesService = audioFilesService;
     }
 
     @Override
-    public void loadData(Observer<AudioData> observable, AudioFilesRequestParams params) {
-        Observable<AudioData> audioDataObservable = audioFilesService.getAudioFiles(
+    public Observable<AudioData> loadData(AudioFilesRequestParams params) {
+        return audioFilesService.getAudioFiles(
                 params.getDuration(),
                 params.getPage(),
                 params.getPageSize(),
@@ -55,7 +59,6 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
                 params.getDurationLT()
                 ).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
-        audioDataObservable.subscribe(observable);
     }
 
     @Override
@@ -88,11 +91,6 @@ public class AudioListModel implements MVPModel<AudioData, List<AudioFile>, Audi
         bundle.putInt(Constants.CURRENT_PAGE, Integer.parseInt(mData.getMetaData().get(Constants.CURRENT_PAGE)));
         bundle.putInt(LAST_PAGE, Integer.parseInt(mData.getMetaData().get(LAST_PAGE)));
         return bundle;
-    }
-
-    @Override
-    public void injectDependencies(SEApplication application) {
-        application.getAudioListModelDiComponent().inject(this);
     }
 
 }

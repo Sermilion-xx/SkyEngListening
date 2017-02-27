@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import ru.skyeng.listening.CommonComponents.Interfaces.ActivityExtensions;
@@ -39,15 +40,13 @@ public class CategoriesPresenter extends MvpBasePresenter<MVPView>
 
     public CategoriesPresenter(){
         this.mRequestParams = new CategoriesRequestParams();
+        SEApplication.getINSTANCE().getCategoriesPresenterDiComponent().inject(this);
     }
 
     @Override
     @Inject
     public void setModel(CategoriesModel model) {
         this.mModel = model;
-        this.mModel.injectDependencies((SEApplication) getAppContext());
-        loadData(false);
-
     }
 
     @Override
@@ -68,17 +67,18 @@ public class CategoriesPresenter extends MvpBasePresenter<MVPView>
 
     @Override
     public void loadData(boolean pullToRefresh) {
-        mModel.loadData(new Observer<TagsData>() {
+        Observable<TagsData> tagsDataObservable = mModel.loadData(mRequestParams);
+        tagsDataObservable.subscribe(new Observer<TagsData>() {
             @Override
             public void onSubscribe(Disposable d) {
-
+                getActivityContext().showProgress();
             }
 
             @Override
             public void onNext(TagsData value) {
                 getModel().setData(value);
                 if (getActivityContext() != null) {
-                    ((CategoriesActivity) getActivityContext()).initTagView();
+                    getActivityContext().initTagView();
                 }
             }
 
@@ -90,11 +90,11 @@ public class CategoriesPresenter extends MvpBasePresenter<MVPView>
             @Override
             public void onComplete() {
                 if (getView() != null) {
-                    ((ActivityExtensions) getActivityContext()).hideProgress();
+                    getActivityContext().hideProgress();
                 }
 
             }
-        }, mRequestParams);
+        });
     }
 
     @Override
@@ -106,15 +106,11 @@ public class CategoriesPresenter extends MvpBasePresenter<MVPView>
     }
 
     @Override
-    public Context getActivityContext() {
+    public CategoriesActivity getActivityContext() {
         if (getView() != null) {
-            return getView().getActivityContext();
+            return (CategoriesActivity) getView().getActivityContext();
         }
         return null;
     }
 
-    @Override
-    public void injectDependencies() {
-        ((SEApplication) getAppContext()).getCategoriesPresenterDiComponent().inject(this);
-    }
 }

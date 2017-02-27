@@ -35,21 +35,24 @@ public class CategoriesModel implements MVPModel<TagsData, List<AudioTag>, Categ
     private CategoriesService mCategoriesService;
     private TagsData mData;
 
+    public CategoriesModel(){
+        SEApplication.getINSTANCE().getCategoriesModelDiComponent().inject(this);
+    }
+
     @Inject
     void setCategoriesService(CategoriesService service){
         mCategoriesService = service;
     }
 
     @Override
-    public void loadData(Observer<TagsData> observable, CategoriesRequestParams params) {
+    public Observable<TagsData> loadData(CategoriesRequestParams params) {
         if(params==null)
             params = new CategoriesRequestParams();
-        Observable<TagsData> tagsDataObservable = mCategoriesService.getTags(
+        return mCategoriesService.getTags(
                 params.getPage(),
                 params.getPageSize())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
-        tagsDataObservable.subscribe(observable);
     }
 
     @Override
@@ -81,8 +84,4 @@ public class CategoriesModel implements MVPModel<TagsData, List<AudioTag>, Categ
         return bundle;
     }
 
-    @Override
-    public void injectDependencies(SEApplication application) {
-        application.getCategoriesModelDiComponent().inject(this);
-    }
 }

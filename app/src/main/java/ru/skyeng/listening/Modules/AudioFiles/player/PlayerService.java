@@ -67,14 +67,12 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
     public static final int MESSAGE_SUBTITLE_TIME = 7;
     public static final String BINDER_MESSENGER = "MESSENGER";
     public static final int MESSAGE_PLAYING_FILE_STATE_FOR_COVER = 8;
-    public static final int MESSAGE_GET_PLAYING_FILE_ID = 10;
-    public static final int MESSAGE_GET_PLAYING_FILE_DURATION = 11;
-
-    private static final int MESSAGE_SEND_PLAYING_FILE = 9;
     public static final int MESSAGE_UPDATE_PLAYER_UI = 12;
     public static final String AUDIO_ELAPSED_TIME = "AUDIO_ELAPSED_TIME";
     public static final String AUDIO_DURATION = "AUDIO_DURATION";
     public static final int MESSAGE_UPDATE_ADAPTER = 13;
+    public static final String CURRENT_FILE = "CURRENT_FILE";
+    public static final String PLAYER_STATE = "PLAYER_STATE";
     private int mPlaybackInterval = 1000;
     private int mSubtitleInterval = 100;
     private Handler mPlaybackHandler;
@@ -93,15 +91,10 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
         mPlayer.setEventListener(this);
     }
 
-
     @Override
     public void onCreate() {
         super.onCreate();
-        ((SEApplication) getApplicationContext()).getPlayerServiceDiComponent().inject(this);
-        final IntentFilter filter = new IntentFilter();
-        filter.addAction(ACTION_PAUSE);
-        filter.addAction(ACTION_PLAY);
-        filter.addAction(ACTION_CONTINUE);
+        mPlayer = new AudioPlayer(this, this);
         mPlaybackHandler = new Handler();
         messenger = new Messenger(new IncomingHandler(this));
     }
@@ -155,7 +148,10 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
         try {
             Message playingFile = new Message();
             playingFile.what = messageType;
-            playingFile.obj = mPlayer.getAudioFile();
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(CURRENT_FILE, mPlayer.getAudioFile());
+            bundle.putSerializable(PLAYER_STATE, mPlayer.getState());
+            playingFile.obj = bundle;
             outMessenger.send(playingFile);
         } catch (RemoteException e) {
             e.printStackTrace();

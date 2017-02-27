@@ -41,6 +41,7 @@ public class IncomingHandler extends Handler {
             mService.stopSendingPlaybackTime();
             mService.getPlayer().play();
             mService.startSendingPlaybackTime();
+            mService.sendPlayingAudioFile(MESSAGE_UPDATE_PLAYER_UI);
         } else if (msg.what == MESSAGE_PAUSE) {
             mService.getPlayer().pause();
             mService.stopSendingPlaybackTime();

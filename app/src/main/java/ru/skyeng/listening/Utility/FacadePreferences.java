@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 
 import com.google.gson.Gson;
 
+import ru.skyeng.listening.CommonComponents.SEApplication;
 import ru.skyeng.listening.Modules.Settings.model.SettingsObject;
 
 /**
@@ -23,7 +24,7 @@ public class FacadePreferences {
     private static final String KEY_PREF_SETTINGS = "settings";
 
     public static SettingsObject getSettingsFromPref(Context mContext) {
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(SEApplication.getINSTANCE());
         Gson gson = new Gson();
         String json = pref.getString(KEY_PREF_SETTINGS, "");
         return gson.fromJson(json, SettingsObject.class);

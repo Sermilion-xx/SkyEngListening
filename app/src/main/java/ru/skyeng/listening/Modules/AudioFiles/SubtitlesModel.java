@@ -33,18 +33,21 @@ public class SubtitlesModel implements MVPModel<List<SubtitleFile>,
     private SubtitlesService mSubtitlesService;
     private List<SubtitleFile> mData;
 
+    public SubtitlesModel(){
+        SEApplication.getINSTANCE().getAudioListDiComponent().inject(this);
+    }
+
     @Inject
     void setSubtitlesService(SubtitlesService service) {
         mSubtitlesService = service;
     }
 
     @Override
-    public void loadData(Observer<List<SubtitleFile>> observable, SubtitlesRequestParams params) {
-        Observable<List<SubtitleFile>> subtitlesDataObservable = mSubtitlesService.getSubtitles(
+    public Observable<List<SubtitleFile>> loadData(SubtitlesRequestParams params) {
+        return mSubtitlesService.getSubtitles(
                 params.getAudioId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
-        subtitlesDataObservable.subscribe(observable);
     }
 
     @Override
@@ -73,8 +76,4 @@ public class SubtitlesModel implements MVPModel<List<SubtitleFile>,
         return null;
     }
 
-    @Override
-    public void injectDependencies(SEApplication application) {
-        application.getSubtitlesModelListDiComponent().inject(this);
-    }
 }

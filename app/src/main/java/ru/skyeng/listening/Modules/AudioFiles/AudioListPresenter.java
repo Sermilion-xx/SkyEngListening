@@ -18,10 +18,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import ru.skyeng.listening.CommonComponents.FilterSingleton;
-import ru.skyeng.listening.CommonComponents.Interfaces.MVPBase.MVPModel;
 import ru.skyeng.listening.CommonComponents.Interfaces.MVPBase.MVPPresenter;
 import ru.skyeng.listening.CommonComponents.Interfaces.MVPBase.MVPView;
 import ru.skyeng.listening.CommonComponents.SEApplication;
@@ -39,10 +39,13 @@ import ru.skyeng.listening.Utility.FacadePreferences;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.AUDIO_DURATION;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.AUDIO_ELAPSED_TIME;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.BINDER_MESSENGER;
+import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.CURRENT_FILE;
+import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.EXTRA_AUDIO_URL;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAGE_PLAYBACK_TIME;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAGE_SUBTITLE_TIME;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAGE_UPDATE_ADAPTER;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.MESSAGE_UPDATE_PLAYER_UI;
+import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.PLAYER_STATE;
 
 /**
  * ---------------------------------------------------
@@ -66,21 +69,22 @@ public class AudioListPresenter
     private boolean mBound = false;
     private Messenger msgService;
     private SubtitleEngine mSubtitleEngine;
-    private AudioListActivity mActivity;
     private AudioFilesRequestParams mRequestParams;
+
+    public AudioListPresenter() {
+        bindPlayerService();
+        mRequestParams = new AudioFilesRequestParams();
+        SEApplication.getINSTANCE().getAudioListDiComponent().inject(this);
+    }
 
     @Inject
     public void setModel(AudioListModel model) {
         mModel = model;
-        mModel.injectDependencies((SEApplication) getAppContext());
-        loadData(false);
     }
 
     @Inject
     void setSubtitleModel(SubtitlesModel model) {
         mSubtitlesModel = model;
-        mSubtitlesModel.injectDependencies((SEApplication) getAppContext());
-        bindPlayerService();
     }
 
     @Inject
@@ -91,12 +95,6 @@ public class AudioListPresenter
     @Inject
     public void setSubtitlesModel(SubtitlesModel model) {
         this.mSubtitlesModel = model;
-    }
-
-
-    public AudioListPresenter() {
-        mRequestParams = new AudioFilesRequestParams();
-
     }
 
     SubtitleEngine getSubtitleEngine() {
@@ -120,57 +118,72 @@ public class AudioListPresenter
 
     @Override
     public void loadData(final boolean pullToRefresh) {
-        if (mActivity == null) {
-            mActivity = (AudioListActivity) getActivityContext();
-        }
         SettingsObject settingsObject = FacadePreferences.getSettingsFromPref(getActivityContext());
         FilterSingleton mFilter = FilterSingleton.getInstance();
         mRequestParams.prepareDurations(mFilter.getDuration());
-        if(settingsObject!=null) {
+        if (settingsObject != null) {
             mRequestParams.setAccentIds(new ArrayList<>(settingsObject.getAccentIds()));
             mRequestParams.setLevelId(settingsObject.getLevel());
         }
-        mModel.loadData(new Observer<AudioData>() {
+        Observable<AudioData> audioDataObservable = mModel.loadData(mRequestParams);
+        audioDataObservable.subscribe(new Observer<AudioData>() {
             @Override
             public void onSubscribe(Disposable d) {
                 if (!pullToRefresh) {
-                    mActivity.showProgress();
+                    showProgress();
                 }
             }
 
             @Override
             public void onNext(AudioData value) {
-                if(pullToRefresh && mRequestParams.getPage()>1){
+                if (pullToRefresh && mRequestParams.getPage() > 1) {
                     mModel.addData(value);
-                }else {
+                } else {
                     if (mModel.getItems() == null || mModel.getItems().size() == 0 || pullToRefresh) {
                         mModel.setData(value);
                     } else if (mModel.getItems().size() > 0) {
                         mModel.addData(value);
                     }
                 }
-                mActivity.updatePlayList(mModel.getItems());
+                if (getActivityContext() != null) {
+                    getActivityContext().updatePlayList(mModel.getItems());
+                }
             }
 
             @Override
             public void onError(Throwable e) {
-                mActivity.onError(e);
+                if (getActivityContext() != null) {
+                    getActivityContext().onError(e);
+                }
             }
 
             @Override
             public void onComplete() {
                 if (getActivityContext() != null && !pullToRefresh) {
-                    mActivity.hideProgress();
-                    mActivity.updateButtonsVisibility();
+                    getActivityContext().hideProgress();
+                    getActivityContext().updateButtonsVisibility();
                 }
-                if (pullToRefresh)
-                    mActivity.setRefreshing(false);
+                if (pullToRefresh && getActivityContext() != null)
+                    getActivityContext().setRefreshing(false);
             }
-        }, mRequestParams);
+        });
     }
 
-    void loadSubtitles(SubtitlesRequestParams params) {
-        mSubtitlesModel.loadData(new Observer<List<SubtitleFile>>() {
+    private void showProgress() {
+        if (getActivityContext() != null)
+            getActivityContext().showProgress();
+    }
+
+    void loadAudioAndSubtitles(AudioFile audioFile){
+        Bundle bundle = new Bundle();
+        bundle.putString(EXTRA_AUDIO_URL, audioFile.getAudioFileUrl());
+        sendMessage(bundle, PlayerService.MESSAGE_START_BUFFERING, audioFile);
+        loadSubtitles(new SubtitlesRequestParams(audioFile.getId()));
+    }
+
+    private void loadSubtitles(SubtitlesRequestParams params) {
+        Observable<List<SubtitleFile>> subtitlesDataObservable = mSubtitlesModel.loadData(params);
+        subtitlesDataObservable.subscribe(new Observer<List<SubtitleFile>>() {
 
             @Override
             public void onSubscribe(Disposable d) {
@@ -180,7 +193,7 @@ public class AudioListPresenter
             @Override
             public void onNext(List<SubtitleFile> value) {
                 mSubtitleEngine.setSubtitles(value);
-                mActivity.startPlayerMessage();
+                sendMessage(null, PlayerService.MESSAGE_PLAY);
             }
 
             @Override
@@ -192,7 +205,7 @@ public class AudioListPresenter
             public void onComplete() {
 
             }
-        }, params);
+        });
     }
 
     void loadMore(int totalItemsCount) {
@@ -204,21 +217,18 @@ public class AudioListPresenter
 
     @Override
     public Context getAppContext() {
-        if (getView() != null) {
-            return getView().getAppContext();
-        }
-        return null;
+        return SEApplication.getINSTANCE();
     }
 
     @Override
-    public Context getActivityContext() {
+    public AudioListActivity getActivityContext() {
         if (getView() != null) {
-            return getView().getActivityContext();
+            return (AudioListActivity) getView().getActivityContext();
         }
         return null;
     }
 
-    ServiceConnection playerConnection = new ServiceConnection() {
+    private ServiceConnection playerConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder binder) {
             mBound = true;
             msgService = new Messenger(binder);
@@ -233,12 +243,14 @@ public class AudioListPresenter
     void sendMessage(Bundle bundle, int type, Object... obj) {
         if (mBound) {
             try {
-                Message message = Message.obtain(null, type, 1, 1);
-                if (obj.length != 0) {
-                    message.obj = obj[0];
+                if (msgService != null) {
+                    Message message = Message.obtain(null, type, 1, 1);
+                    if (obj.length != 0) {
+                        message.obj = obj[0];
+                    }
+                    message.setData(bundle);
+                    msgService.send(message);
                 }
-                message.setData(bundle);
-                msgService.send(message);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -247,10 +259,11 @@ public class AudioListPresenter
 
     private void bindPlayerService() {
         if (!mBound) {
-            Intent intent = new Intent(getActivityContext(), PlayerService.class);
+            Intent intent = new Intent(getAppContext(), PlayerService.class);
             Messenger messenger = new Messenger(playbackHandler);
             intent.putExtra(BINDER_MESSENGER, messenger);
-            getActivityContext().bindService(intent, playerConnection, Context.BIND_AUTO_CREATE);
+            getAppContext().bindService(intent, playerConnection, Context.BIND_AUTO_CREATE);
+            mBound = true;
         }
     }
 
@@ -258,26 +271,31 @@ public class AudioListPresenter
         public void handleMessage(Message message) {
             if (message.what == MESSAGE_PLAYBACK_TIME) {
                 Bundle bundle = (Bundle) message.obj;
-                mActivity.updatePlaybacktime(bundle.getLong(AUDIO_ELAPSED_TIME), bundle.getLong(AUDIO_DURATION));
+                getActivityContext().updatePlaybacktime(bundle.getLong(AUDIO_ELAPSED_TIME), bundle.getLong(AUDIO_DURATION));
             } else if (message.what == MESSAGE_SUBTITLE_TIME) {
                 long time = (long) message.obj;
-                mActivity.updateSubtitles(time);
+                getActivityContext().updateSubtitles(time);
             } else if (message.what == PlayerService.MESSAGE_PLAYING_FILE_STATE_FOR_COVER) {
-                mActivity.onPlayerCoverClick((PlayerState) message.obj);
+                getActivityContext().onPlayerCoverClick((PlayerState) message.obj);
             } else if (message.what == MESSAGE_UPDATE_PLAYER_UI) {
-                mActivity.updatePlayerUI((AudioFile) message.obj);
+                Bundle bundle = (Bundle) message.obj;
+                getActivityContext().updatePlayerUI(bundle.getParcelable(CURRENT_FILE), (PlayerState) bundle.getSerializable(PLAYER_STATE), false);
             } else if (message.what == MESSAGE_UPDATE_ADAPTER) {
-                mActivity.updateAdapter((AudioFile) message.obj);
+                Bundle bundle = (Bundle) message.obj;
+                getActivityContext().updateAdapter(bundle.getParcelable(CURRENT_FILE));
             }
         }
     };
 
-    @Override
-    public void injectDependencies() {
-        ((SEApplication) getAppContext()).getAudioListPresenterDiComponent().inject(this);
-    }
-
     AudioFilesRequestParams getRequestParams() {
         return mRequestParams;
     }
+
+    void onStop() {
+        if (mBound) {
+            getAppContext().unbindService(playerConnection);
+            mBound = false;
+        }
+    }
+
 }

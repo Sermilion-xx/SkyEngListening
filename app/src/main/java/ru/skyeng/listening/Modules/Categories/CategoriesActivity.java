@@ -61,12 +61,11 @@ public class CategoriesActivity extends BaseActivity<MVPView, CategoriesPresente
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        ((SEApplication) getApplicationContext()).getCategoriesDiComponent().inject(this);
+        SEApplication.getINSTANCE().getCategoriesDiComponent().inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_categories);
-        presenter.injectDependencies();
-        mProgress = (ProgressBar) findViewById(R.id.progressBar);
         ButterKnife.bind(this);
+        mProgress = (ProgressBar) findViewById(R.id.progressBar);
         setupToolbar(getString(R.string.select_categories), R.drawable.ic_x);
         Gson gson = new Gson();
         Type type = new TypeToken<List<Integer>>(){}.getType();
@@ -87,6 +86,10 @@ public class CategoriesActivity extends BaseActivity<MVPView, CategoriesPresente
         });
         mApplyTagsButton.setOnClickListener(this);
         mResetTagsButton.setOnClickListener(this);
+        if(presenter.getData()==null){
+            presenter.loadData(false);
+        }
+        initTagView();
     }
 
     public void initTagView() {

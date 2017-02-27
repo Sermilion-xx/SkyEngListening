@@ -63,10 +63,12 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private List<AudioFile> mItems;
     private Context mContext;
     private PlayerCallback mPlayerCallback;
+    private PlayerState mPlayerState;
 
     public AudioListAdapter(Context context, PlayerCallback callback) {
         this.mContext = context;
         this.mPlayerCallback = callback;
+        this.mPlayerState = PlayerState.STOP;
     }
 
     public List<AudioFile> getItems() {
@@ -96,19 +98,18 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         AudioViewHolder holder = (AudioViewHolder) viewHolder;
         AudioFile item = getItems().get(position);
-        item.setDurationInMinutes(FacadeCommon.getDateFromMillis(item.getDurationInSeconds() * 1000));
-        holder.mDuration.setText(item.getDurationInMinutes());
+        holder.mDuration.setText(FacadeCommon.getDateFromMillis(item.getDurationInSeconds() * 1000));
         holder.mDescription.setText(item.getDescription());
         holder.mName.setText(item.getTitle());
 
-        if (item.getState() == PlayerState.PLAY) {
-            playingPosition = position;
+        if (mPlayerState == PlayerState.PLAY && playingPosition == position) {
             setupAudioCover(holder, R.drawable.ic_pause_blue, View.VISIBLE);
-        } else if (item.getState() == PlayerState.PAUSE) {
+        } else if (mPlayerState == PlayerState.PAUSE && playingPosition == position) {
             setupAudioCover(holder, R.drawable.ic_play_blue, View.VISIBLE);
-        } else if (item.getState() == PlayerState.STOP) {
+        } else if (playingPosition!= position) {
             setupAudioCover(holder, -1, View.GONE);
         }
+
         String category = mContext.getString(R.string.no_category);
         if (item.getTags().size() > 0) {
             category = item.getTags().get(0).get(KEY_TITLE);
@@ -120,53 +121,40 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 .priority(Priority.HIGH)
                 .centerCrop().placeholder(R.drawable.ic_player_cover)
                 .into(holder.mCoverImage);
-        //не делать getDrawable (потому что происходит этов новом треде - тормоз)
         holder.mCoverImage.setOnClickListener(getOnClickListener(position, holder, item));
     }
 
+
     private void setupAudioCover(AudioViewHolder viewHolder, int drawableId, int visibility) {
         if (drawableId > -1) {
-            viewHolder.mPlayPause.setImageDrawable(ContextCompat.getDrawable(mContext, drawableId));
+            viewHolder.mPlayPause.setImageResource(drawableId);
         }
         viewHolder.mPlayPause.setVisibility(visibility);
         viewHolder.mDarkLayer.setVisibility(visibility);
     }
 
-    /**
-     * Метод для установки состояния проигрования аудио файла
-     * @param state: 0 - остановленно, 1 - проигрование, 2 - пауза
-     */
-    void setPlayerState(PlayerState state) {
-        if(playingPosition<getItems().size()) {
-            getItems().get(playingPosition).setState(state);
-            notifyItemChanged(playingPosition);
-        }
-    }
-
     public void onSwitchAudio(AudioFile item, int position) {
-        if (playingPosition < getItems().size()) {
-            getItems().get(playingPosition).setState(PlayerState.STOP);
-        }
+        mPlayerState = PlayerState.STOP;
         notifyItemChanged(playingPosition);
-        item.setState(PlayerState.PLAY);
-        notifyItemPlaying(position);
+        playingPosition = position;
         mPlayerCallback.startPlaying(item);
     }
 
-    public void onPlayingAudioClicked(AudioFile item, AudioViewHolder viewHolder, int position) {
-        item.setState(item.getState() == PlayerState.PLAY ? PlayerState.PAUSE : PlayerState.PLAY);
-        notifyItemChanged(position);
-        int actionType = setPlayPauseIcon(viewHolder, item);
-        if (actionType == 1) {
+    public void onPlayingAudioClicked(AudioViewHolder viewHolder, int position) {
+        PlayerState actionType = setPlayPauseIcon(viewHolder);
+        if (actionType == PlayerState.PAUSE) {
+            mPlayerState = PlayerState.PLAY;
             mPlayerCallback.pausePlayer();
-        } else if (actionType == 2) {
+        } else if (actionType == PlayerState.PLAY) {
+            mPlayerState = PlayerState.PAUSE;
             mPlayerCallback.continuePlaying();
         }
+        notifyItemChanged(position);
     }
 
     public void onPlayingNewAudio(AudioFile item, int position) {
-        item.setState(PlayerState.PLAY);
-        notifyItemPlaying(position);
+        item.setLoading(true);
+        playingPosition = position;
         mPlayerCallback.startPlaying(item);
     }
 
@@ -180,7 +168,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 if (playingPosition != -1 && playingPosition != position) {
                     onSwitchAudio(item, position);
                 } else if (playingPosition == position) {
-                    onPlayingAudioClicked(item, viewHolder, position);
+                    onPlayingAudioClicked(viewHolder, position);
                 } else {
                     onPlayingNewAudio(item, position);
                 }
@@ -188,17 +176,17 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         };
     }
 
-    private void notifyItemPlaying(int position) {
-        playingPosition = position;
-        notifyItemChanged(position);
+    public void notifyPlayerStateChanged(PlayerState playerState) {
+        this.mPlayerState = playerState;
+        notifyItemChanged(playingPosition);
     }
 
-    private int setPlayPauseIcon(AudioViewHolder viewHolder, AudioFile item) {
-        int actionType = 1;
+    private PlayerState setPlayPauseIcon(AudioViewHolder viewHolder) {
+        PlayerState actionType = PlayerState.PLAY;
         int icon = R.drawable.ic_play_blue;
-        if (item.getState() == PlayerState.PLAY) {
+        if (mPlayerState == PlayerState.PLAY) {
             icon = R.drawable.ic_pause_blue;
-            actionType = 2;
+            actionType = PlayerState.PAUSE;
         }
         viewHolder.mPlayPause.setImageDrawable(ContextCompat.getDrawable(mContext, icon));
         return actionType;

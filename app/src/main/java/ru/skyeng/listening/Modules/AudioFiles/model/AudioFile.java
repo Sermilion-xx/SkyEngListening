@@ -33,13 +33,8 @@ public class AudioFile implements Parcelable, Comparable<AudioFile>{
     private List<Map<String, String>> tags;
     private int durationInSeconds;
     private String durationInMinutes;
-    private PlayerState state;
     private boolean loading;
     private List<SubtitleFile> mSubtitles;
-
-    public AudioFile() {
-        state = PlayerState.STOP;
-    }
 
     public boolean isLoading() {
         return loading;
@@ -48,11 +43,6 @@ public class AudioFile implements Parcelable, Comparable<AudioFile>{
     public void setLoading(boolean loading) {
         this.loading = loading;
     }
-
-    public void setSubtitles(List<SubtitleFile> mSubtitles) {
-        this.mSubtitles = mSubtitles;
-    }
-
     public List<SubtitleFile> getSubtitles() {
         return mSubtitles;
     }
@@ -67,7 +57,6 @@ public class AudioFile implements Parcelable, Comparable<AudioFile>{
         durationInSeconds = in.readInt();
         durationInMinutes = in.readString();
         int stateInt = in.readInt();
-        state = PlayerState.values()[stateInt];
     }
 
     public static final Creator<AudioFile> CREATOR = new Creator<AudioFile>() {
@@ -86,96 +75,44 @@ public class AudioFile implements Parcelable, Comparable<AudioFile>{
         return durationInMinutes;
     }
 
-    public void setDurationInMinutes(String durationInMinutes) {
-        this.durationInMinutes = durationInMinutes;
-    }
-
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public String getDescription() {
         return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public String getAudioFileUrl() {
         return audioFileUrl;
     }
 
-    public void setAudioFileUrl(String audioFileUrl) {
-        this.audioFileUrl = audioFileUrl;
-    }
-
     public String getImageFileUrl() {
         return imageFileUrl;
-    }
-
-    public void setImageFileUrl(String imageFileUrl) {
-        this.imageFileUrl = imageFileUrl;
     }
 
     public int getWordsInMinute() {
         return wordsInMinute;
     }
 
-    public void setWordsInMinute(int wordsInMinute) {
-        this.wordsInMinute = wordsInMinute;
-    }
-
     public Map<String, String> getAccent() {
         return accent;
-    }
-
-    public void setAccent(Map<String, String> accent) {
-        this.accent = accent;
     }
 
     public Map<String, String> getLevel() {
         return level;
     }
 
-    public void setLevel(Map<String, String> level) {
-        this.level = level;
-    }
-
     public List<Map<String, String>> getTags() {
         return tags;
     }
 
-    public void setTags(List<Map<String, String>> tags) {
-        this.tags = tags;
-    }
-
     public int getDurationInSeconds() {
         return durationInSeconds;
-    }
-
-    public void setDurationInSeconds(int durationInSeconds) {
-        this.durationInSeconds = durationInSeconds;
-    }
-
-    public PlayerState getState() {
-        return state;
-    }
-
-    public void setState(PlayerState state) {
-        this.state = state;
     }
 
     @Override
@@ -193,8 +130,6 @@ public class AudioFile implements Parcelable, Comparable<AudioFile>{
         dest.writeInt(wordsInMinute);
         dest.writeInt(durationInSeconds);
         dest.writeString(durationInMinutes);
-        int stateTmp = state == null ? -1 : state.ordinal();
-        dest.writeInt(stateTmp);
     }
 
 

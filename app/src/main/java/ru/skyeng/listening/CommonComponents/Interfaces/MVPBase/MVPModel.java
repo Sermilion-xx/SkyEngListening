@@ -2,6 +2,7 @@ package ru.skyeng.listening.CommonComponents.Interfaces.MVPBase;
 
 import android.os.Bundle;
 
+import io.reactivex.Observable;
 import io.reactivex.Observer;
 import ru.skyeng.listening.CommonComponents.SEApplication;
 
@@ -16,11 +17,10 @@ import ru.skyeng.listening.CommonComponents.SEApplication;
  */
 
 public interface MVPModel<L, P, E> {
-    void loadData(Observer<L> observable, E params);
+    Observable<L> loadData(E params);
     void setData(L data);
     void addData(L data);
     P processResult(L data);
     P getItems();
     Bundle getExtraData();
-    void injectDependencies(SEApplication application);
 }
