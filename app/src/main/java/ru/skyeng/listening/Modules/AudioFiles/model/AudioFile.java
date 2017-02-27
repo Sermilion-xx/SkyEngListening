@@ -22,30 +22,15 @@ import ru.skyeng.listening.Modules.AudioFiles.player.PlayerState;
 
 public class AudioFile implements Parcelable, Comparable<AudioFile>{
 
-    private int id;
-    private String title;
-    private String description;
-    private String audioFileUrl;
-    private String imageFileUrl;
-    private int wordsInMinute;
-    private Map<String, String> accent;
-    private Map<String, String> level;
-    private List<Map<String, String>> tags;
-    private int durationInSeconds;
-    private String durationInMinutes;
-    private boolean loading;
-    private List<SubtitleFile> mSubtitles;
+    private final int id;
+    private final String title;
+    private final String description;
+    private final String audioFileUrl;
+    private final String imageFileUrl;
+    private final int wordsInMinute;
+    private final int durationInSeconds;
+    private final String durationInMinutes;
 
-    public boolean isLoading() {
-        return loading;
-    }
-
-    public void setLoading(boolean loading) {
-        this.loading = loading;
-    }
-    public List<SubtitleFile> getSubtitles() {
-        return mSubtitles;
-    }
 
     protected AudioFile(Parcel in) {
         id = in.readInt();
@@ -56,7 +41,18 @@ public class AudioFile implements Parcelable, Comparable<AudioFile>{
         wordsInMinute = in.readInt();
         durationInSeconds = in.readInt();
         durationInMinutes = in.readString();
-        int stateInt = in.readInt();
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeInt(id);
+        out.writeString(title);
+        out.writeString(description);
+        out.writeString(audioFileUrl);
+        out.writeString(imageFileUrl);
+        out.writeInt(wordsInMinute);
+        out.writeInt(durationInSeconds);
+        out.writeString(durationInMinutes);
     }
 
     public static final Creator<AudioFile> CREATOR = new Creator<AudioFile>() {
@@ -99,18 +95,6 @@ public class AudioFile implements Parcelable, Comparable<AudioFile>{
         return wordsInMinute;
     }
 
-    public Map<String, String> getAccent() {
-        return accent;
-    }
-
-    public Map<String, String> getLevel() {
-        return level;
-    }
-
-    public List<Map<String, String>> getTags() {
-        return tags;
-    }
-
     public int getDurationInSeconds() {
         return durationInSeconds;
     }
@@ -119,19 +103,6 @@ public class AudioFile implements Parcelable, Comparable<AudioFile>{
     public int describeContents() {
         return 0;
     }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
-        dest.writeString(title);
-        dest.writeString(description);
-        dest.writeString(audioFileUrl);
-        dest.writeString(imageFileUrl);
-        dest.writeInt(wordsInMinute);
-        dest.writeInt(durationInSeconds);
-        dest.writeString(durationInMinutes);
-    }
-
 
     @Override
     public int compareTo(AudioFile o) {

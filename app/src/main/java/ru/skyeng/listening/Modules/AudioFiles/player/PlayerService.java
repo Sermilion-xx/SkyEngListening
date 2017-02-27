@@ -205,7 +205,6 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
     public void onLoadingChanged(boolean isLoading) {
         if (isLoading) {
             Intent intent = new Intent(ACTION_AUDIO_STATE);
-            mPlayer.getAudioFile().setLoading(true);
             intent.putExtra(KEY_CURRENT_AUDIO, mPlayer.getAudioFile());
             sendBroadcast(intent);
         }
@@ -214,7 +213,6 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         if (playbackState == 3 && mPlayer.getPlayer().getPlayWhenReady()) {
-            mPlayer.getAudioFile().setLoading(false);
             mPlayer.setState(PlayerState.PLAY);
             Intent intent = new Intent(ACTION_AUDIO_STATE);
             intent.putExtra(KEY_CURRENT_AUDIO, mPlayer.getAudioFile());

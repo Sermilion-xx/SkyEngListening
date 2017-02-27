@@ -17,7 +17,7 @@ import com.makeramen.roundedimageview.RoundedImageView;
 import java.util.List;
 
 import ru.skyeng.listening.CommonComponents.FacadeCommon;
-import ru.skyeng.listening.CommonComponents.PlayerCallback;
+import ru.skyeng.listening.CommonComponents.PlayerAdapterCallback;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
 import ru.skyeng.listening.Modules.AudioFiles.player.PlayerState;
 import ru.skyeng.listening.R;
@@ -62,10 +62,10 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private int playingPosition = -1;
     private List<AudioFile> mItems;
     private Context mContext;
-    private PlayerCallback mPlayerCallback;
+    private PlayerAdapterCallback mPlayerCallback;
     private PlayerState mPlayerState;
 
-    public AudioListAdapter(Context context, PlayerCallback callback) {
+    public AudioListAdapter(Context context, PlayerAdapterCallback callback) {
         this.mContext = context;
         this.mPlayerCallback = callback;
         this.mPlayerState = PlayerState.STOP;
@@ -111,9 +111,6 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
 
         String category = mContext.getString(R.string.no_category);
-        if (item.getTags().size() > 0) {
-            category = item.getTags().get(0).get(KEY_TITLE);
-        }
         holder.mCategory.setText(category);
         Glide.with(mContext)
                 .load(item.getImageFileUrl())
@@ -137,25 +134,24 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         mPlayerState = PlayerState.STOP;
         notifyItemChanged(playingPosition);
         playingPosition = position;
-        mPlayerCallback.startPlaying(item);
+        mPlayerCallback.onPlay(item);
     }
 
     public void onPlayingAudioClicked(AudioViewHolder viewHolder, int position) {
         PlayerState actionType = setPlayPauseIcon(viewHolder);
         if (actionType == PlayerState.PAUSE) {
             mPlayerState = PlayerState.PLAY;
-            mPlayerCallback.pausePlayer();
+            mPlayerCallback.onPause();
         } else if (actionType == PlayerState.PLAY) {
             mPlayerState = PlayerState.PAUSE;
-            mPlayerCallback.continuePlaying();
+            mPlayerCallback.onContinue();
         }
         notifyItemChanged(position);
     }
 
     public void onPlayingNewAudio(AudioFile item, int position) {
-        item.setLoading(true);
         playingPosition = position;
-        mPlayerCallback.startPlaying(item);
+        mPlayerCallback.onPlay(item);
     }
 
     @NonNull

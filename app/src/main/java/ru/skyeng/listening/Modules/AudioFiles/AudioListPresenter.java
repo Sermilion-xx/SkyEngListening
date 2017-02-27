@@ -181,6 +181,12 @@ public class AudioListPresenter
         loadSubtitles(new SubtitlesRequestParams(audioFile.getId()));
     }
 
+    public void loadDataIfEmpty(){
+        if(getData()==null){
+            loadData(false);
+        }
+    }
+
     private void loadSubtitles(SubtitlesRequestParams params) {
         Observable<List<SubtitleFile>> subtitlesDataObservable = mSubtitlesModel.loadData(params);
         subtitlesDataObservable.subscribe(new Observer<List<SubtitleFile>>() {
@@ -239,7 +245,6 @@ public class AudioListPresenter
         }
     };
 
-    //Binding к PlayerService
     void sendMessage(Bundle bundle, int type, Object... obj) {
         if (mBound) {
             try {
@@ -271,7 +276,7 @@ public class AudioListPresenter
         public void handleMessage(Message message) {
             if (message.what == MESSAGE_PLAYBACK_TIME) {
                 Bundle bundle = (Bundle) message.obj;
-                getActivityContext().updatePlaybacktime(bundle.getLong(AUDIO_ELAPSED_TIME), bundle.getLong(AUDIO_DURATION));
+                getActivityContext().updatePlaybackTime(bundle.getLong(AUDIO_ELAPSED_TIME), bundle.getLong(AUDIO_DURATION));
             } else if (message.what == MESSAGE_SUBTITLE_TIME) {
                 long time = (long) message.obj;
                 getActivityContext().updateSubtitles(time);
@@ -296,6 +301,10 @@ public class AudioListPresenter
             getAppContext().unbindService(playerConnection);
             mBound = false;
         }
+    }
+
+    void onStart(){
+        bindPlayerService();
     }
 
 }

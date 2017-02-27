@@ -10,6 +10,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.util.Pair;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -23,16 +26,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -44,12 +46,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.skyeng.listening.CommonComponents.BaseActivity;
 import ru.skyeng.listening.CommonComponents.EndlessRecyclerViewScrollListener;
-import ru.skyeng.listening.CommonComponents.FacadeCommon;
 import ru.skyeng.listening.CommonComponents.FilterSingleton;
 import ru.skyeng.listening.CommonComponents.Interfaces.MVPBase.MVPView;
-import ru.skyeng.listening.CommonComponents.PlayerCallback;
+import ru.skyeng.listening.CommonComponents.PlayerAdapterCallback;
 import ru.skyeng.listening.CommonComponents.SEApplication;
 import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
+import ru.skyeng.listening.Modules.AudioFiles.player.PlayerFragment;
+import ru.skyeng.listening.Modules.AudioFiles.player.PlayerFragmentCallback;
 import ru.skyeng.listening.Modules.AudioFiles.player.PlayerService;
 import ru.skyeng.listening.Modules.AudioFiles.player.PlayerState;
 import ru.skyeng.listening.Modules.Categories.CategoriesActivity;
@@ -58,9 +61,8 @@ import ru.skyeng.listening.R;
 
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.ACTION_AUDIO_STATE;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.ACTION_DID_NOT_STAR;
-import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.KEY_CURRENT_AUDIO;
 
-public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter> implements SwipeRefreshLayout.OnRefreshListener, MVPView {
+public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter> implements SwipeRefreshLayout.OnRefreshListener, MVPView, PlayerFragmentCallback {
 
     private static final String KEY_PROGRESS_VISIBILITY = "progressVisibility";
     public static final int TAG_REQUEST_CODE = 0;
@@ -69,6 +71,17 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     public static final String ACTION_UPDATE_ADAPTER = "updateAdapter";
     private static final String CATEGORY_BUTTON_TEXT = "categoryButtonText";
     public static boolean categoriesSelected = false;
+
+
+    @Override
+    public void seekTo(long time) {
+        presenter.sendMessage(null, PlayerService.MESSAGE_PLAYBACK_SEARCH, time * 1000);
+    }
+
+    @Override
+    public void updateCover() {
+        presenter.sendMessage(null, PlayerService.MESSAGE_PLAYING_FILE_STATE_FOR_COVER);
+    }
 
     class EndlessScrollListener extends EndlessRecyclerViewScrollListener {
 
@@ -88,25 +101,13 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     private EndlessScrollListener mScrollListener;
     private AudioListAdapter mAdapter;
     private FilterSingleton mFilter;
+    private PlayerFragment mFragment;
 
-    @BindView(R.id.player_dialog)
+    @BindView(R.id.fragment_player)
     RelativeLayout mLayoutBottomSheet;
-    @BindView(R.id.audio_cover)
-    RoundedImageView audioCoverImage;
-    @BindView(R.id.audio_title)
-    TextView audioTitle;
-    @BindView(R.id.audio_left)
-    TextView audioLeft;
-    @BindView(R.id.audio_seek)
-    SeekBar audioSeek;
-    @BindView(R.id.audio_played)
-    TextView audioPlayed;
-    @BindView(R.id.audio_subtitles)
-    TextView audioSubtitles;
-    @BindView(R.id.audio_play_pause)
-    ImageView audioPlayPause;
-    @BindView(R.id.cover_dark_layer)
-    View mDarkLayer;
+    @BindView(R.id.bottom_sheet)
+    LinearLayout mFragmentBottomSheet;
+
     @BindView(R.id.button_length)
     Button mLengthButton;
     @BindView(R.id.button_category)
@@ -141,30 +142,29 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         mProgress = (ProgressBar) findViewById(R.id.loadingView);
         setupToolbar(getString(R.string.Listening));
         mFilter = FilterSingleton.getInstance();
-
-        if(presenter.getData()==null){
+        mFragment = (PlayerFragment) setupFragment(savedInstanceState, R.id.fragment_player);
+        if (presenter.getData() == null) {
             this.presenter.loadData(false);
         }
-
         mResetCategories.setText(fromHtml(getResources().getString(R.string.try_to_refresh)));
-        mAdapter = new AudioListAdapter(this, new PlayerCallback() {
+        mAdapter = new AudioListAdapter(this, new PlayerAdapterCallback() {
             @Override
-            public void startPlaying(AudioFile audioFile) {
+            public void onPlay(AudioFile audioFile) {
                 Glide.with(AudioListActivity.this)
                         .load(audioFile.getImageFileUrl()).asBitmap()
                         .priority(Priority.HIGH).placeholder(R.drawable.ic_player_cover)
-                        .into(audioCoverImage);
-                updatePlayerUI(audioFile,  PlayerState.PLAY, true);
+                        .into(mFragment.getAudioCoverImage());
+                updatePlayerUI(audioFile, PlayerState.PLAY, true);
                 presenter.loadAudioAndSubtitles(audioFile);
             }
 
             @Override
-            public void pausePlayer() {
+            public void onPause() {
                 pausePlayerMessage();
             }
 
             @Override
-            public void continuePlaying() {
+            public void onContinue() {
                 continuePlayingMessage();
             }
         });
@@ -180,21 +180,20 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
 
         startService(new Intent(this, PlayerService.class));
 
-        mBottomSheetBehavior = BottomSheetBehavior.from(mLayoutBottomSheet);
+        mBottomSheetBehavior = BottomSheetBehavior.from(mFragmentBottomSheet);
         mBottomSheetBehavior.setPeekHeight(225);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         mLayoutBottomSheet.setBackground(ContextCompat.getDrawable(this, R.drawable.left_right_gradient_blue));
-        audioCoverImage.setBackgroundColor(ContextCompat.getColor(this, R.color.colorWhite));
-        audioCoverImage.setImageResource(R.drawable.ic_player_cover);
+
         mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                if(newState == 3){
-                    audioTitle.setTextColor(ContextCompat.getColor(AudioListActivity.this, R.color.textColorDark));
+                if (newState == 3) {
+                    mFragment.setTitleColor(R.color.textColorDark);
                     mExpandPlayerButton.setVisibility(View.GONE);
                     mLayoutBottomSheet.setBackgroundColor(ContextCompat.getColor(AudioListActivity.this, R.color.almostWhite));
-                } else if(newState == 4){
-                    audioTitle.setTextColor(ContextCompat.getColor(AudioListActivity.this, R.color.colorWhite));
+                } else if (newState == 4) {
+                    mFragment.setTitleColor(R.color.colorWhite);
                     mExpandPlayerButton.setVisibility(View.VISIBLE);
                     mLayoutBottomSheet.setBackground(ContextCompat.getDrawable(AudioListActivity.this, R.drawable.left_right_gradient_blue));
                 }
@@ -211,7 +210,6 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         mAudioProgressBar.setIndeterminate(true);
         mAudioProgressBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(this, R.color.colorWhite), android.graphics.PorterDuff.Mode.MULTIPLY);
         setupListeners();
-        setupPlayerCoverListener();
     }
 
     public void hideNoContentView() {
@@ -267,25 +265,6 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
                 loadData(false);
             }
         });
-
-        audioSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            int currentProgress;
-
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                currentProgress = progress;
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                presenter.sendMessage(null, PlayerService.MESSAGE_PLAYBACK_SEARCH, (long) currentProgress * 1000);
-            }
-        });
         mSettingsButton.setOnClickListener(v -> startActivity(new Intent(AudioListActivity.this, SettingsActivity.class)));
     }
 
@@ -309,37 +288,38 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
                         selected[which] = isChecked;
                     }
                 }).setPositiveButton(R.string.select, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mFilter.setDuration(selected);
-                                Pair<Integer, Integer> durationRange = mFilter.getDurationRange();
-                                if (mFilter.getDuration().size() > 0) {
-                                    //Вынести в класс который имеет в себе эту логику и имеет наальные и конечные значения
-                                    if (durationRange.first > -1 && durationRange.second <= 2400) {
-                                        if (durationRange.first == 0 && durationRange.second == 2400) {
-                                            mLengthButton.setText(R.string.from_0_and_greater);
-                                        } else {
-                                            if (durationRange.first == 0 && durationRange.second < 2400) {
-                                                mLengthButton.setText(String.format(getString(R.string.from_0_to), durationRange.second / 60));
-                                            } else if(durationRange.first > 0 && durationRange.second == 2400) {
-                                                mLengthButton.setText(String.format(getString(R.string.from_n_and_greater), durationRange.first / 60));
-                                            } if (durationRange.first > 0 && durationRange.second < 2400) {
-                                                mLengthButton.setText(String.format(getString(R.string.selected_time), durationRange.first / 60, durationRange.second / 60));
-                                            }
-                                        }
-                                        mLengthButton.setBackgroundColor(ContextCompat.getColor(AudioListActivity.this, R.color.colorBlue3));
-                                        mLengthButton.setTextColor(ContextCompat.getColor(AudioListActivity.this, R.color.colorWhite));
-                                    } else {
-                                        resetLengthButton();
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mFilter.setDuration(selected);
+                        Pair<Integer, Integer> durationRange = mFilter.getDurationRange();
+                        if (mFilter.getDuration().size() > 0) {
+                            //Вынести в класс который имеет в себе эту логику и имеет наальные и конечные значения
+                            if (durationRange.first > -1 && durationRange.second <= 2400) {
+                                if (durationRange.first == 0 && durationRange.second == 2400) {
+                                    mLengthButton.setText(R.string.from_0_and_greater);
+                                } else {
+                                    if (durationRange.first == 0 && durationRange.second < 2400) {
+                                        mLengthButton.setText(String.format(getString(R.string.from_0_to), durationRange.second / 60));
+                                    } else if (durationRange.first > 0 && durationRange.second == 2400) {
+                                        mLengthButton.setText(String.format(getString(R.string.from_n_and_greater), durationRange.first / 60));
+                                    }
+                                    if (durationRange.first > 0 && durationRange.second < 2400) {
+                                        mLengthButton.setText(String.format(getString(R.string.selected_time), durationRange.first / 60, durationRange.second / 60));
                                     }
                                 }
-                                mFilter.setDuration(selected);
-                                presenter.clear();
-                                setNewDurations();
-                                loadData(false);
+                                mLengthButton.setBackgroundColor(ContextCompat.getColor(AudioListActivity.this, R.color.colorBlue3));
+                                mLengthButton.setTextColor(ContextCompat.getColor(AudioListActivity.this, R.color.colorWhite));
+                            } else {
+                                resetLengthButton();
                             }
                         }
-                ).setCancelable(true)
+                        mFilter.setDuration(selected);
+                        presenter.clear();
+                        setNewDurations();
+                        loadData(false);
+                    }
+                }
+        ).setCancelable(true)
                 .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.cancel());
         AlertDialog dialog = builder.create();
         dialog.show();
@@ -392,7 +372,28 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         outState.putString(CATEGORY_BUTTON_TEXT, mCategoryButton.getText().toString());
         outState.putBoolean(KEY_SERVICE_BOUND, mBound);
         outState.putInt(KEY_PROGRESS_VISIBILITY, mAudioProgressBar.getVisibility());
+        if (mFragment != null) {
+            FragmentManager manager = getSupportFragmentManager();
+            manager.putFragment(outState, mFragment.getClass().getName(), mFragment);
+        }
         super.onSaveInstanceState(outState);
+    }
+
+    protected Fragment setupFragment(Bundle inState, int containerId) {
+        PlayerFragment fragment;
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        if (inState != null) {
+            fragment = (PlayerFragment) manager.getFragment(inState, PlayerFragment.class.getName());
+        } else {
+            fragment = (PlayerFragment) manager.findFragmentById(R.id.fragment_player);
+            fragment.setPlayerCallback(this);
+            if (!fragment.isAdded()) {
+                transaction.add(containerId, fragment, PlayerFragment.class.getName());
+                transaction.commit();
+            }
+        }
+        return fragment;
     }
 
     private void restoreSavedInstanceState(Bundle savedInstanceState) {
@@ -428,14 +429,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     }
 
     //--------------------------Player UI----------------------------------------//
-    public void setupPlayerCoverListener() {
-        audioCoverImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.sendMessage(null, PlayerService.MESSAGE_PLAYING_FILE_STATE_FOR_COVER);
-            }
-        });
-    }
+
 
     public void onPlayerCoverClick(PlayerState audioState) {
         if (mAdapter.getPlayingPosition() != -1) {
@@ -450,38 +444,39 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
                 icon = R.drawable.ic_pause_white;
                 continuePlayingMessage();
             }
-            audioPlayPause.setImageResource(icon);
+            mFragment.setPlayPauseImage(icon);
             if (audioState == PlayerState.STOP) {
-                mDarkLayer.setVisibility(View.GONE);
-                audioPlayPause.setVisibility(View.VISIBLE);
+                mFragment.hideCoverDarkMask();
+                mFragment.hidePlayPauseView();
             } else {
-                mDarkLayer.setVisibility(View.VISIBLE);
+                mFragment.showCoverDarkMask();
+                mFragment.showPlayPauseView();
             }
             notifyPlayerStateChanged(state);
         }
     }
 
-    public void updatePlayerUI(AudioFile mAudioFile, PlayerState playerState,  boolean loading) {
+    public void updatePlayerUI(AudioFile mAudioFile, PlayerState playerState, boolean loading) {
         if (mAudioFile != null) {
-            audioTitle.setText(mAudioFile.getTitle());
-            audioSeek.setMax(mAudioFile.getDurationInSeconds());
+            mFragment.setAudioTitle(mAudioFile.getTitle());
+            mFragment.setAudioDuration(mAudioFile.getDurationInSeconds());
             int icon = R.drawable.ic_pause_white;
             if (playerState == PlayerState.PLAY && !loading) {
                 hideAudioLoading();
-                audioPlayPause.setVisibility(View.VISIBLE);
+                mFragment.showPlayPauseView();
                 mAdapter.notifyPlayerStateChanged(PlayerState.PLAY);
             } else if (playerState == PlayerState.PAUSE && !loading) {
                 icon = R.drawable.ic_play_white;
                 hideAudioLoading();
-                audioPlayPause.setVisibility(View.VISIBLE);
+                mFragment.showPlayPauseView();
                 mAdapter.notifyPlayerStateChanged(PlayerState.PAUSE);
             } else {
-                audioSubtitles.setText(getString(R.string.dash));
+                mFragment.setSubtitles(getString(R.string.dash));
                 showAudioLoading();
-                audioPlayPause.setVisibility(View.GONE);
+                mFragment.hidePlayPauseView();
             }
-            mDarkLayer.setVisibility(View.VISIBLE);
-            audioPlayPause.setImageDrawable(ContextCompat.getDrawable(this, icon));
+            mFragment.showCoverDarkMask();
+            mFragment.setPlayPauseImage(icon);
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             mLayoutBottomSheet.setBackground(ContextCompat.getDrawable(this, R.drawable.left_right_gradient_blue));
         }
@@ -544,21 +539,20 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     //--------------------------Lifecycle Methods--------------------------------//
     //---------------------------------------------------------------------------//
     public void updateSubtitles(long time) {
-        if (presenter.getSubtitleEngine().size() > 0)
-            audioSubtitles.setText(presenter.getSubtitleEngine().updateSubtitles(time * 1000).getTextEn());
+        if (presenter.getSubtitleEngine().size() > 0) {
+            mFragment.setSubtitles(presenter.getSubtitleEngine().updateSubtitles(time * 1000).getTextEn());
+        }
     }
 
-    public void updatePlaybacktime(long elapsedTime, long duration) {
-        audioSeek.setProgress((int) elapsedTime / 1000);
-        audioPlayed.setText(FacadeCommon.getDateFromMillis(elapsedTime));
-        audioLeft.setText(String.format(getString(R.string.leftTime), FacadeCommon.getDateFromMillis(duration * 1000 - elapsedTime)));
+    public void updatePlaybackTime(long elapsedTime, long duration) {
+        mFragment.updatePlaybackInfo(elapsedTime, duration);
     }
 
     public void updateAdapter(AudioFile currentFile) {
         updateAdapter(mAdapter.getItems(), currentFile);
     }
 
-    public void notifyPlayerStateChanged(PlayerState playerState){
+    public void notifyPlayerStateChanged(PlayerState playerState) {
         mAdapter.notifyPlayerStateChanged(playerState);
     }
 

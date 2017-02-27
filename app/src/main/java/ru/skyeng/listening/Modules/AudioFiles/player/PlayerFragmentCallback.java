@@ -1,10 +1,8 @@
-package ru.skyeng.listening.CommonComponents;
-
-import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
+package ru.skyeng.listening.Modules.AudioFiles.player;
 
 /**
  * ---------------------------------------------------
- * Created by Sermilion on 22/02/2017.
+ * Created by Sermilion on 27/02/2017.
  * Project: Listening
  * ---------------------------------------------------
  * <a href="http://www.skyeng.ru">www.skyeng.ru</a>
@@ -12,8 +10,9 @@ import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
  * ---------------------------------------------------
  */
 
-public interface PlayerCallback {
-    void startPlaying(AudioFile audioFile);
-    void pausePlayer();
-    void continuePlaying();
+public interface PlayerFragmentCallback {
+
+    void seekTo(long time);
+
+    void updateCover();
 }

@@ -164,7 +164,7 @@ public class CategoriesActivity extends BaseActivity<MVPView, CategoriesPresente
 
     @Override
     public Context getAppContext() {
-        return getApplicationContext();
+        return SEApplication.getINSTANCE();
     }
 
     @Override
