@@ -3,7 +3,6 @@ package ru.skyeng.listening.Modules.AudioFiles;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
@@ -15,9 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.util.Pair;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -478,7 +475,6 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
             }
             mFragment.setPlayPauseImage(icon);
             if (audioState == PlayerState.STOP) {
-                mFragment.hideCoverDarkMask();
                 mFragment.hidePlayPauseView();
             } else {
                 mFragment.showCoverDarkMask();
