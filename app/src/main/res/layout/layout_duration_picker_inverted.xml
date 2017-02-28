@@ -20,12 +20,13 @@
             android:layout_height="wrap_content">
 
             <Button
-                android:minHeight="20dp"
+                android:minHeight="30dp"
                 android:id="@+id/btn_cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@null"
                 tools:text="cancel"
+                android:textStyle="bold"
                 android:textAllCaps="true"
                 android:textColor="@color/colorGrey3"
                 android:textSize="14sp"
@@ -41,6 +42,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 tools:text="confirm"
+                android:textStyle="bold"
                 android:textColor="@color/colorBlue3"
                 android:textSize="14sp"
                 android:textAllCaps="true"
@@ -55,7 +57,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/colorGrey3"
+                android:background="@color/colorBlack12"
                 android:layout_below="@+id/btn_confirm"/>
         </RelativeLayout>
 

@@ -28,21 +28,12 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.PopupWindow;
-import android.widget.Toast;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import ru.skyeng.listening.R;
 
-/**
- * PopWindow for Date Pick
- */
 public class DurationPicker extends PopupWindow implements OnClickListener {
 
     private static final int DEFAULT_MIN_VALUE = 0;
@@ -144,11 +135,6 @@ public class DurationPicker extends PopupWindow implements OnClickListener {
             return this;
         }
 
-        /**
-         * set btn text btnTextSize
-         *
-         * @param textSize dp
-         */
         public Builder btnTextSize(int textSize) {
             this.btnTextSize = textSize;
             return this;
@@ -206,7 +192,6 @@ public class DurationPicker extends PopupWindow implements OnClickListener {
             @Override
             public void onItemSelect(int item) {
                 valueTwo = item;
-//                initColumnOne();
             }
         });
         columnOneView.setLoopListener(new LoopScrollListener() {
@@ -216,8 +201,8 @@ public class DurationPicker extends PopupWindow implements OnClickListener {
             }
         });
 
-        initColumnTwo(columnTwo); // init year and month loop view
-        initColumnOne(columnOne); //init day loop view
+        initColumnTwo(columnTwo);
+        initColumnOne(columnOne);
 
         cancelBtn.setOnClickListener(this);
         confirmBtn.setOnClickListener(this);
@@ -233,7 +218,6 @@ public class DurationPicker extends PopupWindow implements OnClickListener {
 
         setTouchable(true);
         setFocusable(true);
-        // setOutsideTouchable(true);
         setBackgroundDrawable(new BitmapDrawable());
         setAnimationStyle(R.style.FadeInPopWin);
         setContentView(contentView);
@@ -252,32 +236,20 @@ public class DurationPicker extends PopupWindow implements OnClickListener {
         columnOneView.setInitPosition(valueOne);
     }
 
-    /**
-     * Show date picker popWindow
-     *
-     * @param activity
-     */
     public void showPopWin(Activity activity) {
-
         if (null != activity) {
-
             TranslateAnimation trans = new TranslateAnimation(
                     Animation.RELATIVE_TO_SELF, 0, Animation.RELATIVE_TO_SELF,
                     0, Animation.RELATIVE_TO_SELF, 1,
                     Animation.RELATIVE_TO_SELF, 0);
-
             showAtLocation(activity.getWindow().getDecorView(), Gravity.BOTTOM,
                     0, 0);
             trans.setDuration(400);
             trans.setInterpolator(new AccelerateDecelerateInterpolator());
-
             pickerContainerV.startAnimation(trans);
         }
     }
 
-    /**
-     * Dismiss date picker popWindow
-     */
     public void dismissPopWin() {
 
         TranslateAnimation trans = new TranslateAnimation(
@@ -320,37 +292,6 @@ public class DurationPicker extends PopupWindow implements OnClickListener {
             }
             dismissPopWin();
         }
-    }
-
-    /**
-     * get long from yyyy-MM-dd
-     *
-     * @param date
-     * @return
-     */
-    public static long getLongFromyyyyMMdd(String date) {
-        SimpleDateFormat mFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        Date parse = null;
-        try {
-            parse = mFormat.parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        if (parse != null) {
-            return parse.getTime();
-        } else {
-            return -1;
-        }
-    }
-
-
-    public static String format2LenStr(int num) {
-        return (num < 10) ? "0" + num : String.valueOf(num);
-    }
-
-    public static int spToPx(Context context, int spValue) {
-        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
-        return (int) (spValue * fontScale + 0.5f);
     }
 
 
