@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -30,6 +31,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
@@ -58,6 +60,7 @@ import ru.skyeng.listening.Modules.AudioFiles.player.PlayerState;
 import ru.skyeng.listening.Modules.Categories.CategoriesActivity;
 import ru.skyeng.listening.Modules.Settings.SettingsActivity;
 import ru.skyeng.listening.R;
+import ru.skyeng.listening.Utility.TimePicker.DurationPicker;
 
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.ACTION_AUDIO_STATE;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.ACTION_DID_NOT_STAR;
@@ -273,56 +276,85 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     }
 
     private void showDurationPicker() {
-        CharSequence durations[] = new CharSequence[]{
-                getString(R.string.from0to5),
-                getString(R.string.from5to10),
-                getString(R.string.from10to20),
-                getString(R.string.from20andMore)};
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(AudioListActivity.this);
-        boolean[] selected = mFilter.getDurationsBooleanArray();//settings.getDurationsBooleanArray();
-        builder.setTitle(R.string.select_duration)
-                .setMultiChoiceItems(durations, selected, new DialogInterface.OnMultiChoiceClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                        selected[which] = isChecked;
-                    }
-                }).setPositiveButton(R.string.select, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mFilter.setDuration(selected);
-                        Pair<Integer, Integer> durationRange = mFilter.getDurationRange();
-                        if (mFilter.getDuration().size() > 0) {
-                            //Вынести в класс который имеет в себе эту логику и имеет наальные и конечные значения
-                            if (durationRange.first > -1 && durationRange.second <= 2400) {
-                                if (durationRange.first == 0 && durationRange.second == 2400) {
-                                    mLengthButton.setText(R.string.from_0_and_greater);
-                                } else {
-                                    if (durationRange.first == 0 && durationRange.second < 2400) {
-                                        mLengthButton.setText(String.format(getString(R.string.from_0_to), durationRange.second / 60));
-                                    } else if (durationRange.first > 0 && durationRange.second == 2400) {
-                                        mLengthButton.setText(String.format(getString(R.string.from_n_and_greater), durationRange.first / 60));
-                                    }
-                                    if (durationRange.first > 0 && durationRange.second < 2400) {
-                                        mLengthButton.setText(String.format(getString(R.string.selected_time), durationRange.first / 60, durationRange.second / 60));
-                                    }
-                                }
-                                mLengthButton.setBackgroundColor(ContextCompat.getColor(AudioListActivity.this, R.color.colorBlue3));
-                                mLengthButton.setTextColor(ContextCompat.getColor(AudioListActivity.this, R.color.colorWhite));
-                            } else {
-                                resetLengthButton();
-                            }
-                        }
-                        mFilter.setDuration(selected);
-                        presenter.clear();
-                        setNewDurations();
-                        loadData(false);
-                    }
-                }
-        ).setCancelable(true)
-                .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.cancel());
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        List<String> fromValues = new ArrayList<>();
+        fromValues.add("От");
+        fromValues.add("0 минут");
+        fromValues.add("5 минут");
+        fromValues.add("10 минут");
+        fromValues.add("20 минут");
+        List<String> toValues = new ArrayList<>();
+        toValues.add("До");
+        toValues.add("5 минут");
+        toValues.add("10 минут");
+        toValues.add("20 минут");
+        toValues.add("больше");
+        DurationPicker pickerPopWin = new DurationPicker.Builder(this, new DurationPicker.OnDatePickedListener() {
+            @Override
+            public void onDatePickCompleted(int year, int month, int day, String dateDesc) {
+                Toast.makeText(AudioListActivity.this, dateDesc, Toast.LENGTH_SHORT).show();
+            }
+        }).textConfirm(getString(R.string.apply))
+                .textCancel(getString(R.string.cancel))
+                .btnTextSize(16)
+                .viewTextSize(25)
+                .colorCancel(Color.parseColor("#999999"))
+                .colorConfirm(Color.parseColor("#009900"))
+                .showDayMonthYear(true)
+                .dateChose("2013-11-11")
+                .columnOneValues(fromValues)
+                .columnTwoValues(toValues)
+                .build();
+        pickerPopWin.showPopWin(this);
+//        CharSequence durations[] = new CharSequence[]{
+//                getString(R.string.from0to5),
+//                getString(R.string.from5to10),
+//                getString(R.string.from10to20),
+//                getString(R.string.from20andMore)};
+//
+//        AlertDialog.Builder builder = new AlertDialog.Builder(AudioListActivity.this);
+//        boolean[] selected = mFilter.getDurationsBooleanArray();//settings.getDurationsBooleanArray();
+//        builder.setTitle(R.string.select_duration)
+//                .setMultiChoiceItems(durations, selected, new DialogInterface.OnMultiChoiceClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+//                        selected[which] = isChecked;
+//                    }
+//                }).setPositiveButton(R.string.select, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        mFilter.setDuration(selected);
+//                        Pair<Integer, Integer> durationRange = mFilter.getDurationRange();
+//                        if (mFilter.getDuration().size() > 0) {
+//                            //Вынести в класс который имеет в себе эту логику и имеет наальные и конечные значения
+//                            if (durationRange.first > -1 && durationRange.second <= 2400) {
+//                                if (durationRange.first == 0 && durationRange.second == 2400) {
+//                                    mLengthButton.setText(R.string.from_0_and_greater);
+//                                } else {
+//                                    if (durationRange.first == 0 && durationRange.second < 2400) {
+//                                        mLengthButton.setText(String.format(getString(R.string.from_0_to), durationRange.second / 60));
+//                                    } else if (durationRange.first > 0 && durationRange.second == 2400) {
+//                                        mLengthButton.setText(String.format(getString(R.string.from_n_and_greater), durationRange.first / 60));
+//                                    }
+//                                    if (durationRange.first > 0 && durationRange.second < 2400) {
+//                                        mLengthButton.setText(String.format(getString(R.string.selected_time), durationRange.first / 60, durationRange.second / 60));
+//                                    }
+//                                }
+//                                mLengthButton.setBackgroundColor(ContextCompat.getColor(AudioListActivity.this, R.color.colorBlue3));
+//                                mLengthButton.setTextColor(ContextCompat.getColor(AudioListActivity.this, R.color.colorWhite));
+//                            } else {
+//                                resetLengthButton();
+//                            }
+//                        }
+//                        mFilter.setDuration(selected);
+//                        presenter.clear();
+//                        setNewDurations();
+//                        loadData(false);
+//                    }
+//                }
+//        ).setCancelable(true)
+//                .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.cancel());
+//        AlertDialog dialog = builder.create();
+//        dialog.show();
     }
 
     private void resetLengthButton() {

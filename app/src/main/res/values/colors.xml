@@ -24,5 +24,8 @@
     <color name="colorBlueDark">#4061b5</color>
     <color name="colorBluePlayer">#3d40b1</color>
 
+    <color name="btn_cancel_color">#999999</color>
+    <color name="btn_confirm_color">#303F9F</color>
+
 
 </resources>

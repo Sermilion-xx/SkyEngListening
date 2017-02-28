@@ -57,6 +57,7 @@
     <string name="all_correct">Все верно!</string>
     <string name="dont_stop_further_difficult">Но не останавливайтесь. \nДальше — сложнее!</string>
     <string name="did_u_like_everything">Вам всё понравилось?</string>
+    <string name="done">Отмена</string>
 
 
     <string-array name="notification_days">
