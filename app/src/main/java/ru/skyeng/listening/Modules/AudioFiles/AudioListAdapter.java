@@ -111,6 +111,9 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
 
         String category = mContext.getString(R.string.no_category);
+        if(item.getTags().get(0)!=null){
+            category = item.getTags().get(0).get(KEY_TITLE);
+        }
         holder.mCategory.setText(category);
         Glide.with(mContext)
                 .load(item.getImageFileUrl())

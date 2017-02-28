@@ -30,6 +30,7 @@ public class AudioFile implements Parcelable, Comparable<AudioFile>{
     private final int wordsInMinute;
     private final int durationInSeconds;
     private final String durationInMinutes;
+    private List<Map<String, String>> tags;
 
 
     protected AudioFile(Parcel in) {
@@ -102,6 +103,14 @@ public class AudioFile implements Parcelable, Comparable<AudioFile>{
     @Override
     public int describeContents() {
         return 0;
+    }
+
+    public List<Map<String, String>> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Map<String, String>> tags) {
+        this.tags = tags;
     }
 
     @Override
