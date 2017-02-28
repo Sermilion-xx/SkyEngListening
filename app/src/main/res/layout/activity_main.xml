@@ -43,48 +43,59 @@
 
 
             <LinearLayout
-                android:id="@+id/layout_button_category"
-                android:layout_width="158dp"
-                android:layout_height="36dp"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
+                android:id="@+id/filter_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_below="@+id/toolbar"
-                android:layout_margin="16dp"
-                android:background="@color/colorBlue0">
+                android:baselineAligned="false">
 
-                <Button
-                    android:id="@+id/button_category"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:background="?attr/selectableItemBackground"
-                    android:textColor="@color/colorAccent" />
-            </LinearLayout>
+                <FrameLayout
+                    android:id="@+id/layout_button_category"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_margin="16dp"
+                    android:layout_weight="1"
+                    android:background="@color/colorBlue0"
+                    android:minWidth="100dp">
+
+                    <Button
+                        android:id="@+id/button_category"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:background="?attr/selectableItemBackground"
+                        android:minWidth="100dp"
+                        android:textColor="@color/colorAccent" />
+                </FrameLayout>
 
 
-            <LinearLayout
-                android:id="@+id/layout_length"
-                android:layout_width="158dp"
-                android:layout_height="36dp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/toolbar"
-                android:layout_margin="16dp"
-                android:background="@color/colorBlue1">
+                <FrameLayout
+                    android:id="@+id/layout_length"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_margin="16dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:background="@color/colorBlue1"
+                    android:minWidth="100dp">
 
-                <Button
-                    android:id="@+id/button_length"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="?attr/selectableItemBackground"
-                    android:textColor="@color/colorAccent" />
+                    <Button
+                        android:id="@+id/button_length"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="?attr/selectableItemBackground"
+                        android:minWidth="100dp"
+                        android:textColor="@color/colorAccent" />
+                </FrameLayout>
+
             </LinearLayout>
 
             <View
                 android:id="@+id/separator"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_below="@+id/layout_length"
+                android:layout_below="@+id/filter_layout"
                 android:background="@color/colorGrey2" />
 
             <View xmlns:android="http://schemas.android.com/apk/res/android"
@@ -124,19 +135,19 @@
         app:layout_anchor="@+id/bottom_sheet" />
 
     <LinearLayout
-        app:layout_behavior="@string/bottom_sheet_behavior"
         android:id="@+id/bottom_sheet"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-    <fragment
-        android:name="ru.skyeng.listening.Modules.AudioFiles.player.PlayerFragment"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:behavior_hideable="true"
-        app:elevation="16dp"
-        tools:layout="@layout/fragment_player"
-        android:id="@+id/fragment_player" />
+        app:layout_behavior="@string/bottom_sheet_behavior">
+
+        <fragment
+            android:id="@+id/fragment_player"
+            android:name="ru.skyeng.listening.Modules.AudioFiles.player.PlayerFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:behavior_hideable="true"
+            app:elevation="16dp"
+            tools:layout="@layout/fragment_player" />
     </LinearLayout>
 
     <ProgressBar xmlns:android="http://schemas.android.com/apk/res/android"
