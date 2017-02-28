@@ -106,14 +106,14 @@ public class AudioFilesRequestParams {
         this.durationLT = durationLT;
     }
 
-    public void prepareDurations(List<Pair<Integer, Integer>> durationValues) {
+    public void prepareDurations(Pair<Integer, Integer> durationValues) {
         Map<String, Integer> paramsMap = new HashMap<>();
-        for (int i = 0; i < durationValues.size(); i++) {
-            if (durationValues.get(i).first > -1 && durationValues.get(i).second > -1) {
-                paramsMap.put("durations[" + i + "][0]", durationValues.get(i).first);
-                paramsMap.put("durations[" + i + "][1]", durationValues.get(i).second);
-            }
+        if(durationValues!=null) {
+            paramsMap.put("durations[0][0]", durationValues.first);
+            paramsMap.put("durations[0][1]", durationValues.second);
+            setDuration(paramsMap);
+        }else {
+            setDuration(new HashMap<>());
         }
-        setDuration(paramsMap);
     }
 }

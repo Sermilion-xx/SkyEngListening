@@ -14,6 +14,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.support.v4.util.Pair;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -27,6 +28,7 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import ru.skyeng.listening.R;
 
@@ -49,12 +52,12 @@ public class DurationPicker extends PopupWindow implements OnClickListener {
     public LoopView columnOneView;
     public View pickerContainerV;
     public View contentView;//root view
+    public List<Pair<Integer, Integer>> mPositionValues;
 
     private int minValue;
     private int maxValue;
-    private int yearPos = 0;
-    private int monthPos = 0;
-    private int dayPos = 0;
+    private int valueTwo = 0;
+    private int valueOne = 0;
     private Context mContext;
     private String textCancel;
     private String textConfirm;
@@ -89,6 +92,12 @@ public class DurationPicker extends PopupWindow implements OnClickListener {
         private int viewTextSize = 25;
         private List<String> columnOne;
         private List<String> columnTwo;
+        public List<Pair<Integer, Integer>> mPositionValues;
+
+        public Builder positionValues(List<Pair<Integer, Integer>> positionValues) {
+            this.mPositionValues = positionValues;
+            return this;
+        }
 
         public Builder minYear(int minYear) {
             this.minValue = minYear;
@@ -175,6 +184,7 @@ public class DurationPicker extends PopupWindow implements OnClickListener {
         this.buttonTextSize = builder.btnTextSize;
         this.viewTextSize = builder.viewTextSize;
         this.showDayMonthYear = builder.showDayMonthYear;
+        this.mPositionValues = builder.mPositionValues;
         initView(builder.columnOne, builder.columnTwo);
     }
 
@@ -195,14 +205,14 @@ public class DurationPicker extends PopupWindow implements OnClickListener {
         columnTwoView.setLoopListener(new LoopScrollListener() {
             @Override
             public void onItemSelect(int item) {
-                monthPos = item;
+                valueTwo = item;
 //                initColumnOne();
             }
         });
         columnOneView.setLoopListener(new LoopScrollListener() {
             @Override
             public void onItemSelect(int item) {
-                dayPos = item;
+                valueOne = item;
             }
         });
 
@@ -233,13 +243,13 @@ public class DurationPicker extends PopupWindow implements OnClickListener {
 
     private void initColumnTwo(List<String> values) {
         columnTwoView.setDataList(values);
-        columnTwoView.setInitPosition(monthPos);
+        columnTwoView.setInitPosition(valueTwo);
     }
 
 
     private void initColumnOne(List<String> values) {
         columnOneView.setDataList(values);
-        columnOneView.setInitPosition(dayPos);
+        columnOneView.setInitPosition(valueOne);
     }
 
     /**
@@ -285,11 +295,11 @@ public class DurationPicker extends PopupWindow implements OnClickListener {
 
             @Override
             public void onAnimationRepeat(Animation animation) {
+
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
-
                 dismiss();
             }
         });
@@ -301,25 +311,13 @@ public class DurationPicker extends PopupWindow implements OnClickListener {
     public void onClick(View v) {
 
         if (v == contentView || v == cancelBtn) {
-
             dismissPopWin();
         } else if (v == confirmBtn) {
-
             if (null != mListener) {
-
-                int year = minValue + yearPos;
-                int month = monthPos + 1;
-                int day = dayPos + 1;
-                StringBuffer sb = new StringBuffer();
-
-                sb.append(String.valueOf(year));
-                sb.append("-");
-                sb.append(format2LenStr(month));
-                sb.append("-");
-                sb.append(format2LenStr(day));
-                mListener.onDatePickCompleted(year, month, day, sb.toString());
+                int valueOne = mPositionValues.get(this.valueOne).first;
+                int valueTwo = mPositionValues.get(this.valueTwo).second;
+                mListener.onDatePickCompleted(valueOne, valueTwo);
             }
-
             dismissPopWin();
         }
     }
@@ -346,12 +344,6 @@ public class DurationPicker extends PopupWindow implements OnClickListener {
     }
 
 
-    /**
-     * Transform int to String with prefix "0" if less than 10
-     *
-     * @param num
-     * @return
-     */
     public static String format2LenStr(int num) {
         return (num < 10) ? "0" + num : String.valueOf(num);
     }
@@ -363,16 +355,6 @@ public class DurationPicker extends PopupWindow implements OnClickListener {
 
 
     public interface OnDatePickedListener {
-
-        /**
-         * Listener when date has been checked
-         *
-         * @param year
-         * @param month
-         * @param day
-         * @param dateDesc yyyy-MM-dd
-         */
-        void onDatePickCompleted(int year, int month, int day,
-                                 String dateDesc);
+        void onDatePickCompleted(int valueOne, int valueTwo);
     }
 }

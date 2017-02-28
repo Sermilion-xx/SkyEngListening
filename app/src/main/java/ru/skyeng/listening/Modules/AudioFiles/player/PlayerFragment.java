@@ -108,7 +108,7 @@ public class PlayerFragment extends Fragment {
     }
 
     public void showCoverDarkMask(){
-        mDarkLayer.setVisibility(View.GONE);
+        mDarkLayer.setVisibility(View.VISIBLE);
     }
 
     public void setPlayPauseImage(int resource){

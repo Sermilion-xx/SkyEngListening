@@ -1,10 +1,15 @@
 package ru.skyeng.listening.CommonComponents;
 
+import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.util.Pair;
 import android.util.SparseIntArray;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import ru.skyeng.listening.Modules.AudioFiles.AudioListActivity;
+import ru.skyeng.listening.R;
 
 /**
  * ---------------------------------------------------
@@ -32,7 +37,7 @@ public class FilterSingleton {
     private static FilterSingleton INSTANCE;
 
     private List<Integer> selectedTags;
-    private List<Pair<Integer, Integer>> duration;
+    private Pair<Integer, Integer> duration;
 
     public static FilterSingleton getInstance() {
         if (INSTANCE == null) {
@@ -41,78 +46,7 @@ public class FilterSingleton {
         return INSTANCE;
     }
 
-    public void setDuration(boolean[] index) {
-        boolean allZeros = true;
-        duration.clear();
-        int one = 0;
-        int two = 5 * 60;
-        for (int i = 0; i < index.length; i++) {
-            if (index[i]) {
-                duration.add(new Pair<>(one, two));
-                allZeros = false;
-            } else {
-                duration.add(new Pair<>(-1, -1));
-            }
-            one = two;
-            two = one * 2;
-            if (i == 3) {
-                two = 360;
-            }
-        }
-        if (allZeros) {
-            duration.clear();
-            duration.add(new Pair<>(START_1, END_5));
-        }
-    }
-
-    public Pair<Integer, Integer> getDurationRange() {
-        int duration1 = 0;
-        boolean firstSelected = false;
-        int duration2 = 0;
-        for (int i = 0; i < duration.size(); i++) {
-            if (duration.get(i).second > 0) {
-                if(!firstSelected) {
-                    duration1 = duration.get(i).first;
-                    firstSelected = true;
-                }
-            }
-            if (duration1>-1) {
-                if (duration.get(i).second > 0) {
-                    duration2 = duration.get(i).second;
-                }
-            }
-        }
-        return new Pair<>(duration1, duration2);
-    }
-
-    public boolean[] getDurationsBooleanArray() {
-        boolean allFalse = true;
-        SparseIntArray map = new SparseIntArray();
-        //durations: 0, 300, 300, 600, 600, 1200, 1200, 2400
-        map.put(START_1, END_1);
-        map.put(START_2, END_2);
-        map.put(START_3, END_3);
-        map.put(START_4, END_4);
-        map.put(START_5, END_5);
-        boolean[] values = new boolean[4];
-        for (int i = 0; i < duration.size(); i++) {
-            if (map.get(duration.get(i).first) == duration.get(i).second) {
-                if (i < values.length) {
-                    values[i] = true;
-                    allFalse = false;
-                }
-            }
-        }
-        if (allFalse) {
-            for (int i = 0; i < values.length; i++) {
-                values[i] = false;
-            }
-        }
-        return values;
-    }
-
     private FilterSingleton() {
-        duration = new ArrayList<>();
         selectedTags = new ArrayList<>();
     }
 
@@ -124,11 +58,27 @@ public class FilterSingleton {
         this.selectedTags = selectedTags;
     }
 
-    public List<Pair<Integer, Integer>> getDuration() {
+    public Pair<Integer, Integer> getDuration() {
         return duration;
     }
 
-    public void setDuration(List<Pair<Integer, Integer>> duration) {
+    public void setDuration(Pair<Integer, Integer> duration) {
         this.duration = duration;
+    }
+
+    public static String getDurationText(Context context, Pair<Integer, Integer> durationRange){
+            if (durationRange.first == 0 && durationRange.second == 2400) {
+                return context.getString(R.string.length);
+            } else {
+                if (durationRange.first == 0 && durationRange.second < 2400) {
+                    return String.format(context.getString(R.string.from_0_to), durationRange.second / 60);
+                } else if (durationRange.first > 0 && durationRange.second == 2400) {
+                    return String.format(context.getString(R.string.from_n_and_greater), durationRange.first / 60);
+                }
+                if (durationRange.first > 0 && durationRange.second < 2400) {
+                    return String.format(context.getString(R.string.selected_time), durationRange.first / 60, durationRange.second / 60);
+                }
+            }
+        return context.getString(R.string.length);
     }
 }

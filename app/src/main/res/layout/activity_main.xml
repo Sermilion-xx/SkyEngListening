@@ -123,16 +123,12 @@
         android:background="@drawable/shape_gradient_top_shadow"
         app:layout_anchor="@+id/bottom_sheet" />
 
-    <!--<include-->
-        <!--layout="@layout/fragment_player"-->
-        <!--app:behavior_hideable="true"-->
-        <!--app:elevation="16dp" />-->
-
     <LinearLayout
         app:layout_behavior="@string/bottom_sheet_behavior"
         android:id="@+id/bottom_sheet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
+
     <fragment
         android:name="ru.skyeng.listening.Modules.AudioFiles.player.PlayerFragment"
         android:layout_width="wrap_content"

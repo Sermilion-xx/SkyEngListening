@@ -21,7 +21,6 @@ public class SettingsObject {
     private boolean intAccent;
     private boolean britishAccent;
     private boolean americanAccent;
-
     private boolean remainderOn;
     private RemindTime remindEvery;
     private Calendar time;
