@@ -102,16 +102,6 @@
         android:progressDrawable="@drawable/seek_bar_style_grey"/>
 
     <TextView
-        android:id="@+id/audio_played"
-        style="@style/textStyleDarkBlue"
-        android:layout_below="@+id/audio_seek"
-        android:layout_marginLeft="24dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="14dp"
-        android:layout_marginBottom="50dp"
-        android:text="@string/audio_default_time" />
-
-    <TextView
         android:id="@+id/audio_subtitles"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -140,4 +130,16 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:id="@+id/player_expand_button" />
+
+    <TextView
+        android:id="@+id/audio_played"
+        style="@style/textStyleDarkBlue"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:paddingBottom="50dp"
+        android:text="@string/audio_default_time"
+        android:layout_alignBaseline="@+id/audio_subtitles"
+        android:layout_alignBottom="@+id/audio_subtitles"
+        android:layout_alignLeft="@+id/audio_seek"
+        android:layout_alignStart="@+id/audio_seek" />
 </RelativeLayout>

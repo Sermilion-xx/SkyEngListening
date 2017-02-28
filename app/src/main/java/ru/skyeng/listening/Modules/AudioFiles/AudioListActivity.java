@@ -518,7 +518,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     //-----------------------Lifecycle Methods-----------------------------------//
     @Override
     public void onResume() {
-        if (modelHasData()) {
+        if (mAdapter.getItems() != null) {
             updateButtonsVisibility();
         }
         mPlayerBroadcast = new AudioReceiver();
