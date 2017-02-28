@@ -71,17 +71,6 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     private static final String CATEGORY_BUTTON_TEXT = "categoryButtonText";
     public static boolean categoriesSelected = false;
 
-
-    @Override
-    public void seekTo(long time) {
-        presenter.sendMessage(null, PlayerService.MESSAGE_PLAYBACK_SEARCH, time * 1000);
-    }
-
-    @Override
-    public void updateCover() {
-        presenter.sendMessage(null, PlayerService.MESSAGE_PLAYING_FILE_STATE_FOR_COVER);
-    }
-
     class EndlessScrollListener extends EndlessRecyclerViewScrollListener {
 
         EndlessScrollListener(LinearLayoutManager layoutManager) {
@@ -453,6 +442,26 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         }
     }
 
+    @Override
+    public void onSeekStarted() {
+
+    }
+
+    @Override
+    public void onSeekEnded() {
+
+    }
+
+    @Override
+    public void seekTo(long time) {
+        presenter.sendMessage(null, PlayerService.MESSAGE_PLAYBACK_SEARCH, time * 1000);
+    }
+
+    @Override
+    public void updateCover() {
+        presenter.sendMessage(null, PlayerService.MESSAGE_PLAYING_FILE_STATE_FOR_COVER);
+    }
+
     public void updatePlayerUI(AudioFile mAudioFile, PlayerState playerState, boolean loading) {
         if (mAudioFile != null) {
             mFragment.setAudioTitle(mAudioFile.getTitle());
@@ -533,6 +542,12 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         super.onStop();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        presenter.onStart();
+    }
+
     //--------------------------Lifecycle Methods--------------------------------//
     //---------------------------------------------------------------------------//
     public void updateSubtitles(long time) {
@@ -562,7 +577,6 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(ACTION_AUDIO_STATE)) {
-//                updatePlayerUI(intent.getParcelableExtra(KEY_CURRENT_AUDIO));
             } else if (intent.getAction().equals(ACTION_DID_NOT_STAR)) {
                 hideAudioLoading();
             }

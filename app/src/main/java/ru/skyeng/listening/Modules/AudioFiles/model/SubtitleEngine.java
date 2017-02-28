@@ -72,12 +72,20 @@ public class SubtitleEngine implements Comparable<Long>, Parcelable {
     }
 
     @Override
-    public int compareTo(@NonNull Long o) {
+    public int compareTo(@NonNull Long newSubStart) {
         if (current == null) return -1;
-        long thisStart = FacadeCommon.dateToMills(current.getEndTime()) * 1000;
-        if (thisStart < o) {
+        if (index > -1) {
+            while (FacadeCommon.dateToMills(subtitleFileList.get(index).getEndTime()) * 1000 < newSubStart) {
+                index++;
+            }
+            index--;
+            if (index > -1)
+                current = subtitleFileList.get(index);
+        }
+        long currentStart = FacadeCommon.dateToMills(current.getEndTime()) * 1000;
+        if (currentStart < newSubStart) {
             return -1;
-        } else if (thisStart == 0) {
+        } else if (currentStart == 0) {
             return 0;
         } else {
             return 1;

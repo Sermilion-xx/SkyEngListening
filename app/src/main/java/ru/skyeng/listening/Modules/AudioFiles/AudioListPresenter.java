@@ -174,15 +174,15 @@ public class AudioListPresenter
             getActivityContext().showProgress();
     }
 
-    void loadAudioAndSubtitles(AudioFile audioFile){
+    void loadAudioAndSubtitles(AudioFile audioFile) {
         Bundle bundle = new Bundle();
         bundle.putString(EXTRA_AUDIO_URL, audioFile.getAudioFileUrl());
         sendMessage(bundle, PlayerService.MESSAGE_START_BUFFERING, audioFile);
         loadSubtitles(new SubtitlesRequestParams(audioFile.getId()));
     }
 
-    public void loadDataIfEmpty(){
-        if(getData()==null){
+    public void loadDataIfEmpty() {
+        if (getData() == null) {
             loadData(false);
         }
     }
@@ -303,8 +303,16 @@ public class AudioListPresenter
         }
     }
 
-    void onStart(){
+    void onStart() {
         bindPlayerService();
     }
+
+//    public void onSeekStarted(){
+//        sendMessage(null, MESSAGE_SEEK_START);
+//    }
+//
+//    public void onSeekEnded(){
+//        sendMessage(null, MESSAGE_SEEK_END);
+//    }
 
 }

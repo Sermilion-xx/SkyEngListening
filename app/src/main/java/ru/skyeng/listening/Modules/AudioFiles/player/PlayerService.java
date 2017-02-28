@@ -33,6 +33,7 @@ import javax.inject.Inject;
 
 import ru.skyeng.listening.CommonComponents.SEApplication;
 import ru.skyeng.listening.Modules.AudioFiles.AudioListActivity;
+import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
 import ru.skyeng.listening.R;
 
 /**
@@ -65,16 +66,17 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
     public final static int MESSAGE_PLAYBACK_SEARCH = 5;
     public static final int MESSAGE_START_BUFFERING = 6;
     public static final int MESSAGE_SUBTITLE_TIME = 7;
-    public static final String BINDER_MESSENGER = "MESSENGER";
     public static final int MESSAGE_PLAYING_FILE_STATE_FOR_COVER = 8;
     public static final int MESSAGE_UPDATE_PLAYER_UI = 12;
+    public static final int MESSAGE_UPDATE_ADAPTER = 13;
+    public static final String BINDER_MESSENGER = "MESSENGER";
     public static final String AUDIO_ELAPSED_TIME = "AUDIO_ELAPSED_TIME";
     public static final String AUDIO_DURATION = "AUDIO_DURATION";
-    public static final int MESSAGE_UPDATE_ADAPTER = 13;
     public static final String CURRENT_FILE = "CURRENT_FILE";
     public static final String PLAYER_STATE = "PLAYER_STATE";
+
     private int mPlaybackInterval = 1000;
-    private int mSubtitleInterval = 100;
+    private int mSubtitleInterval = 400;
     private Handler mPlaybackHandler;
     private AudioPlayer mPlayer;
     Messenger messenger;
@@ -107,6 +109,36 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
     public void stopSendingPlaybackTime() {
         mPlaybackHandler.removeCallbacks(mPlaybackSenderRunnable);
         mPlaybackHandler.removeCallbacks(mSubtitleRunnable);
+    }
+
+    public void seekTo(long mills){
+        mPlayer.getPlayer().seekTo(mills);
+    }
+
+    public void startPlayback(){
+        getPlayer().setState(PlayerState.PLAY);
+        stopSendingPlaybackTime();
+        getPlayer().play();
+        startSendingPlaybackTime();
+        sendPlayingAudioFile(MESSAGE_UPDATE_PLAYER_UI);
+    }
+
+    public void continuePlaying(){
+        getPlayer().setState(PlayerState.PLAY);
+        getPlayer().play();
+        startSendingPlaybackTime();
+        sendPlayingAudioFile(MESSAGE_UPDATE_PLAYER_UI);
+    }
+
+    public void pausePlayback(){
+        getPlayer().pause();
+        stopSendingPlaybackTime();
+        sendPlayingAudioFile(MESSAGE_UPDATE_PLAYER_UI);
+    }
+
+    public void startBuffering(Bundle bundle, AudioFile audioFile) {
+        setPlayerSource(bundle);
+        getPlayer().setAudioFile(audioFile);
     }
 
     Runnable mPlaybackSenderRunnable = new Runnable() {
@@ -317,5 +349,7 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
             e.printStackTrace();
         }
     }
+
+
 }
 

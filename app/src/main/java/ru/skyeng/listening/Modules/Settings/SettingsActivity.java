@@ -111,7 +111,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
+        final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.ic_arrow_back_black);
         upArrow.setColorFilter(getResources().getColor(R.color.colorGrey4), PorterDuff.Mode.SRC_ATOP);
         setupToolbar(getString(R.string.settings), upArrow);
         ButterKnife.bind(this);
@@ -345,8 +345,8 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
     private void showNotificationPanel() {
         mSlidingArea.setVisibility(View.VISIBLE);
-        mSlidingPart1.animate().translationY(300);
-        mSlidingPart2.animate().translationY(300);
+        mSlidingPart1.animate().translationY(mSlidingPart1.getHeight());
+        mSlidingPart2.animate().translationY(mSlidingPart1.getHeight());
     }
 
     private void hideNotificationPanel() {

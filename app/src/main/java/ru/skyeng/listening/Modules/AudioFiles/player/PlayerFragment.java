@@ -86,11 +86,12 @@ public class PlayerFragment extends Fragment {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                mPlayerFragmentCallback.onSeekStarted();
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                mPlayerFragmentCallback.onSeekEnded();
                 mPlayerFragmentCallback.seekTo(currentProgress);
             }
         });
@@ -103,6 +104,7 @@ public class PlayerFragment extends Fragment {
         });
         return view;
     }
+
     public void hideCoverDarkMask(){
         mDarkLayer.setVisibility(View.GONE);
     }
