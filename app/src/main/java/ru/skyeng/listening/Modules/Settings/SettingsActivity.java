@@ -105,6 +105,11 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     private SettingsObject mSettings;
     private List<ImageView> mLevelViews;
     private GcmNetworkManager mGcmNetworkManager;
+    private static Calendar mCalendar;
+
+    static {
+        mCalendar = Calendar.getInstance();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -330,24 +335,23 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         final PendingIntent pIntent = PendingIntent.getBroadcast(this, NotificationReceiver.REQUEST_CODE,
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Calendar calendar = Calendar.getInstance();
         long firstMillis;
         long currentMils = System.currentTimeMillis();
         long destMills = FacadeCommon.dateToMills(
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH),
+                mCalendar.get(Calendar.YEAR),
+                mCalendar.get(Calendar.MONTH),
+                mCalendar.get(Calendar.DAY_OF_MONTH),
                 mSettings.getTime().get(Calendar.HOUR_OF_DAY),
                 mSettings.getTime().get(Calendar.MINUTE),
                 mSettings.getTime().get(Calendar.SECOND));
         if(currentMils<destMills){
             firstMillis = destMills;
         } else {
-            calendar.add(Calendar.DAY_OF_MONTH, 1);
+            mCalendar.add(Calendar.DAY_OF_MONTH, 1);
             firstMillis = FacadeCommon.dateToMills(
-                    calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH),
-                    calendar.get(Calendar.DAY_OF_MONTH),
+                    mCalendar.get(Calendar.YEAR),
+                    mCalendar.get(Calendar.MONTH),
+                    mCalendar.get(Calendar.DAY_OF_MONTH),
                     mSettings.getTime().get(Calendar.HOUR_OF_DAY),
                     mSettings.getTime().get(Calendar.MINUTE),
                     mSettings.getTime().get(Calendar.SECOND));
