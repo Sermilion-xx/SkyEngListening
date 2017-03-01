@@ -23,17 +23,6 @@ import ru.skyeng.listening.R;
 
 public class FilterSingleton {
 
-    private static final int START_1 = 0;
-    private static final int END_1 = 300;
-    private static final int START_2 = 300;
-    private static final int END_2 = 600;
-    private static final int START_3 = 600;
-    private static final int END_3 = 1200;
-    private static final int START_4 = 1200;
-    private static final int END_4 = 2400;
-    private static final int START_5 = 2400;
-    private static final int END_5 = 60000;
-
     private static FilterSingleton INSTANCE;
 
     private List<Integer> selectedTags;

@@ -20,7 +20,9 @@ import ru.skyeng.listening.CommonComponents.Interfaces.ModelData;
 
 public class AudioData implements ModelData<AudioFile>{
 
-    @SerializedName("data")
+    private static final String AUDIO_FILE_SERIALIZED_NAME = "data";
+
+    @SerializedName(AUDIO_FILE_SERIALIZED_NAME)
     private List<AudioFile> audioFiles;
     private Map<String, String> meta;
 

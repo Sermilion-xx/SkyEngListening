@@ -118,7 +118,7 @@ public class AudioListPresenter
 
     @Override
     public void loadData(final boolean pullToRefresh) {
-        SettingsObject settingsObject = FacadePreferences.getSettingsFromPref(getActivityContext());
+        SettingsObject settingsObject = FacadePreferences.getSettingsFromPref();
         FilterSingleton mFilter = FilterSingleton.getInstance();
         mRequestParams.prepareDurations(mFilter.getDuration());
         if (settingsObject != null) {

@@ -23,15 +23,15 @@ public class FacadePreferences {
 
     private static final String KEY_PREF_SETTINGS = "settings";
 
-    public static SettingsObject getSettingsFromPref(Context mContext) {
+    public static SettingsObject getSettingsFromPref() {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(SEApplication.getINSTANCE());
         Gson gson = new Gson();
         String json = pref.getString(KEY_PREF_SETTINGS, "");
         return gson.fromJson(json, SettingsObject.class);
     }
 
-    public static void setSettingsToPref(Context mContext, SettingsObject settings) {
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+    public static void setSettingsToPref(SettingsObject settings) {
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(SEApplication.getINSTANCE()).edit();
         Gson gson = new Gson();
         String json = gson.toJson(settings);
         editor.putString(KEY_PREF_SETTINGS, json);

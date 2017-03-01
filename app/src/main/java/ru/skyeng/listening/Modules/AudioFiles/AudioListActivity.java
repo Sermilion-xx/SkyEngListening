@@ -67,7 +67,6 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     public static final int TAG_REQUEST_CODE = 0;
     public static final String TAG_REQUEST_DATA = "tagExtra";
     private static final String KEY_SERVICE_BOUND = "serviceBound";
-    public static final String ACTION_UPDATE_ADAPTER = "updateAdapter";
     private static final String CATEGORY_BUTTON_TEXT = "categoryButtonText";
     public static boolean categoriesSelected = false;
 
@@ -171,7 +170,8 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         mBottomSheetBehavior = BottomSheetBehavior.from(mFragmentBottomSheet);
         mBottomSheetBehavior.setPeekHeight(225);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        mLayoutBottomSheet.setBackground(ContextCompat.getDrawable(this, R.drawable.left_right_gradient_blue));
+
+        mLayoutBottomSheet.setBackgroundResource(R.drawable.left_right_gradient_blue);
 
         mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
@@ -183,7 +183,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
                 } else if (newState == 4) {
                     mFragment.setTitleColor(R.color.colorWhite);
                     mExpandPlayerButton.setVisibility(View.VISIBLE);
-                    mLayoutBottomSheet.setBackground(ContextCompat.getDrawable(AudioListActivity.this, R.drawable.left_right_gradient_blue));
+                    mLayoutBottomSheet.setBackgroundResource(R.drawable.left_right_gradient_blue);
                 }
             }
 
@@ -262,18 +262,18 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
 
     private void showDurationPicker() {
         List<String> fromValues = new ArrayList<>();
-        fromValues.add("От");
-        fromValues.add("0 минут");
-        fromValues.add("5 минут");
-        fromValues.add("10 минут");
-        fromValues.add("20 минут");
+        fromValues.add(getString(R.string.from));
+        fromValues.add(getString(R.string.zero_minutes));
+        fromValues.add(getString(R.string.five_minutes));
+        fromValues.add(getString(R.string.ten_minutes));
+        fromValues.add(getString(R.string.twenty_minutes));
 
         List<String> toValues = new ArrayList<>();
-        toValues.add("До");
-        toValues.add("5 минут");
-        toValues.add("10 минут");
-        toValues.add("20 минут");
-        toValues.add("больше");
+        toValues.add(getString(R.string.to));
+        toValues.add(getString(R.string.five_minutes));
+        toValues.add(getString(R.string.ten_minutes));
+        toValues.add(getString(R.string.twenty_minutes));
+        toValues.add(getString(R.string.more));
 
         List<Pair<Integer, Integer>> positionValues = new ArrayList<>();
         positionValues.add(new Pair<>(0, 2400));
@@ -415,7 +415,6 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
 
     //--------------------------Player UI----------------------------------------//
 
-
     public void onPlayerCoverClick(PlayerState audioState) {
         if (mAdapter.getPlayingPosition() != -1) {
             int icon;
@@ -440,15 +439,6 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         }
     }
 
-    @Override
-    public void onSeekStarted() {
-
-    }
-
-    @Override
-    public void onSeekEnded() {
-
-    }
 
     @Override
     public void seekTo(long time) {
@@ -482,7 +472,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
             mFragment.showCoverDarkMask();
             mFragment.setPlayPauseImage(icon);
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-            mLayoutBottomSheet.setBackground(ContextCompat.getDrawable(this, R.drawable.left_right_gradient_blue));
+            mLayoutBottomSheet.setBackgroundResource(R.drawable.left_right_gradient_blue);
         }
     }
 

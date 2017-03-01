@@ -187,7 +187,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             icon = R.drawable.ic_pause_blue;
             actionType = PlayerState.PAUSE;
         }
-        viewHolder.mPlayPause.setImageDrawable(ContextCompat.getDrawable(mContext, icon));
+        viewHolder.mPlayPause.setImageResource(icon);
         return actionType;
     }
 

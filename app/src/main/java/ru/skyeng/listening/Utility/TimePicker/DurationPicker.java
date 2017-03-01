@@ -14,6 +14,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.util.Pair;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -58,32 +59,33 @@ public class DurationPicker extends PopupWindow implements OnClickListener {
     private int viewTextSize;
     private boolean showDayMonthYear;
 
-    private List<String> columnOne = new ArrayList<>();
-    private List<String> columnTwo = new ArrayList<>();
-
     public static class Builder {
         private Context context;
         private OnDatePickedListener listener;
-
-        public Builder(Context context, OnDatePickedListener listener) {
-            this.context = context;
-            this.listener = listener;
-        }
 
         //Option
         private boolean showDayMonthYear = false;
         private int minValue = DEFAULT_MIN_VALUE;
         private int maxValue = 1000;
-        private String textCancel = "Отмена";
-        private String textConfirm = "Готово";
+        private String textCancel;
+        private String textConfirm;
         private String dateChose = "0";
-        private int colorCancel = Color.parseColor("#999999");
-        private int colorConfirm = Color.parseColor("#303F9F");
+        private int colorCancel;
+        private int colorConfirm;
         private int btnTextSize = 16;
         private int viewTextSize = 25;
         private List<String> columnOne;
         private List<String> columnTwo;
         public List<Pair<Integer, Integer>> mPositionValues;
+
+        public Builder(Context context, OnDatePickedListener listener) {
+            this.context = context;
+            this.listener = listener;
+            textCancel  = context.getString(R.string.cancel);
+            textConfirm = context.getString(R.string.done);
+            colorCancel = ContextCompat.getColor(context, R.color.btn_cancel_color);
+            colorConfirm = ContextCompat.getColor(context, R.color.btn_confirm_color);
+        }
 
         public Builder positionValues(List<Pair<Integer, Integer>> positionValues) {
             this.mPositionValues = positionValues;

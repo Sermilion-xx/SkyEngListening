@@ -116,7 +116,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         ButterKnife.bind(this);
         mGcmNetworkManager = GcmNetworkManager.getInstance(this);
         initLevelViewsList();
-        mSettings = FacadePreferences.getSettingsFromPref(this);
+        mSettings = FacadePreferences.getSettingsFromPref();
         if (mSettings == null) {
             mSettings = new SettingsObject();
         }
@@ -221,9 +221,9 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 text = getString(R.string.advanced);
                 break;
         }
-        mLevelViews.get(mSettings.getLevel() - 1).setImageDrawable(ContextCompat.getDrawable(this, R.drawable.oval_grey));
+        mLevelViews.get(mSettings.getLevel() - 1).setImageResource(R.drawable.oval_grey);
         mSettings.setLevel(selectedLevel);
-        mLevelViews.get(mSettings.getLevel() - 1).setImageDrawable(ContextCompat.getDrawable(this, R.drawable.oval_blue));
+        mLevelViews.get(mSettings.getLevel() - 1).setImageResource(R.drawable.oval_blue);
         mLevelText.setText(text);
     }
 
@@ -352,14 +352,13 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                     mSettings.getTime().get(Calendar.MINUTE),
                     mSettings.getTime().get(Calendar.SECOND));
         }
-
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis,
                 AlarmManager.INTERVAL_DAY, pIntent);
     }
 
     private void saveSettings(SettingsObject mSettings) {
-        FacadePreferences.setSettingsToPref(SettingsActivity.this, mSettings);
+        FacadePreferences.setSettingsToPref(mSettings);
     }
 
     boolean doNotTriggerAllAccents = false;

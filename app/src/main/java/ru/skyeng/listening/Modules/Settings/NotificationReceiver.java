@@ -41,7 +41,7 @@ public class NotificationReceiver extends BroadcastReceiver {
             boolean isWeekday = ((day >= Calendar.MONDAY) && (day <= Calendar.FRIDAY));
 
             Intent i = new Intent(context, NotificationService.class);
-            SettingsObject settingsObject = FacadePreferences.getSettingsFromPref(context);
+            SettingsObject settingsObject = FacadePreferences.getSettingsFromPref();
 
             boolean onEveryday = settingsObject.getRemindEvery() == RemindTime.EVERYDAY;
             boolean onWeekends = settingsObject.getRemindEvery() == RemindTime.WEEKENDS;

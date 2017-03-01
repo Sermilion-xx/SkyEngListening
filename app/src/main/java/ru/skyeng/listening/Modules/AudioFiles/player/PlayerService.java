@@ -51,8 +51,6 @@ public class PlayerService extends Service implements ExoPlayer.EventListener,
 
     public static final String DOMAIN = "ru.skyeng.listening";
     public static final String ACTION_PLAY = DOMAIN + ".ACTION_PLAY";
-    public static final String ACTION_PAUSE = DOMAIN + ".ACTION_PAUSE";
-    public static final String ACTION_CONTINUE = DOMAIN + ".ACTION_CONTINUE";
     public static final String EXTRA_TITLE = "title";
     public static final String EXTRA_MESSAGE = "message";
     public static final String EXTRA_AUDIO_URL = "audioUrl";

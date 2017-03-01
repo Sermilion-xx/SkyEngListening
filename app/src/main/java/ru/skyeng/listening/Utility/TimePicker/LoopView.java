@@ -136,7 +136,7 @@ public class LoopView extends View {
     private void initData() {
 
         if (mDataList == null) {
-            throw new IllegalArgumentException("Нету данных");
+            throw new IllegalArgumentException(mContext.getString(R.string.no_data));
         }
         mTopBottomTextPaint.setColor(mTopBottomTextColor);
         mTopBottomTextPaint.setAntiAlias(true);
@@ -206,7 +206,6 @@ public class LoopView extends View {
 
         super.onDraw(canvas);
 
-        //the length of single item is mItemHeight
         int mChangingItem = (int) (mTotalScrollY / (mItemHeight));
         mCurrentIndex = mInitPosition + mChangingItem % mDataList.size();
         if (!mCanLoop) { // can loop
@@ -216,7 +215,7 @@ public class LoopView extends View {
             if (mCurrentIndex > mDataList.size() - 1) {
                 mCurrentIndex = mDataList.size() - 1;
             }
-        } else { //can not loop
+        } else {
             if (mCurrentIndex < 0) {
                 mCurrentIndex = mDataList.size() + mCurrentIndex;
             }
@@ -256,26 +255,17 @@ public class LoopView extends View {
         int changingLeftY = (int) (mTotalScrollY % (mItemHeight));
         while (count < mDrawItemsCount) {
             canvas.save();
-            // L= å * r -> å = rad
             float itemHeight = mMaxTextHeight * lineSpacingMultiplier;
-            //get radian  L = (itemHeight * count - changingLeftY),r = mCircularRadius
             double radian = (itemHeight * count - changingLeftY) / mCircularRadius;
-            // a = rad * 180 / π
-            //get angle
             float angle = (float) (radian * 180 / Math.PI);
 
-            //when angle >= 180 || angle <= 0 don't draw
             if (angle >= 180F || angle <= 0F) {
                 canvas.restore();
             } else {
-                // translateY = r - r*cos(å) -
-                //(Math.sin(radian) * mMaxTextHeight) / 2 this is text offset
                 int translateY = (int) (mCircularRadius - Math.cos(radian) * mCircularRadius - (Math.sin(radian) * mMaxTextHeight) / 2) + mPaddingTopBottom;
                 canvas.translate(0.0F, translateY);
-                //scale offset = Math.sin(radian) -> 0 - 1
                 canvas.scale(1.0F, (float) Math.sin(radian));
                 if (translateY <= mTopLineY) {
-                    //draw text y between 0 -> mTopLineY,include incomplete text
                     canvas.save();
                     canvas.clipRect(0, 0, mWidgetWidth, mTopLineY - translateY);
                     canvas.drawText(itemCount[count], mPaddingLeftRight, mMaxTextHeight, mTopBottomTextPaint);
@@ -285,7 +275,6 @@ public class LoopView extends View {
                     canvas.drawText(itemCount[count], mPaddingLeftRight, mMaxTextHeight, mCenterTextPaint);
                     canvas.restore();
                 } else if (mMaxTextHeight + translateY >= mBottomLineY) {
-                    //draw text y between  mTopLineY -> mBottomLineY ,include incomplete text
                     canvas.save();
                     canvas.clipRect(0, 0, mWidgetWidth, mBottomLineY - translateY);
                     canvas.drawText(itemCount[count], mPaddingLeftRight, mMaxTextHeight, mCenterTextPaint);
@@ -295,10 +284,8 @@ public class LoopView extends View {
                     canvas.drawText(itemCount[count], mPaddingLeftRight, mMaxTextHeight, mTopBottomTextPaint);
                     canvas.restore();
                 } else if (translateY >= mTopLineY && mMaxTextHeight + translateY <= mBottomLineY) {
-                    //draw center complete text
                     canvas.clipRect(0, 0, mWidgetWidth, (int) (itemHeight));
                     canvas.drawText(itemCount[count], mPaddingLeftRight, mMaxTextHeight, mCenterTextPaint);
-                    //center one indicate selected item
                     mSelectedItem = mDataList.indexOf(itemCount[count]);
                 }
                 canvas.restore();
@@ -345,10 +332,6 @@ public class LoopView extends View {
         mLoopListener = LoopListener;
     }
 
-    /**
-     * All public method must be called before this method
-     * @param list data list
-     */
     public final void setDataList(List<String> list) {
         this.mDataList = (ArrayList) list;
         initData();
@@ -358,7 +341,6 @@ public class LoopView extends View {
         return mSelectedItem;
     }
 
-
     private void itemSelected() {
         if (mLoopListener != null) {
             postDelayed(new SelectedRunnable(), 200L);
@@ -366,7 +348,6 @@ public class LoopView extends View {
     }
 
     private void cancelSchedule() {
-
         if (mScheduledFuture != null && !mScheduledFuture.isCancelled()) {
             mScheduledFuture.cancel(true);
             mScheduledFuture = null;
@@ -390,20 +371,17 @@ public class LoopView extends View {
         @Override
         public final boolean onDown(MotionEvent motionevent) {
             cancelSchedule();
-            Log.i(TAG, "LoopViewGestureListener->onDown");
             return true;
         }
 
         @Override
         public final boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             startSmoothScrollTo(velocityY);
-            Log.i(TAG, "LoopViewGestureListener->onFling");
             return true;
         }
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            Log.i(TAG, "LoopViewGestureListener->onScroll");
             mTotalScrollY = (int) ((float) mTotalScrollY + distanceY);
             if (!mCanLoop) {
                 int initPositionCircleLength = (int) (mInitPosition * (mItemHeight));
@@ -439,9 +417,6 @@ public class LoopView extends View {
         }
     }
 
-    /**
-     * Use in ACTION_UP
-     */
     class HalfHeightRunnable implements Runnable {
 
         int realTotalOffset;
@@ -456,22 +431,16 @@ public class LoopView extends View {
 
         @Override
         public void run() {
-            //first in
             if (realTotalOffset == Integer.MAX_VALUE) {
-
                 if ((float) offset > mItemHeight / 2.0F) {
-                    //move to next item
                     realTotalOffset = (int) (mItemHeight - (float) offset);
                 } else {
-                    //move to pre item
                     realTotalOffset = -offset;
                 }
             }
 
             realOffset = (int) ((float) realTotalOffset * 0.1F);
-
             if (realOffset == 0) {
-
                 if (realTotalOffset < 0) {
                     realOffset = -1;
                 } else {
@@ -491,14 +460,9 @@ public class LoopView extends View {
         }
     }
 
-    /**
-     * Use in {@link LoopViewGestureListener#onFling(MotionEvent, MotionEvent, float, float)}
-     */
     class FlingRunnable implements Runnable {
-
         float velocity;
         final float velocityY;
-
         FlingRunnable(float velocityY) {
             this.velocityY = velocityY;
             velocity = Integer.MAX_VALUE;
@@ -517,7 +481,6 @@ public class LoopView extends View {
                     velocity = velocityY;
                 }
             }
-            Log.i(TAG, "velocity->" + velocity);
             if (Math.abs(velocity) >= 0.0F && Math.abs(velocity) <= 20F) {
                 cancelSchedule();
                 mHandler.sendEmptyMessage(MSG_SCROLL_LOOP);

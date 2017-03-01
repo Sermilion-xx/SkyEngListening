@@ -19,6 +19,11 @@ import java.util.TimeZone;
 
 public class FacadeCommon {
 
+    private static final String SART_DATE_STR = "1970-01-01 ";
+    private static final String TIME_ZONE = "UTC";
+    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SS";
+    private static final String LOCALE = "Ru";
+
     public static String getDateFromMillis(long millis) {
         SimpleDateFormat formatter = new SimpleDateFormat("mm:ss", Locale.getDefault());
         return formatter.format(new Date(millis));
@@ -34,9 +39,9 @@ public class FacadeCommon {
     public static long dateToMills(String inputString) {
         try {
             String local = inputString.substring(0,8);
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");
-            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-            Date date = sdf.parse("1970-01-01 " + inputString);
+            SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT, new Locale(LOCALE));
+            sdf.setTimeZone(TimeZone.getTimeZone(TIME_ZONE));
+            Date date = sdf.parse(SART_DATE_STR + inputString);
             return date.getTime();
         } catch (ParseException e) {
             e.printStackTrace();

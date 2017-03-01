@@ -57,7 +57,15 @@
     <string name="all_correct">Все верно!</string>
     <string name="dont_stop_further_difficult">Но не останавливайтесь. \nДальше — сложнее!</string>
     <string name="did_u_like_everything">Вам всё понравилось?</string>
-    <string name="done">Отмена</string>
+    <string name="done">Готово</string>
+    <string name="from">От</string>
+    <string name="zero_minutes">0 минут</string>
+    <string name="five_minutes">5 минут</string>
+    <string name="ten_minutes">10 минут</string>
+    <string name="twenty_minutes">20 минут</string>
+    <string name="to">До</string>
+    <string name="more">больше</string>
+    <string name="no_data">Нету данных</string>
 
 
     <string-array name="notification_days">

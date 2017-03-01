@@ -33,8 +33,6 @@ import ru.skyeng.listening.Modules.AudioFiles.model.AudioFile;
 
 public class AudioPlayer {
 
-    private static final int BUFFER_SEGMENT_SIZE = 1024;
-    private static final int MAIN_BUFFER_SEGMENTS = 254;
     private static final DefaultBandwidthMeter BANDWIDTH_METER = new DefaultBandwidthMeter();
     private Context mContext;
     private SimpleExoPlayer mPlayer;

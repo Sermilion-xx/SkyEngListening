@@ -1,10 +1,19 @@
 package ru.skyeng.listening.Utility.TagView;
 
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 
 
 public class Tag {
+
+    static final int DEFAULT_TAG_LAYOUT_COLOR = Color.parseColor("#AED374");
+    static final int DEFAULT_TAG_LAYOUT_COLOR_PRESS = Color.parseColor("#88363636");
+    static final int DEFAULT_TAG_TEXT_COLOR = Color.parseColor("#ffffff");
+    static final int DEFAULT_TAG_DELETE_INDICATOR_COLOR = Color.parseColor("#ffffff");
+    static final int DEFAULT_TAG_LAYOUT_BORDER_COLOR = Color.parseColor("#ffffff");
+
+    private static final String DELETE_ICON = "×";
     public int id;
     public String text;
     public int tagTextColor;
@@ -22,13 +31,13 @@ public class Tag {
     public Typeface typeface;
 
     public Tag(String text) {
-        this.init(0, text, TagViewConstants.DEFAULT_TAG_TEXT_COLOR,
-                14.0F, TagViewConstants.DEFAULT_TAG_LAYOUT_COLOR,
-                TagViewConstants.DEFAULT_TAG_LAYOUT_COLOR_PRESS,
+        this.init(0, text, DEFAULT_TAG_TEXT_COLOR,
+                14.0F, DEFAULT_TAG_LAYOUT_COLOR,
+                DEFAULT_TAG_LAYOUT_COLOR_PRESS,
                 false,
-                TagViewConstants.DEFAULT_TAG_DELETE_INDICATOR_COLOR,
-                14.0F, 100.0F, "×", 0.0F,
-                TagViewConstants.DEFAULT_TAG_LAYOUT_BORDER_COLOR,
+                DEFAULT_TAG_DELETE_INDICATOR_COLOR,
+                14.0F, 100.0F, DELETE_ICON, 0.0F,
+                DEFAULT_TAG_LAYOUT_BORDER_COLOR,
                 Typeface.DEFAULT);
     }
 

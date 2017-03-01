@@ -1,14 +1,10 @@
 package ru.skyeng.listening.Modules.AudioFiles.model;
 
-import android.graphics.Bitmap;
-import android.media.session.PlaybackState;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.List;
 import java.util.Map;
-
-import ru.skyeng.listening.Modules.AudioFiles.player.PlayerState;
 
 /**
  * ---------------------------------------------------

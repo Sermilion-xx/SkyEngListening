@@ -12,10 +12,6 @@ package ru.skyeng.listening.Modules.AudioFiles.player;
 
 public interface PlayerFragmentCallback {
 
-    void onSeekStarted();
-
-    void onSeekEnded();
-
     void seekTo(long time);
 
     void updateCover();
