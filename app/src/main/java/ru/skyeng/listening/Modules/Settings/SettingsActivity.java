@@ -1,5 +1,8 @@
 package ru.skyeng.listening.Modules.Settings;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -28,8 +31,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
-import com.google.android.gms.gcm.PeriodicTask;
-import com.google.android.gms.gcm.Task;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -37,14 +38,12 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import ru.skyeng.listening.CommonComponents.BaseActivity;
+import ru.skyeng.listening.CommonComponents.FacadeCommon;
 import ru.skyeng.listening.Modules.Settings.model.RemindTime;
 import ru.skyeng.listening.Modules.Settings.model.SettingsObject;
 import ru.skyeng.listening.R;
 import ru.skyeng.listening.Utility.FacadePreferences;
 import ru.skyeng.listening.Utility.HelperMethod;
-
-import static ru.skyeng.listening.Modules.Settings.NotificationService.TAG_TASK_PERIODIC_LOG;
 
 public class SettingsActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
 
@@ -308,24 +307,55 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    protected void showToast(int message){
+    protected void showToast(int message) {
         Toast.makeText(this, getString(message), Toast.LENGTH_LONG).show();
     }
 
     private void removeNotification() {
-        mGcmNetworkManager.cancelAllTasks(NotificationService.class);
+        Intent intentAlarm = new Intent(getApplicationContext(), NotificationService.class);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        PendingIntent pendingIntent = PendingIntent.getService(
+                getApplicationContext(),
+                NotificationReceiver.REQUEST_CODE,
+                intentAlarm,
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+        alarmManager.cancel(pendingIntent);
     }
 
-    private void setNotification() {
 
-        Task task = new PeriodicTask.Builder()
-                .setService(NotificationService.class)
-                .setPeriod(mSettings.getTime().getTimeInMillis())
-                .setFlex(10)
-                .setTag(TAG_TASK_PERIODIC_LOG)
-                .setPersisted(true)
-                .build();
-        mGcmNetworkManager.schedule(task);
+    private void setNotification() {
+        Intent intent = new Intent(getApplicationContext(), NotificationReceiver.class);
+        intent.setAction(NotificationReceiver.ACTION_APP_NOTIFY);
+        final PendingIntent pIntent = PendingIntent.getBroadcast(this, NotificationReceiver.REQUEST_CODE,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Calendar calendar = Calendar.getInstance();
+        long firstMillis;
+        long currentMils = System.currentTimeMillis();
+        long destMills = FacadeCommon.dateToMills(
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH),
+                mSettings.getTime().get(Calendar.HOUR_OF_DAY),
+                mSettings.getTime().get(Calendar.MINUTE),
+                mSettings.getTime().get(Calendar.SECOND));
+        if(currentMils<destMills){
+            firstMillis = destMills;
+        } else {
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+            firstMillis = FacadeCommon.dateToMills(
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH),
+                    mSettings.getTime().get(Calendar.HOUR_OF_DAY),
+                    mSettings.getTime().get(Calendar.MINUTE),
+                    mSettings.getTime().get(Calendar.SECOND));
+        }
+
+        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis,
+                AlarmManager.INTERVAL_DAY, pIntent);
     }
 
     private void saveSettings(SettingsObject mSettings) {
@@ -431,6 +461,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         } else if (parent.getId() == R.id.text_remainder_time_value) {
             createNotificationTime(textView.getText().toString());
         }
+        setNotification();
         saveSettings(mSettings);
     }
 

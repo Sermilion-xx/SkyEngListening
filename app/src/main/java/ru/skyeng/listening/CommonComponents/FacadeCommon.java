@@ -2,6 +2,7 @@ package ru.skyeng.listening.CommonComponents;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -21,6 +22,13 @@ public class FacadeCommon {
     public static String getDateFromMillis(long millis) {
         SimpleDateFormat formatter = new SimpleDateFormat("mm:ss", Locale.getDefault());
         return formatter.format(new Date(millis));
+    }
+
+    public static long dateToMills(int year, int month, int day, int hour, int minute, int seconds) {
+        Calendar c = Calendar.getInstance();
+        c.set(year, month, day, hour, minute, seconds);
+
+        return c.getTimeInMillis();
     }
 
     public static long dateToMills(String inputString) {

@@ -1,5 +1,6 @@
 package ru.skyeng.listening.Modules.Settings;
 
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -23,27 +24,24 @@ import ru.skyeng.listening.R;
  * ---------------------------------------------------
  */
 
-public class NotificationService extends GcmTaskService {
+public class NotificationService extends IntentService {
 
-    public static final String TAG_TASK_PERIODIC_LOG = "notificationTask";
     private static int NOTIFICATION_ID = 0;
 
-    @Override
-    public int onRunTask(TaskParams taskParams) {
-        switch (taskParams.getTag()) {
-            case TAG_TASK_PERIODIC_LOG:
-                createNotification("Пора учить английский", this,  AudioListActivity.class);
-                return GcmNetworkManager.RESULT_SUCCESS;
-            default:
-                return GcmNetworkManager.RESULT_FAILURE;
-        }
+    public NotificationService() {
+        super("MyTestService");
     }
 
-    public static void createNotification(String message, Context context, Class aClass) {
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        createNotification("Пора учить английский", this,  AudioListActivity.class);
+    }
+
+    public void createNotification(String message, Context context, Class aClass) {
         Intent intent = new Intent(context, aClass);
         PendingIntent pIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(), intent, 0);
         Notification noti = new Notification.Builder(context)
-                .setContentTitle("SkyEng Listening")
+                .setContentTitle(getString(R.string.app_name))
                 .setContentText(message)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentIntent(pIntent).build();

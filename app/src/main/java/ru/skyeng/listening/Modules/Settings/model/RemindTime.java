@@ -10,7 +10,7 @@ package ru.skyeng.listening.Modules.Settings.model;
  * ---------------------------------------------------
  */
 
-public enum RemindTime {
+public enum RemindTime{
 
     WEEKENDS(0), WEEKDAYS(1), EVERYDAY(2), MONDAY(3), TUESDAY(4), WEDNESDAY(5), THURSDAY(6), FRIDAY(7), SATURDAY(8), SUNDAY(9);
     int value;
@@ -21,5 +21,7 @@ public enum RemindTime {
     public int getValue() {
         return value;
     }
+
+
 
 }

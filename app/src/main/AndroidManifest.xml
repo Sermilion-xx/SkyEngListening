@@ -32,12 +32,15 @@
             android:screenOrientation="portrait"/>
 
         <service android:name=".Modules.Settings.NotificationService"
-            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
-            </intent-filter>
+            android:exported="false">
         </service>
+
+        <receiver
+            android:name=".Modules.Settings.NotificationReceiver">
+            <intent-filter>
+                <action android:name="ru.skyeng.listening.skyengNotification"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

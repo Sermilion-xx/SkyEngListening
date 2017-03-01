@@ -8,9 +8,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import java.util.Calendar;
+
 import ru.skyeng.listening.Modules.AudioFiles.AudioListActivity;
+import ru.skyeng.listening.Modules.Settings.model.RemindTime;
 import ru.skyeng.listening.Modules.Settings.model.SettingsObject;
 import ru.skyeng.listening.R;
+import ru.skyeng.listening.Utility.FacadePreferences;
 
 /**
  * ---------------------------------------------------
@@ -24,24 +28,34 @@ import ru.skyeng.listening.R;
 
 public class NotificationReceiver extends BroadcastReceiver {
 
-    private static int NOTIFICATION_ID = 0;
+    public static String ACTION_APP_NOTIFY = "ru.skyeng.listening.skyengNotification";
+
+    public static final int REQUEST_CODE = 0;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        createNotification("Пора учить английский", context,  AudioListActivity.class);
+        if(intent.getAction().equals(ACTION_APP_NOTIFY)) {
+
+            Calendar calendar = Calendar.getInstance();
+            int day = calendar.get(Calendar.DAY_OF_WEEK);
+            boolean isWeekday = ((day >= Calendar.MONDAY) && (day <= Calendar.FRIDAY));
+
+            Intent i = new Intent(context, NotificationService.class);
+            SettingsObject settingsObject = FacadePreferences.getSettingsFromPref(context);
+
+            boolean onEveryday = settingsObject.getRemindEvery() == RemindTime.EVERYDAY;
+            boolean onWeekends = settingsObject.getRemindEvery() == RemindTime.WEEKENDS;
+            boolean onWeekdays = !onEveryday && !onWeekends;
+            boolean onDay = !onEveryday && !onWeekends;
+
+            if(onEveryday
+                    || (onWeekdays && isWeekday)
+                    || (onWeekends && !isWeekday)
+                    || (onDay && day == settingsObject.getTime().get(Calendar.DAY_OF_WEEK))){
+                context.startService(i);
+            }
+        }
+
     }
 
-    public static void createNotification(String message, Context context, Class aClass) {
-        Intent intent = new Intent(context, aClass);
-        PendingIntent pIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(), intent, 0);
-        Notification noti = new Notification.Builder(context)
-                .setContentTitle("SkyEng Listening")
-                .setContentText(message)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentIntent(pIntent).build();
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        noti.flags |= Notification.FLAG_AUTO_CANCEL;
-        notificationManager.notify(NOTIFICATION_ID, noti);
-        NOTIFICATION_ID++;
-    }
 }
