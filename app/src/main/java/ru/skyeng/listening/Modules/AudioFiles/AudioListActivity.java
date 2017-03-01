@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -288,14 +287,12 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
             public void onDatePickCompleted(int valueOne, int valueTwo) {
                 Pair<Integer, Integer> durationRange = new Pair<>(valueOne, valueTwo);
                 mFilter.setDuration(durationRange);
-                if (mFilter.getDuration() != null && durationRange.first!=0 && durationRange.second!=2400) {
-                    if (durationRange.first > -1 && durationRange.second <= 2400) {
-                        mLengthButton.setText(FilterSingleton.getDurationText(AudioListActivity.this, durationRange));
-                        mLengthButton.setBackgroundColor(ContextCompat.getColor(AudioListActivity.this, R.color.colorBlue3));
-                        mLengthButton.setTextColor(ContextCompat.getColor(AudioListActivity.this, R.color.colorWhite));
-                    } else {
-                        resetLengthButton();
-                    }
+                if (durationRange.first > -1 && durationRange.second <= 2400) {
+                    mLengthButton.setText(FilterSingleton.getDurationText(AudioListActivity.this, durationRange));
+                    mLengthButton.setBackgroundColor(ContextCompat.getColor(AudioListActivity.this, R.color.colorBlue3));
+                    mLengthButton.setTextColor(ContextCompat.getColor(AudioListActivity.this, R.color.colorWhite));
+                } else {
+                    resetLengthButton();
                 }
                 presenter.clear();
                 setNewDurations();
@@ -509,7 +506,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         if (mFilter.getSelectedTags().size() == 0) {
             mCategoryButton.setText(getString(R.string.categories));
         }
-        if (mFilter.getDuration()== null) {
+        if (mFilter.getDuration() == null) {
             mLengthButton.setText(getString(R.string.length));
         }
     }
