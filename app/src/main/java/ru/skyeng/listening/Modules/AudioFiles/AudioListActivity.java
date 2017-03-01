@@ -20,9 +20,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -57,6 +58,7 @@ import ru.skyeng.listening.Modules.Categories.CategoriesActivity;
 import ru.skyeng.listening.Modules.Settings.SettingsActivity;
 import ru.skyeng.listening.R;
 import ru.skyeng.listening.Utility.TimePicker.DurationPicker;
+import ru.skyeng.listening.Utility.ViewServer;
 
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.ACTION_AUDIO_STATE;
 import static ru.skyeng.listening.Modules.AudioFiles.player.PlayerService.ACTION_DID_NOT_STAR;
@@ -105,8 +107,6 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     RelativeLayout mNoContentFoundLayout;
     @BindView(R.id.text_try)
     TextView mResetCategories;
-    @BindView(R.id.action_settings)
-    ImageButton mSettingsButton;
     @BindView(R.id.recyclerView)
     RecyclerView mRecyclerView;
     @BindView(R.id.swipeContainer)
@@ -125,6 +125,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         SEApplication.getINSTANCE().getAudioListDiComponent().inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ViewServer.get(this).addWindow(this);
         ButterKnife.bind(this);
         mProgress = (ProgressBar) findViewById(R.id.loadingView);
         setupToolbar(getString(R.string.Listening));
@@ -253,7 +254,6 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
                 loadData(false);
             }
         });
-        mSettingsButton.setOnClickListener(v -> startActivity(new Intent(AudioListActivity.this, SettingsActivity.class)));
     }
 
     private void setNewDurations() {
@@ -505,6 +505,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     //-----------------------Lifecycle Methods-----------------------------------//
     @Override
     public void onResume() {
+        ViewServer.get(this).setFocusedWindow(this);
         if (mAdapter.getItems() != null) {
             updateButtonsVisibility();
         }
@@ -535,6 +536,26 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         super.onStart();
         presenter.onStart();
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_audio_list, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                startActivity(new Intent(AudioListActivity.this, SettingsActivity.class));
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
 
     //--------------------------Lifecycle Methods--------------------------------//
     //---------------------------------------------------------------------------//
@@ -574,6 +595,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        ViewServer.get(this).removeWindow(this);
     }
 
     public void updatePlayList(List<AudioFile> value) {

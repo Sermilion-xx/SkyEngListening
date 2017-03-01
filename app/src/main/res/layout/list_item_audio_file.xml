@@ -21,7 +21,6 @@
             android:layout_height="86dp"
             app:riv_corner_radius="3dp"
             app:riv_mutate_background="true"
-            android:background="@drawable/round_image_background"
             android:contentDescription="@string/track_cover"
             android:src="@drawable/ic_player_cover" />
 

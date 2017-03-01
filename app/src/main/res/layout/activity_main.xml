@@ -16,7 +16,7 @@
         android:background="@color/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         app:elevation="0dp"
-        app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
+        app:layout_scrollFlags="scroll|enterAlways">
 
         <RelativeLayout
             android:id="@+id/toolbar_layout"
@@ -25,22 +25,11 @@
             android:orientation="horizontal"
             app:layout_scrollFlags="scroll|enterAlways">
 
-            <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+            <android.support.v7.widget.Toolbar
+                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize">
-
-                <ImageButton
-                    android:id="@+id/action_settings"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
-                    android:background="@drawable/selector_button_settings"
-                    android:contentDescription="@string/settings" />
-            </android.support.v7.widget.Toolbar>
-
+                android:layout_height="?attr/actionBarSize" />
 
             <LinearLayout
                 android:id="@+id/filter_layout"
@@ -49,28 +38,23 @@
                 android:layout_below="@+id/toolbar"
                 android:baselineAligned="false">
 
-                <FrameLayout
-                    android:id="@+id/layout_button_category"
+                <Button
+                    android:id="@+id/button_category"
+                    style="?attr/buttonBarButtonStyle"
                     android:layout_width="0dp"
                     android:layout_height="36dp"
+                    android:layout_gravity="center"
                     android:layout_margin="16dp"
                     android:layout_weight="1"
                     android:background="@color/colorBlue0"
-                    android:minWidth="100dp">
-
-                    <Button
-                        android:id="@+id/button_category"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:background="?attr/selectableItemBackground"
-                        android:minWidth="100dp"
-                        android:textColor="@color/colorAccent" />
-                </FrameLayout>
+                    android:foreground="?attr/selectableItemBackground"
+                    android:minWidth="100dp"
+                    android:textColor="@color/colorAccent" />
 
 
-                <FrameLayout
-                    android:id="@+id/layout_length"
+                <Button
+                    android:id="@+id/button_length"
+                    style="?attr/buttonBarButtonStyle"
                     android:layout_width="0dp"
                     android:layout_height="36dp"
                     android:layout_margin="16dp"
@@ -78,17 +62,9 @@
                     android:layout_marginRight="5dp"
                     android:layout_weight="1"
                     android:background="@color/colorBlue1"
-                    android:minWidth="100dp">
-
-                    <Button
-                        android:id="@+id/button_length"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="?attr/selectableItemBackground"
-                        android:minWidth="100dp"
-                        android:textColor="@color/colorAccent" />
-                </FrameLayout>
-
+                    android:foreground="?attr/selectableItemBackground"
+                    android:minWidth="100dp"
+                    android:textColor="@color/colorAccent" />
             </LinearLayout>
 
             <View
@@ -120,7 +96,9 @@
         <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <include
