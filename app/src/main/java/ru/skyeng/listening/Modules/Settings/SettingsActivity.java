@@ -102,13 +102,24 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     Spinner mTimeSpinner;
     protected Toolbar mToolbar;
 
-    private SettingsObject mSettings;
+    private static SettingsObject mSettings;
     private List<ImageView> mLevelViews;
-    private GcmNetworkManager mGcmNetworkManager;
     private static Calendar mCalendar;
+    private static long destMills;
 
     static {
         mCalendar = Calendar.getInstance();
+        mSettings = FacadePreferences.getSettingsFromPref();
+        if (mSettings == null) {
+            mSettings = new SettingsObject();
+        }
+        destMills = FacadeCommon.dateToMills(
+                mCalendar.get(Calendar.YEAR),
+                mCalendar.get(Calendar.MONTH),
+                mCalendar.get(Calendar.DAY_OF_MONTH),
+                mSettings.getTime().get(Calendar.HOUR_OF_DAY),
+                mSettings.getTime().get(Calendar.MINUTE),
+                mSettings.getTime().get(Calendar.SECOND));
     }
 
     @Override
@@ -119,15 +130,9 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         upArrow.setColorFilter(getResources().getColor(R.color.colorGrey4), PorterDuff.Mode.SRC_ATOP);
         setupToolbar(getString(R.string.settings), upArrow);
         ButterKnife.bind(this);
-        mGcmNetworkManager = GcmNetworkManager.getInstance(this);
         initLevelViewsList();
-        mSettings = FacadePreferences.getSettingsFromPref();
-        if (mSettings == null) {
-            mSettings = new SettingsObject();
-        }
         applySettings(mSettings);
         setClickListeners();
-
         ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(this,
                 R.array.notification_days, android.R.layout.simple_spinner_item);
         adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -335,26 +340,12 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         final PendingIntent pIntent = PendingIntent.getBroadcast(this, NotificationReceiver.REQUEST_CODE,
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        long firstMillis;
+        long firstMillis = 0;
         long currentMils = System.currentTimeMillis();
-        long destMills = FacadeCommon.dateToMills(
-                mCalendar.get(Calendar.YEAR),
-                mCalendar.get(Calendar.MONTH),
-                mCalendar.get(Calendar.DAY_OF_MONTH),
-                mSettings.getTime().get(Calendar.HOUR_OF_DAY),
-                mSettings.getTime().get(Calendar.MINUTE),
-                mSettings.getTime().get(Calendar.SECOND));
         if(currentMils<destMills){
             firstMillis = destMills;
         } else {
-            mCalendar.add(Calendar.DAY_OF_MONTH, 1);
-            firstMillis = FacadeCommon.dateToMills(
-                    mCalendar.get(Calendar.YEAR),
-                    mCalendar.get(Calendar.MONTH),
-                    mCalendar.get(Calendar.DAY_OF_MONTH),
-                    mSettings.getTime().get(Calendar.HOUR_OF_DAY),
-                    mSettings.getTime().get(Calendar.MINUTE),
-                    mSettings.getTime().get(Calendar.SECOND));
+            firstMillis += 24*60*60*1000;
         }
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis,
