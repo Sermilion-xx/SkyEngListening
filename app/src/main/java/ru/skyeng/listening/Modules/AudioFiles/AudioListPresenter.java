@@ -92,11 +92,6 @@ public class AudioListPresenter
         mSubtitleEngine = engine;
     }
 
-    @Inject
-    public void setSubtitlesModel(SubtitlesModel model) {
-        this.mSubtitlesModel = model;
-    }
-
     SubtitleEngine getSubtitleEngine() {
         return mSubtitleEngine;
     }

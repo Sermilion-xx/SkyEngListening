@@ -38,6 +38,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ru.skyeng.listening.CommonComponents.BaseActivity;
 import ru.skyeng.listening.CommonComponents.FacadeCommon;
 import ru.skyeng.listening.Modules.Settings.model.RemindTime;
 import ru.skyeng.listening.Modules.Settings.model.SettingsObject;
@@ -45,7 +46,7 @@ import ru.skyeng.listening.R;
 import ru.skyeng.listening.Utility.FacadePreferences;
 import ru.skyeng.listening.Utility.HelperMethod;
 
-public class SettingsActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
+public class SettingsActivity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
 
     private static final int selectedColor = R.color.colorAccent;
     private static final int deselectedColor = R.color.textColorDark;
@@ -100,15 +101,13 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     Spinner mDaysSpinner;
     @BindView(R.id.text_remainder_time_value)
     Spinner mTimeSpinner;
-    protected Toolbar mToolbar;
 
     private static SettingsObject mSettings;
     private List<ImageView> mLevelViews;
-    private static Calendar mCalendar;
-    private static long destMills;
+    private static final long destMills;
 
     static {
-        mCalendar = Calendar.getInstance();
+        Calendar mCalendar = Calendar.getInstance();
         mSettings = FacadePreferences.getSettingsFromPref();
         if (mSettings == null) {
             mSettings = new SettingsObject();
@@ -148,18 +147,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         mTimeSpinner.setOnItemSelectedListener(this);
     }
 
-    protected Toolbar setupToolbar(String title, Drawable drawable) {
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mToolbar.setTitle(title);
-        setSupportActionBar(mToolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setHomeAsUpIndicator(drawable);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }
 
-        return mToolbar;
-    }
 
     private void applySettings(SettingsObject settings) {
         if (settings.isRemainderOn()) {
