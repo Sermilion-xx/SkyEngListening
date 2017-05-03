@@ -169,7 +169,7 @@ public class AudioListActivity extends BaseActivity<MVPView, AudioListPresenter>
         startService(new Intent(this, PlayerService.class));
 
         mBottomSheetBehavior = BottomSheetBehavior.from(mFragmentBottomSheet);
-        mBottomSheetBehavior.setPeekHeight(225);
+        mBottomSheetBehavior.setPeekHeight(200);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         mLayoutBottomSheet.setBackgroundResource(R.drawable.left_right_gradient_blue);

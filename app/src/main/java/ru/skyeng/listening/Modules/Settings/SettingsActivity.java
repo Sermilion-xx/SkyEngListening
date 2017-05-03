@@ -40,13 +40,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.skyeng.listening.CommonComponents.BaseActivity;
 import ru.skyeng.listening.CommonComponents.FacadeCommon;
+import ru.skyeng.listening.CommonComponents.SEApplication;
 import ru.skyeng.listening.Modules.Settings.model.RemindTime;
 import ru.skyeng.listening.Modules.Settings.model.SettingsObject;
 import ru.skyeng.listening.R;
 import ru.skyeng.listening.Utility.FacadePreferences;
 import ru.skyeng.listening.Utility.HelperMethod;
 
-public class SettingsActivity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
+public class SettingsActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
 
     private static final int selectedColor = R.color.colorAccent;
     private static final int deselectedColor = R.color.textColorDark;
@@ -101,6 +102,8 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
     Spinner mDaysSpinner;
     @BindView(R.id.text_remainder_time_value)
     Spinner mTimeSpinner;
+    @BindView(R.id.toolbar)
+    protected Toolbar mToolbar;
 
     private static SettingsObject mSettings;
     private List<ImageView> mLevelViews;
@@ -119,6 +122,18 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                 mSettings.getTime().get(Calendar.HOUR_OF_DAY),
                 mSettings.getTime().get(Calendar.MINUTE),
                 mSettings.getTime().get(Calendar.SECOND));
+    }
+
+    protected Toolbar setupToolbar(String title, Drawable drawable) {
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbar.setTitle(title);
+        setSupportActionBar(mToolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setHomeAsUpIndicator(drawable);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+        return mToolbar;
     }
 
     @Override

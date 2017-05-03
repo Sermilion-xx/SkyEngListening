@@ -16,8 +16,7 @@ import ru.skyeng.listening.CommonComponents.Interfaces.ActivityExtensions;
 import ru.skyeng.listening.CommonComponents.Interfaces.MVPBase.MVPView;
 import ru.skyeng.listening.R;
 
-public abstract class BaseActivity
-        <V extends MVPView, Presenter extends MvpPresenter<V>>
+public abstract class BaseActivity <V extends MVPView, Presenter extends MvpPresenter<V>>
         extends MvpActivity<V, Presenter> implements ActivityExtensions {
 
     protected ProgressBar mProgress;
